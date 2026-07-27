@@ -214,15 +214,21 @@
     .tl-scard__cap { color: #28251e; font-family: var(--f-body); font-size: clamp(1rem, 1.25vw, 1.125rem); line-height: 1.6; max-width: 100%; text-align: left; }
     .tl-scard__cap b { color: #18160f; font-weight: 600; }
 
-    /* ---------- Inside the project — ONE grey frame; 4 screens present themselves on scroll ---------- */
-    .tl-frameshow { --mat: clamp(10px, 1.4vw, 20px); margin-top: clamp(1.75rem, 3.5vw, 2.75rem); position: relative; }
-    .tl-frameshow__pin { position: sticky; top: calc(var(--hdr-h) + 1.1rem);
-      min-height: calc(100svh - var(--hdr-h) - 2.2rem);
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(14px, 2vw, 22px); }
+    /* ---------- Inside the project — 4 SEPARATE views; the page just scrolls past them ----------
+       Nothing here is driven by scroll any more. Each of the four screens is its own view (grey
+       frame card + its own caption). Desktop: the views stack in one grid cell — everything still
+       to come waits below the clip edge and rises, card and all, when its dot is clicked; going
+       back drops the view that no longer applies straight back down and out of frame. Mobile: the
+       very same views become a snap-scrolling row you swipe sideways. In both, the notes inside a
+       view are advanced by tapping the right half of the screen (left half steps back). */
+    .tl-frameshow { --mat: clamp(10px, 1.4vw, 20px);
+      --fw: min(94vw, 1108px, calc((100svh - 300px) * 1.6));
+      margin-top: clamp(1.75rem, 3.5vw, 2.75rem); position: relative; }
 
-    /* dots hang in the left gutter; the frame itself stays page-centred */
-    .tl-stagewrap { position: relative; width: max-content; max-width: 100%; margin-inline: auto; }
-    .tl-dots { position: absolute; right: 100%; top: 0; height: 100%; margin-right: clamp(12px, 1.4vw, 22px);
+    /* dots hang in the left gutter (desktop) or in a row under the views (mobile) */
+    .tl-fsstage { position: relative; width: max-content; max-width: 100%; margin-inline: auto; }
+    .tl-fsview { display: flex; flex-direction: column; align-items: center; gap: clamp(14px, 2vw, 22px); }
+    .tl-dots { position: absolute; right: 100%; top: 0; height: 100%; margin-right: clamp(12px, 1.4vw, 22px); z-index: 4;
       display: flex; flex-direction: column; justify-content: center; gap: 14px; }
     .tl-dots__d { width: 11px; height: 11px; border-radius: 50%; border: 0; padding: 0; cursor: pointer;
       background: var(--line); transition: background .3s ease, transform .3s ease, box-shadow .3s ease; }
@@ -231,16 +237,13 @@
     .tl-dots__d:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
 
     /* grey mat; the stage inside it is EXACTLY 16:10, so 16:10 screens are never cropped */
-    .tl-frame { position: relative; width: min(94vw, calc((100svh - 300px) * 1.6));
+    .tl-frame { position: relative; width: var(--fw);
       background: #d5d5d5; border-radius: clamp(20px, 2.4vw, 34px); padding: var(--mat);
       box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 10px 36px rgba(0,0,0,0.11); }
     .tl-frame__stage { position: relative; aspect-ratio: 16 / 10; border-radius: 18px; overflow: clip; background: #d0ccc3; }
 
-    /* screens stack; the incoming one slides up from below (clipped by the stage) while the old one fades in place */
-    .tl-frame__screen { position: absolute; inset: 0; opacity: 0; z-index: 1; transition: opacity .45s ease; will-change: opacity, transform; }
-    .tl-frame__screen.is-active { opacity: 1; z-index: 2; }
-    .tl-frame__screen.is-entering { z-index: 3; animation: tlSlideUp .72s .16s cubic-bezier(.2,.72,.2,1) both; }
-    @keyframes tlSlideUp { from { transform: translateY(58%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    /* one screen per view now — it simply fills its own stage */
+    .tl-frame__screen { position: absolute; inset: 0; z-index: 1; }
     .tl-frame__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 
     /* darkening scrim — fades in when the screen's content lifts to the front */
@@ -283,42 +286,100 @@
       48%{transform:rotate(-9deg) scale(1.08)} 64%{transform:rotate(6deg) scale(1.05)} 82%{transform:rotate(-3deg) scale(1.03)} 100%{transform:rotate(0) scale(1)} }
 
     /* caption under the frame — persistent bold label + typed suffix; brand-purple caret */
-    .tl-frame__cap { width: min(94vw, calc((100svh - 300px) * 1.6)); margin: 0; min-height: 4.9em;
+    .tl-frame__cap { width: var(--fw); margin: 0; min-height: 4.9em;
       color: #28251e; font-family: var(--f-body); font-size: clamp(1rem, 1.25vw, 1.125rem); line-height: 1.6; text-align: left; }
     .tl-frame__cap b { color: #18160f; font-weight: 600; }
     .tl-frame__cap .tl-caret { background: var(--brand); }
 
-    /* mobile / tablet — SAME pinned experience; dots drop to a row under the frame, nothing overflows the grid */
+    /* ---- desktop: the four views share one cell; the ones still to come wait below the clip ---- */
+    @media (min-width: 761px) {
+      .tl-fsviews { display: grid; grid-template-areas: "v"; overflow: clip; overflow-clip-margin: 56px; }
+      /* the page-coloured backing is what lets a view hide the one it rose in front of */
+      .tl-fsview { grid-area: v; background: var(--bg); will-change: transform, opacity;
+        transition: transform .82s cubic-bezier(.2,.72,.2,1), opacity .42s ease; }
+      .tl-fsview.is-below { transform: translateY(116%); opacity: 0; }
+    }
+
+    /* ---- mobile: the same four views, swiped sideways ---- */
     @media (max-width: 760px) {
-      .tl-frame { width: min(92vw, calc((100svh - 210px) * 1.6)); }
-      .tl-frame__cap { width: min(92vw, calc((100svh - 210px) * 1.6)); min-height: 6em; font-size: 0.95rem; }
-      .tl-stagewrap { display: flex; flex-direction: column; align-items: center; }
-      .tl-frame { order: 1; }
-      .tl-dots { order: 2; position: static; height: auto; margin: 10px 0 0; flex-direction: row; justify-content: center; }
-      /* the frame parks at exactly the height the "Before" card parks at — a little above centre —
-         and the pin box stops being a full screen tall, which is what left a dead gap between
-         this section and the one before it, and between the heading and the frame. */
-      .tl-frameshow__pin { top: calc(var(--hdr-h) + 2.75rem); min-height: 0; justify-content: flex-start; }
+      .tl-frameshow { --fw: 100%; }
+      .tl-fsstage { width: auto; display: flex; flex-direction: column; }
+      /* padding/margin pair gives the frame's shadow room the overflow would otherwise shave off */
+      .tl-fsviews { order: 1; position: relative; display: flex; gap: clamp(14px, 4vw, 22px);
+        overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
+        padding-block: 20px; margin-block: -20px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+      .tl-fsviews::-webkit-scrollbar { display: none; }
+      .tl-fsview, .tl-fsview.is-below { flex: 0 0 100%; scroll-snap-align: center; transform: none; opacity: 1; }
+      .tl-frame__cap { min-height: 6.5em; font-size: 0.95rem; }
+      .tl-dots { order: 2; position: static; height: auto; margin: 16px 0 0; flex-direction: row; justify-content: center; }
       /* the hero tablet is the first thing you see — let it use the full width of the phone
          instead of sitting inside the text gutter. EXACTLY 100vw: a single pixel wider and the
          document scrolls sideways under your finger, which drags the whole page off-centre. */
       .tl-tablet { width: 100vw; margin-inline: calc(50% - 50vw); }
     }
 
-    /* reduced motion — un-pin, show the seated composed home + its first line; hide the rest */
+    /* reduced motion — no rising, no sliding; the views simply sit where they are */
     @media (prefers-reduced-motion: reduce) {
-      .tl-frameshow.is-static .tl-frameshow__pin { position: static; min-height: 0; }
-      .tl-frameshow.is-static .tl-frame__screen { transition: none; animation: none; }
-      .tl-frameshow.is-static .tl-frame__screen:not(.tl-screen--home) { display: none; }
-      .tl-frameshow.is-static .tl-dots { display: none; }
+      .tl-fsview { transition: none; }
+      .tl-hint { transition: none; }
     }
 
-    /* ---------- Scrolly "Before" card — the home screen pins, gets lassoed in pencil, then states its verdict ---------- */
-    /* the section is tall (JS sets its height) so the card stays pinned while the mark-up + caption play out */
+    /* ---------- Tap zones — the right half of a screen advances its notes, the left half steps back ----------
+       They sit above the artwork and the pencil, below the dark hint that explains them. */
+    .tl-zone { position: absolute; top: 0; bottom: 0; width: 50%; z-index: 4; border: 0; padding: 0; margin: 0;
+      background: none; cursor: pointer; -webkit-tap-highlight-color: transparent;
+      display: flex; align-items: center; opacity: 0; transition: opacity .26s ease; }
+    .tl-zone--prev { left: 0;  justify-content: flex-start; padding-left: clamp(10px, 1.6vw, 20px); }
+    .tl-zone--next { right: 0; justify-content: flex-end;   padding-right: clamp(10px, 1.6vw, 20px); }
+    .tl-zone:disabled { cursor: default; }
+    .tl-zone__i { display: grid; place-items: center; width: clamp(30px, 3.2vw, 40px); aspect-ratio: 1; border-radius: 50%;
+      background: rgba(12,8,28,0.5); color: #fff; -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+      font-family: var(--f-display); font-size: clamp(.95rem, 1.4vw, 1.15rem); line-height: 1; }
+    @media (hover: hover) and (pointer: fine) { .tl-zone:hover:not(:disabled) { opacity: 1; } }
+    .tl-zone:focus-visible { opacity: 1; outline: 2px solid var(--brand); outline-offset: -5px; border-radius: 16px; }
+
+    /* ---------- The dark hint — shown once, when the first view settles into the middle of the screen ---------- */
+    .tl-hint { position: absolute; inset: 0; z-index: 5; border-radius: inherit; pointer-events: none;
+      display: flex; align-items: center; justify-content: center; padding: clamp(16px, 3vw, 34px);
+      background: linear-gradient(180deg, rgba(10,7,26,0.74), rgba(8,5,20,0.86));
+      -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+      opacity: 0; visibility: hidden; transition: opacity .55s ease, visibility .55s; }
+    .tl-hint.is-on { opacity: 1; visibility: visible; }
+    .tl-hint__box { width: min(100%, 34rem); text-align: center; color: #fff; }
+    .tl-hint__t { font-family: var(--f-display); font-weight: 700; letter-spacing: -0.01em;
+      font-size: clamp(1.02rem, 1.9vw, 1.4rem); line-height: 1.2; }
+    .tl-hint__p { margin-top: .55rem; color: rgba(255,255,255,0.82);
+      font-size: clamp(.86rem, 1.15vw, 1.02rem); line-height: 1.55; }
+    .tl-hint__row { display: flex; justify-content: space-between; gap: 1rem; margin-top: clamp(14px, 2.2vw, 22px); }
+    .tl-hint__k { display: inline-flex; align-items: center; gap: .45em; padding: .5em 1em; border-radius: 999px;
+      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22);
+      font-family: var(--f-display); font-weight: 600; font-size: clamp(.76rem, 1vw, .88rem); white-space: nowrap; }
+    /* one wording for fingers, another for a mouse — only one is ever on screen */
+    .tl-hint__p--touch { display: none; }
+    /* a phone-sized 16:10 stage is only ~200px tall, so the card tightens up to stay inside it */
+    @media (max-width: 760px) {
+      .tl-hint__p--touch { display: block; }
+      .tl-hint__p--fine { display: none; }
+      .tl-hint { padding: 12px; overflow-y: auto; }
+      .tl-hint__p { margin-top: .4rem; }
+      .tl-hint__row { margin-top: 11px; }
+      .tl-hint__k { padding: .42em .85em; }
+    }
+    /* the smallest phones: a 16:10 stage is barely 160px tall, so the card shrinks again */
+    @media (max-width: 420px) {
+      .tl-hint { padding: 10px; }
+      .tl-hint__t { font-size: .92rem; }
+      .tl-hint__p { font-size: .78rem; line-height: 1.45; margin-top: .35rem; }
+      .tl-hint__row { margin-top: 9px; }
+      .tl-hint__k { font-size: .7rem; padding: .35em .7em; }
+    }
+
+    /* ---------- "Before" card — the home screen sits in the flow and gets lassoed in pencil on tap ---------- */
+    /* the section is a normal block now: the page scrolls straight past it, and the three notes are
+       stepped through by tapping the halves of the image, not by scrolling. */
     /* margin-top matches the heading→content gap used elsewhere (e.g. .tl-frameshow) */
     .tl-scrolly { position: relative; margin-top: clamp(1.75rem, 3.5vw, 2.75rem); }
-    .tl-scrolly__pin { position: sticky; top: calc(var(--hdr-h) + 2.75rem);
-      min-height: calc(100svh - var(--hdr-h) - 4.5rem); display: flex; align-items: flex-start; justify-content: center; }
+    .tl-scrolly__pin { display: flex; align-items: flex-start; justify-content: center; }
 
     /* the flat before card — no grey frame: reset the inherited card box (no bg, padding, clip or big radius),
        leaving just the image (with its own shadow + modest radius) and the caption below it */
@@ -327,9 +388,9 @@
       /* the whole card tracks the (smaller) image width, so the caption lines up under it.
          Its section now carries .tl-wrap, so 100% here IS the grid — the frame can't spill past it. */
       width: 100%; max-width: min(100%, calc((100svh - 300px) * 1.6 * 0.72)); margin-inline: auto; }
-    .tl-scard--before-flat .tl-scard__fig { position: relative; max-width: 100%; }
+    .tl-scard--before-flat .tl-scard__fig { position: relative; max-width: 100%; border-radius: 20px; }
     /* radius matches the page's screenshot images (.tl-scard__fig img = 20px); shadow no longer clipped */
-    .tl-scard--before-flat .tl-scard__fig img { border-radius: 20px; box-shadow: 0 18px 40px -12px rgba(40,37,30,0.28); }
+    .tl-scard--before-flat .tl-scard__fig > img { border-radius: 20px; box-shadow: 0 18px 40px -12px rgba(40,37,30,0.28); }
 
     /* pencil mark-up layer — red, drawn on by scroll via stroke-dashoffset */
     .tl-pencil { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; overflow: visible; pointer-events: none; }
@@ -347,14 +408,8 @@
     .tl-caret.is-on { opacity: 1; animation: tlCaret 1s steps(1,end) infinite; }
     @keyframes tlCaret { 50% { opacity: 0; } }
 
-    /* phones: the pin box shrinks to the card, so the section doesn't trail a screen of dead
-       space before "Inside the project" (must sit after the .tl-scrolly rules above to win) */
-    @media (max-width: 760px) { .tl-scrolly__pin { min-height: 0; } }
-
     @media (prefers-reduced-motion: reduce) {
-      .tl-pencil path[data-mark="top"], .tl-pencil path[data-mark="bottom"] { stroke-dashoffset: 0; opacity: 1; }
       .tl-scard--before-flat .tl-scard__reveal { max-height: none; opacity: 1; }
-      .tl-scrolly__pin { position: static; min-height: 0; }
       .tl-caret { display: none; }
     }
 
@@ -723,6 +778,16 @@
                 <path class="tl-pencil__p" data-mark="quiz" d="M 992.8 137.0 L 1095.0 137.0 A 26.0 26.0 0 0 1 1121.0 163.0 L 1121.0 445.0 A 26.0 26.0 0 0 1 1095.0 471.0 L 890.6 471.0 A 26.0 26.0 0 0 1 864.6 445.0 L 864.6 163.0 A 26.0 26.0 0 0 1 890.6 137.0 L 992.8 137.0" />
                 <path class="tl-pencil__p" data-mark="prog" d="M 680.0 873.0 L 1186.4 873.0 A 36.0 36.0 0 0 1 1222.4 909.0 L 1222.4 915.0 A 36.0 36.0 0 0 1 1186.4 951.0 L 173.6 951.0 A 36.0 36.0 0 0 1 137.6 909.0 L 137.6 909.0 A 36.0 36.0 0 0 1 173.6 873.0 L 680.0 873.0" />
               </svg>
+              <button class="tl-zone tl-zone--prev" type="button" data-step="-1" aria-label="Previous note"><span class="tl-zone__i" aria-hidden="true">←</span></button>
+              <button class="tl-zone tl-zone--next" type="button" data-step="1" aria-label="Next note"><span class="tl-zone__i" aria-hidden="true">→</span></button>
+              <div class="tl-hint" data-hint>
+                <div class="tl-hint__box">
+                  <p class="tl-hint__t">Three things were wrong with this screen</p>
+                  <p class="tl-hint__p tl-hint__p--touch">Tap the <b>right</b> side of the image to see the next one — tap the <b>left</b> side to go back.</p>
+                  <p class="tl-hint__p tl-hint__p--fine">Click the <b>right</b> side of the image to see the next one — click the <b>left</b> side to go back.</p>
+                  <div class="tl-hint__row"><span class="tl-hint__k">← Back</span><span class="tl-hint__k">Next →</span></div>
+                </div>
+              </div>
             </div>
             <div class="tl-scard__reveal" data-reveal>
               <p class="tl-scard__cap"><b>Home.</b> <span class="tl-scard__type" data-suffix></span><span class="tl-caret" data-caret aria-hidden="true"></span></p>
@@ -738,56 +803,100 @@
         <h2 class="tl-h2 reveal">Inside the project</h2>
       </div>
       <div class="tl-wrap tl-frameshow" data-frameshow>
-        <div class="tl-frameshow__pin">
-          <div class="tl-stagewrap">
-            <nav class="tl-dots" data-dots aria-label="Jump between screens">
-              <button class="tl-dots__d is-active" type="button" data-goto="0" aria-label="Screen 1 — Home"></button>
-              <button class="tl-dots__d" type="button" data-goto="1" aria-label="Screen 2 — Quiz"></button>
-              <button class="tl-dots__d" type="button" data-goto="2" aria-label="Screen 3 — Game"></button>
-              <button class="tl-dots__d" type="button" data-goto="3" aria-label="Screen 4 — Lesson"></button>
-            </nav>
-            <div class="tl-frame">
-              <div class="tl-frame__stage">
-                <!-- SCREEN 1 — HOME: empty dashboard + the liftable "prepare" component -->
-                <div class="tl-frame__screen tl-screen--home is-active" data-screen="home">
-                  <img class="tl-frame__bg" src="talmind-home-empty.jpg" width="2400" height="1500" alt="Talmind home dashboard" loading="lazy" />
-                  <div class="tl-frame__scrim" aria-hidden="true"></div>
-                  <div class="tl-comp" data-comp style="--comp-l:10.2%;--comp-t:14.2%;--comp-w:87.6%;">
-                    <img class="tl-comp__img" src="talmind-steps.png" width="3432" height="1258" alt="Prepare for today's lesson — video, quiz and game steps" />
-                    <img class="tl-comp__badge" data-badge src="talmind-badge-done.png"     alt="" aria-hidden="true" style="--x:29.20%;--y:31.92%;--w:2.46%;--i:0" />
-                    <img class="tl-comp__badge" data-badge src="talmind-badge-progress.png" alt="" aria-hidden="true" style="--x:59.97%;--y:31.92%;--w:2.46%;--i:1" />
-                    <img class="tl-comp__badge" data-badge src="talmind-badge-locked.png"   alt="" aria-hidden="true" style="--x:90.73%;--y:31.92%;--w:2.46%;--i:2" />
-                    <img class="tl-comp__prog"  data-prog  src="talmind-progressbar.png"     alt="" aria-hidden="true" width="768" height="96" style="--x:38.7%;--y:71.4%;--w:22.4%" />
+        <div class="tl-fsstage" data-fsstage>
+          <nav class="tl-dots" data-dots aria-label="Jump between screens">
+            <button class="tl-dots__d is-active" type="button" data-goto="0" aria-label="Screen 1 — Home"></button>
+            <button class="tl-dots__d" type="button" data-goto="1" aria-label="Screen 2 — Quiz"></button>
+            <button class="tl-dots__d" type="button" data-goto="2" aria-label="Screen 3 — Game"></button>
+            <button class="tl-dots__d" type="button" data-goto="3" aria-label="Screen 4 — Lesson"></button>
+          </nav>
+          <div class="tl-fsviews" data-fsviews>
+
+            <!-- VIEW 1 — HOME: empty dashboard + the liftable "prepare" component -->
+            <div class="tl-fsview" data-view="0">
+              <div class="tl-frame">
+                <div class="tl-frame__stage">
+                  <div class="tl-frame__screen tl-screen--home" data-screen="home">
+                    <img class="tl-frame__bg" src="talmind-home-empty.jpg" width="2400" height="1500" alt="Talmind home dashboard" loading="lazy" />
+                    <div class="tl-frame__scrim" aria-hidden="true"></div>
+                    <div class="tl-comp" data-comp style="--comp-l:10.2%;--comp-t:14.2%;--comp-w:87.6%;">
+                      <img class="tl-comp__img" src="talmind-steps.png" width="3432" height="1258" alt="Prepare for today's lesson — video, quiz and game steps" />
+                      <img class="tl-comp__badge" data-badge src="talmind-badge-done.png"     alt="" aria-hidden="true" style="--x:29.20%;--y:31.92%;--w:2.46%;--i:0" />
+                      <img class="tl-comp__badge" data-badge src="talmind-badge-progress.png" alt="" aria-hidden="true" style="--x:59.97%;--y:31.92%;--w:2.46%;--i:1" />
+                      <img class="tl-comp__badge" data-badge src="talmind-badge-locked.png"   alt="" aria-hidden="true" style="--x:90.73%;--y:31.92%;--w:2.46%;--i:2" />
+                      <img class="tl-comp__prog"  data-prog  src="talmind-progressbar.png"     alt="" aria-hidden="true" width="768" height="96" style="--x:38.7%;--y:71.4%;--w:22.4%" />
+                    </div>
                   </div>
-                </div>
-                <!-- SCREEN 2 — QUIZ: empty quiz + the points panel (with a waving monster) lifting to the front -->
-                <div class="tl-frame__screen tl-screen--quiz" data-screen="quiz">
-                  <img class="tl-frame__bg" src="talmind-quiz-empty.jpg" width="2400" height="1500" alt="Talmind daily quiz screen" loading="lazy" />
-                  <div class="tl-frame__scrim" aria-hidden="true"></div>
-                  <div class="tl-lift tl-qpanel" data-lift style="--x:75.8%;--y:15.5%;--w:22.4%;--emph:1.09;--o:70% 60%">
-                    <img src="talmind-quiz-points.png" width="384" height="760" alt="" aria-hidden="true" />
-                    <span class="tl-monster" style="--mx:25%;--my:59%;--mw:58%"><img src="talmind-monster.png" width="400" height="400" alt="" aria-hidden="true" /></span>
+                  <button class="tl-zone tl-zone--prev" type="button" data-step="-1" aria-label="Previous note"><span class="tl-zone__i" aria-hidden="true">←</span></button>
+                  <button class="tl-zone tl-zone--next" type="button" data-step="1" aria-label="Next note"><span class="tl-zone__i" aria-hidden="true">→</span></button>
+                  <div class="tl-hint" data-hint>
+                    <div class="tl-hint__box">
+                      <p class="tl-hint__t">Four screens — each with a few notes of its own</p>
+                      <p class="tl-hint__p tl-hint__p--touch">Swipe sideways for the other screens. Tap the <b>right</b> side of a screen for its next note — the <b>left</b> side goes back.</p>
+                      <p class="tl-hint__p tl-hint__p--fine">Click the <b>right</b> side of the screen for its next note — click the <b>left</b> side to go back. To bring the next screen up, click the next dot.</p>
+                      <div class="tl-hint__row"><span class="tl-hint__k">← Back</span><span class="tl-hint__k">Next →</span></div>
+                    </div>
                   </div>
-                </div>
-                <!-- SCREEN 3 — GAME: empty board + a drag card and a category box lifting to the front -->
-                <div class="tl-frame__screen tl-screen--game" data-screen="game">
-                  <img class="tl-frame__bg" src="talmind-game-empty.jpg" width="2400" height="1500" alt="Talmind drag-and-match game board" loading="lazy" />
-                  <div class="tl-frame__scrim" aria-hidden="true"></div>
-                  <img class="tl-lift" data-lift src="talmind-drag-card.png" width="428" height="248" alt="" aria-hidden="true" style="--x:12.2%;--y:34.6%;--w:14.4%;--emph:1.12" />
-                  <img class="tl-lift" data-lift src="talmind-category-box.png" width="412" height="254" alt="" aria-hidden="true" style="--x:59%;--y:79%;--w:13.2%;--emph:1.12" />
-                </div>
-                <!-- SCREEN 4 — LESSON: the 3 skill cards on the right lift to the front -->
-                <div class="tl-frame__screen tl-screen--lesson" data-screen="lesson">
-                  <img class="tl-frame__bg" src="talmind-lesson.jpg" width="1280" height="800" alt="Talmind lesson screen" loading="lazy" />
-                  <div class="tl-frame__scrim" aria-hidden="true"></div>
-                  <img class="tl-lift" data-lift src="talmind-skill-questioning.png" width="506" height="320" alt="" aria-hidden="true" style="--x:77.75%;--y:15.45%;--w:19.7%;--emph:1.1" />
-                  <img class="tl-lift" data-lift src="talmind-skill-solve.png"       width="506" height="320" alt="" aria-hidden="true" style="--x:77.75%;--y:39.45%;--w:19.7%;--emph:1.1" />
-                  <img class="tl-lift" data-lift src="talmind-skill-creativity.png"  width="506" height="320" alt="" aria-hidden="true" style="--x:77.75%;--y:63.25%;--w:19.7%;--emph:1.1" />
                 </div>
               </div>
+              <p class="tl-frame__cap"><b>Home.</b> <span class="tl-scard__type" data-fs-type></span><span class="tl-caret" data-fs-caret aria-hidden="true"></span></p>
             </div>
+
+            <!-- VIEW 2 — QUIZ: empty quiz + the points panel (with a waving monster) lifting to the front -->
+            <div class="tl-fsview is-below" data-view="1">
+              <div class="tl-frame">
+                <div class="tl-frame__stage">
+                  <div class="tl-frame__screen tl-screen--quiz" data-screen="quiz">
+                    <img class="tl-frame__bg" src="talmind-quiz-empty.jpg" width="2400" height="1500" alt="Talmind daily quiz screen" loading="lazy" />
+                    <div class="tl-frame__scrim" aria-hidden="true"></div>
+                    <div class="tl-lift tl-qpanel" data-lift style="--x:75.8%;--y:15.5%;--w:22.4%;--emph:1.09;--o:70% 60%">
+                      <img src="talmind-quiz-points.png" width="384" height="760" alt="" aria-hidden="true" />
+                      <span class="tl-monster" style="--mx:25%;--my:59%;--mw:58%"><img src="talmind-monster.png" width="400" height="400" alt="" aria-hidden="true" /></span>
+                    </div>
+                  </div>
+                  <button class="tl-zone tl-zone--prev" type="button" data-step="-1" aria-label="Previous note"><span class="tl-zone__i" aria-hidden="true">←</span></button>
+                  <button class="tl-zone tl-zone--next" type="button" data-step="1" aria-label="Next note"><span class="tl-zone__i" aria-hidden="true">→</span></button>
+                </div>
+              </div>
+              <p class="tl-frame__cap"><b>The quiz.</b> <span class="tl-scard__type" data-fs-type></span><span class="tl-caret" data-fs-caret aria-hidden="true"></span></p>
+            </div>
+
+            <!-- VIEW 3 — GAME: empty board + a drag card and a category box lifting to the front -->
+            <div class="tl-fsview is-below" data-view="2">
+              <div class="tl-frame">
+                <div class="tl-frame__stage">
+                  <div class="tl-frame__screen tl-screen--game" data-screen="game">
+                    <img class="tl-frame__bg" src="talmind-game-empty.jpg" width="2400" height="1500" alt="Talmind drag-and-match game board" loading="lazy" />
+                    <div class="tl-frame__scrim" aria-hidden="true"></div>
+                    <img class="tl-lift" data-lift src="talmind-drag-card.png" width="428" height="248" alt="" aria-hidden="true" style="--x:12.2%;--y:34.6%;--w:14.4%;--emph:1.12" />
+                    <img class="tl-lift" data-lift src="talmind-category-box.png" width="412" height="254" alt="" aria-hidden="true" style="--x:59%;--y:79%;--w:13.2%;--emph:1.12" />
+                  </div>
+                  <button class="tl-zone tl-zone--prev" type="button" data-step="-1" aria-label="Previous note"><span class="tl-zone__i" aria-hidden="true">←</span></button>
+                  <button class="tl-zone tl-zone--next" type="button" data-step="1" aria-label="Next note"><span class="tl-zone__i" aria-hidden="true">→</span></button>
+                </div>
+              </div>
+              <p class="tl-frame__cap"><b>The game.</b> <span class="tl-scard__type" data-fs-type></span><span class="tl-caret" data-fs-caret aria-hidden="true"></span></p>
+            </div>
+
+            <!-- VIEW 4 — LESSON: the 3 skill cards on the right lift to the front -->
+            <div class="tl-fsview is-below" data-view="3">
+              <div class="tl-frame">
+                <div class="tl-frame__stage">
+                  <div class="tl-frame__screen tl-screen--lesson" data-screen="lesson">
+                    <img class="tl-frame__bg" src="talmind-lesson.jpg" width="1280" height="800" alt="Talmind lesson screen" loading="lazy" />
+                    <div class="tl-frame__scrim" aria-hidden="true"></div>
+                    <img class="tl-lift" data-lift src="talmind-skill-questioning.png" width="506" height="320" alt="" aria-hidden="true" style="--x:77.75%;--y:15.45%;--w:19.7%;--emph:1.1" />
+                    <img class="tl-lift" data-lift src="talmind-skill-solve.png"       width="506" height="320" alt="" aria-hidden="true" style="--x:77.75%;--y:39.45%;--w:19.7%;--emph:1.1" />
+                    <img class="tl-lift" data-lift src="talmind-skill-creativity.png"  width="506" height="320" alt="" aria-hidden="true" style="--x:77.75%;--y:63.25%;--w:19.7%;--emph:1.1" />
+                  </div>
+                  <button class="tl-zone tl-zone--prev" type="button" data-step="-1" aria-label="Previous note"><span class="tl-zone__i" aria-hidden="true">←</span></button>
+                  <button class="tl-zone tl-zone--next" type="button" data-step="1" aria-label="Next note"><span class="tl-zone__i" aria-hidden="true">→</span></button>
+                </div>
+              </div>
+              <p class="tl-frame__cap"><b>The lesson.</b> <span class="tl-scard__type" data-fs-type></span><span class="tl-caret" data-fs-caret aria-hidden="true"></span></p>
+            </div>
+
           </div>
-          <p class="tl-frame__cap" data-fs-cap><b data-fs-label>Home.</b> <span class="tl-scard__type" data-fs-type></span><span class="tl-caret" data-fs-caret aria-hidden="true"></span></p>
         </div>
       </div>
     </section>
@@ -919,212 +1028,150 @@
         soloImg.style.setProperty('--o3d', clamp(p * 1.6, 0, 1).toFixed(3));
       }
 
-      // ===== Inside the project — ONE grey frame; 4 screens present themselves on scroll =====
-      //  A flat list of 10 "states" (screen × act) is driven by scroll. Moving between states self-plays an
-      //  erase→type caption (with bold runs) and flips CSS state; crossing a screen boundary slides the new
-      //  screen up into the frame while the old one fades. Dots jump between screens; a hard fling releases
-      //  the pin so an impatient reader lands straight at the section's exit. Reduced-motion → static home.
-      const fshow    = document.querySelector('[data-frameshow]');
-      const fsScreens = fshow ? Array.from(fshow.querySelectorAll('.tl-frame__screen')) : [];
-      const fsComp   = fshow && fshow.querySelector('[data-comp]');
-      const fsLabel  = fshow && fshow.querySelector('[data-fs-label]');
-      const fsType   = fshow && fshow.querySelector('[data-fs-type]');
-      const fsCaretEl= fshow && fshow.querySelector('[data-fs-caret]');
-      const fsDots   = fshow ? Array.from(fshow.querySelectorAll('.tl-dots__d')) : [];
+      // ===== Inside the project — 4 SEPARATE views; the page just scrolls past them =====
+      //  No scroll driving anything. Each view owns a short list of "acts" (a CSS state + a caption);
+      //  the right half of a screen steps forward, the left half back, and the caption erases and
+      //  retypes itself in between. Desktop changes view by dot — the new one rises with its frame
+      //  card, going back drops the old one out of frame. Mobile swipes the views sideways instead.
+      const fshow   = document.querySelector('[data-frameshow]');
+      const fsTrack = fshow && fshow.querySelector('[data-fsviews]');
+      const fsDots  = fshow ? Array.from(fshow.querySelectorAll('.tl-dots__d')) : [];
       const T = (t) => ({ t }), B = (t) => ({ t, b: 1 });   // plain / bold caption run
-      const LABELS = ['Home.', 'The quiz.', 'The game.', 'The lesson.'];
-      const STATES = [
-        { s: 0, fx: 'rest',   seg: [] },
-        { s: 0, fx: 'lift',   seg: [T('Includes 3 main steps. '), B('Learning video → Quiz practice → Game practice.')] },
-        { s: 0, fx: 'badges', seg: [T('Status icons clearly indicate completed steps and the user’s current progress. '), B('To maintain focus and build anticipation —'), T(' access to the next step is locked until the current one is completed.')] },
-        { s: 0, fx: 'prog',   seg: [T('Progress within each stage — to increase motivation.')] },
-        { s: 1, fx: 'rest',   seg: [T('Includes 8 questions about the material taught in the video.')] },
-        { s: 1, fx: 'emph',   seg: [T('To increase engagement, a points system and an immersive character animation were added to create a more rewarding and enjoyable experience.')] },
-        { s: 2, fx: 'rest',   seg: [] },
-        { s: 2, fx: 'emph',   seg: [T('Dragging concepts into the correct category ensures that the rules stick — and varies from 4th grade to 12th grade.')] },
-        { s: 3, fx: 'rest',   seg: [T('Lessons are organized by topic, while an AI assistant clearly highlights what’s left to complete — to make it easier for the student and keep them focused.')] },
-        { s: 3, fx: 'emph',   seg: [T('These 3 skills accompany the student in every lesson '), B('to encourage and adopt Talmudic thinking.')] },
+      const VIEW_ACTS = [
+        [ // 1 — Home
+          { fx: 'rest',   seg: [] },
+          { fx: 'lift',   seg: [T('Includes 3 main steps. '), B('Learning video → Quiz practice → Game practice.')] },
+          { fx: 'badges', seg: [T('Status icons clearly indicate completed steps and the user’s current progress. '), B('To maintain focus and build anticipation —'), T(' access to the next step is locked until the current one is completed.')] },
+          { fx: 'prog',   seg: [T('Progress within each stage — to increase motivation.')] },
+        ],
+        [ // 2 — Quiz
+          { fx: 'rest',   seg: [T('Includes 8 questions about the material taught in the video.')] },
+          { fx: 'emph',   seg: [T('To increase engagement, a points system and an immersive character animation were added to create a more rewarding and enjoyable experience.')] },
+        ],
+        [ // 3 — Game
+          { fx: 'rest',   seg: [] },
+          { fx: 'emph',   seg: [T('Dragging concepts into the correct category ensures that the rules stick — and varies from 4th grade to 12th grade.')] },
+        ],
+        [ // 4 — Lesson
+          { fx: 'rest',   seg: [T('Lessons are organized by topic, while an AI assistant clearly highlights what’s left to complete — to make it easier for the student and keep them focused.')] },
+          { fx: 'emph',   seg: [T('These 3 skills accompany the student in every lesson '), B('to encourage and adopt Talmudic thinking.')] },
+        ],
       ];
-      const SCREEN_FIRST = [0, 4, 6, 8];               // first state index of each screen
       const segLen = (seg) => seg.reduce((n, r) => n + r.t.length, 0);
       const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      function renderSeg(seg, n) {                       // build the revealed caption HTML (keeps bold runs intact)
+      function renderSeg(el, seg, n) {                   // build the revealed caption HTML (keeps bold runs intact)
         let out = '', c = 0;
         for (const r of seg) { if (c >= n) break; const k = Math.min(r.t.length, n - c); const p = esc(r.t.slice(0, k)); out += r.b ? '<b>' + p + '</b>' : p; c += k; }
-        fsType.innerHTML = out;
-      }
-      const fsStatic = () => reduce;                    // mobile + tablet now get the full experience
-
-      let fsCur = 0;                                    // currently displayed screen (for slide detection)
-      function fsSlide(scr) { fsScreens.forEach((sc) => sc.classList.remove('is-entering')); const el = fsScreens[scr]; if (el) { void el.offsetWidth; el.classList.add('is-entering'); } }
-      function applyState(i) {
-        const st = STATES[i];
-        fsScreens.forEach((sc, idx) => sc.classList.toggle('is-active', idx === st.s));
-        fsScreens[0].classList.toggle('is-lift', st.s === 0 && st.fx !== 'rest');
-        if (fsComp) { fsComp.classList.toggle('is-badges', st.s === 0 && st.fx === 'badges'); fsComp.classList.toggle('is-prog', st.s === 0 && st.fx === 'prog'); }
-        fsScreens.forEach((sc, idx) => { if (idx >= 1) sc.classList.toggle('is-emph', idx === st.s && st.fx === 'emph'); });
-        if (fsLabel) fsLabel.textContent = LABELS[st.s];
-        fsDots.forEach((d, idx) => d.classList.toggle('is-active', idx === st.s));
-        if (st.s !== fsCur) { fsSlide(st.s); fsCur = st.s; }
+        el.innerHTML = out;
       }
 
-      let fsDisp = 0, fsWant = 0, fsAnim = null, fsRAF = null, fsLock = 0;
-      const fsCaret = (on) => fsCaretEl && fsCaretEl.classList.toggle('is-on', on);
-      function fsBegin(to) { fsAnim = { to, t0: performance.now(), from: STATES[fsDisp].seg, fromN: segLen(STATES[fsDisp].seg), toSeg: STATES[to].seg, toN: segLen(STATES[to].seg), phase: 'erase' }; fsCaret(true); }
-      function fsStep(now) {
-        const a = fsAnim, ERASE = 7, TYPE = 16;
+      const fsViews = fshow ? Array.from(fshow.querySelectorAll('.tl-fsview')).map((el, i) => ({
+        i, el,
+        screen: el.querySelector('.tl-frame__screen'),
+        comp:   el.querySelector('[data-comp]'),
+        typeEl: el.querySelector('[data-fs-type]'),
+        caret:  el.querySelector('[data-fs-caret]'),
+        zones:  Array.from(el.querySelectorAll('.tl-zone')),
+        acts:   VIEW_ACTS[i] || [],
+        disp: 0, want: 0, anim: null, raf: null,
+      })) : [];
+
+      // the arrows grey out at the ends, so a tap that can't do anything never looks like a dead screen
+      const fsZones = (v, i) => v.zones.forEach((z) => { const t = i + (+z.dataset.step); z.disabled = t < 0 || t >= v.acts.length; });
+      function fsApply(v, i) {
+        const fx = v.acts[i].fx;
+        if (v.i === 0) {
+          v.screen.classList.toggle('is-lift', fx !== 'rest');
+          if (v.comp) { v.comp.classList.toggle('is-badges', fx === 'badges'); v.comp.classList.toggle('is-prog', fx === 'prog'); }
+        } else {
+          v.screen.classList.toggle('is-emph', fx === 'emph');
+        }
+      }
+
+      const fsCaret = (v, on) => v.caret && v.caret.classList.toggle('is-on', on);
+      function fsFrame(v, now) {
+        const a = v.anim, ERASE = 7, TYPE = 16;
         if (a.phase === 'erase') {
           const shown = Math.max(0, a.fromN - Math.floor((now - a.t0) / ERASE));
-          renderSeg(a.from, shown);
-          if (shown <= 0) { applyState(a.to); a.phase = 'type'; a.t0 = now; }        // flip visuals/slide, then type
+          renderSeg(v.typeEl, a.from, shown);
+          if (shown <= 0) { fsApply(v, a.to); a.phase = 'type'; a.t0 = now; }        // flip the visuals, then type
         } else {
           const shown = Math.floor((now - a.t0) / TYPE);
-          renderSeg(a.toSeg, Math.min(shown, a.toN));
-          if (shown >= a.toN) { renderSeg(a.toSeg, a.toN); fsDisp = a.to; fsAnim = null; fsCaret(false); }
+          renderSeg(v.typeEl, a.toSeg, Math.min(shown, a.toN));
+          if (shown >= a.toN) { renderSeg(v.typeEl, a.toSeg, a.toN); v.disp = a.to; v.anim = null; fsCaret(v, false); }
         }
       }
-      function fsLoop(now) {
-        fsRAF = null;
-        if (!fshow || fsStatic()) return;
-        if (!fsAnim && fsDisp !== fsWant) fsBegin(fsDisp < fsWant ? fsDisp + 1 : fsDisp - 1);
-        if (fsAnim) fsStep(now);
-        if (fsAnim || fsDisp !== fsWant) fsRAF = requestAnimationFrame(fsLoop);
-      }
-      const fsEngine = () => { if (!fsRAF) fsRAF = requestAnimationFrame(fsLoop); };
-
-      function fsLayout() {
-        if (!fshow) return;
-        if (fsStatic()) { fshow.classList.add('is-static'); fshow.style.height = ''; }
-        else { fshow.classList.remove('is-static'); fshow.style.height = Math.round(window.innerHeight * 6.4) + 'px'; }   // 1 pin + 5.4 of scroll room for 10 states
-      }
-      function fsUpdate() {
-        if (!fshow) return;
-        if (fsStatic()) {   // reduced motion: seated home + its first line, no engine
-          if (fsRAF) { cancelAnimationFrame(fsRAF); fsRAF = null; } fsAnim = null; fsDisp = 0; fsCur = 0;
-          applyState(0); renderSeg(STATES[1].seg, STATES[1].seg ? segLen(STATES[1].seg) : 0); fsCaret(false); return;
+      function fsLoop(v, now) {
+        v.raf = null;
+        if (!v.anim && v.disp !== v.want) {
+          const to = v.disp < v.want ? v.disp + 1 : v.disp - 1;
+          v.anim = { to, t0: now, from: v.acts[v.disp].seg, fromN: segLen(v.acts[v.disp].seg),
+                     toSeg: v.acts[to].seg, toN: segLen(v.acts[to].seg), phase: 'erase' };
+          fsCaret(v, true);
         }
-        if (performance.now() < fsLock) return;   // ignore while a dot-jump settles
-        const r = fshow.getBoundingClientRect();
-        const total = fshow.offsetHeight - window.innerHeight;
-        const p = clamp(-r.top / (total || 1), 0, 1);
-        const k = clamp((p - 0.03) / 0.90, 0, 1);
-        fsWant = Math.min(STATES.length - 1, Math.floor(k * STATES.length));
-        fsEngine();
+        if (v.anim) fsFrame(v, now);
+        if (v.anim || v.disp !== v.want) v.raf = requestAnimationFrame((t) => fsLoop(v, t));
       }
-      // dots — jump straight to a screen (snap the engine, then align the scroll)
-      function fsGoto(scr) {
-        if (!fshow || fsStatic()) return;
-        const idx = SCREEN_FIRST[scr];
-        if (fsRAF) { cancelAnimationFrame(fsRAF); fsRAF = null; } fsAnim = null;
-        applyState(idx); fsDisp = fsWant = idx; fsCaret(false); renderSeg(STATES[idx].seg, segLen(STATES[idx].seg));
-        const total = fshow.offsetHeight - window.innerHeight;
-        const topAbs = fshow.getBoundingClientRect().top + window.scrollY;
-        const p = 0.03 + ((idx + 0.5) / STATES.length) * 0.90;
-        // the frame is pinned, so jumping the scroll position keeps it visually put — only the screen slides.
-        fsLock = performance.now() + 260;   // swallow the single-frame scroll spike
-        window.scrollTo(0, Math.round(topAbs + p * total));
+      function fsStep(v, d) {
+        const to = clamp(v.want + d, 0, v.acts.length - 1);
+        if (to === v.want) return;
+        v.want = to; fsZones(v, to);
+        if (reduce) {
+          if (v.raf) { cancelAnimationFrame(v.raf); v.raf = null; }
+          v.anim = null; v.disp = to; fsApply(v, to); fsCaret(v, false);
+          renderSeg(v.typeEl, v.acts[to].seg, segLen(v.acts[to].seg));
+          return;
+        }
+        if (!v.raf) v.raf = requestAnimationFrame((t) => fsLoop(v, t));
       }
-      fsDots.forEach((d, scr) => d.addEventListener('click', () => fsGoto(scr)));
 
-      // ---- Leaving a pinned section ----
-      // Two quick swipes the same way skip the whole section, landing at its near edge. On pointer
-      // devices a sustained hard fling does the same thing.
-      let fsRelease = 0;
-      const fsRect = () => fshow.getBoundingClientRect();
-      function fsSnapTo(idx) {                   // put the show straight on a state, no typing run
-        if (fsRAF) { cancelAnimationFrame(fsRAF); fsRAF = null; }
-        fsAnim = null;
-        applyState(idx); fsDisp = fsWant = idx; fsCaret(false);
-        renderSeg(STATES[idx].seg, segLen(STATES[idx].seg));
-      }
-      function sectionExit(sec, dir) {
-        const vh = window.innerHeight, topAbs = sec.getBoundingClientRect().top + window.scrollY;
-        fsRelease = performance.now() + 1400;    // don't grab the next swipe while the page glides out
-        const from = window.scrollY;
-        const target = Math.max(0, Math.round(dir > 0 ? topAbs + sec.offsetHeight - vh + 4 : topAbs - vh + 4));
-        // skipping means skipping: the show jumps to the far state instead of playing its way there
-        if (sec === fshow) fsSnapTo(dir > 0 ? STATES.length - 1 : 0);
-        window.scrollTo({ top: target, behavior: reduce ? 'auto' : 'smooth' });
-        // a smooth scroll asked for at the tail of a gesture is sometimes dropped; if nothing has
-        // moved shortly after, land it outright. Getting out must never depend on the animation.
-        setTimeout(() => {
-          if (Math.abs(window.scrollY - from) < 8 && Math.abs(window.scrollY - target) > 40) window.scrollTo(0, target);
-        }, 420);
-      }
-      const fsExit = (dir) => sectionExit(fshow, dir);
-
-      // fast-scroll escape (pointer devices) — a *sustained* hard fling inside the section jumps to its
-      // near exit edge. Requires three consecutive fast frames, so a single big jump (Page Down, anchor
-      // jump) never triggers it — only real momentum.
-      let fsLastY = window.scrollY, fsLastT = performance.now(), fsFling = 0, fsFastN = 0;
-      function fsFlingCheck() {
-        if (!fshow || fsStatic() || performance.now() < fsLock) { fsLastY = window.scrollY; fsLastT = performance.now(); fsFastN = 0; return; }
-        const now = performance.now(), y = window.scrollY, dt = Math.max(1, now - fsLastT);
-        const v = (y - fsLastY) / dt * 1000; fsLastY = y; fsLastT = now;
-        const r = fsRect(), vh = window.innerHeight;
-        const inside = r.top < vh * 0.6 && r.bottom > vh * 0.4;
-        const nearExit = (v > 0 && r.bottom < vh * 1.15) || (v < 0 && r.top > -vh * 0.15);
-        fsFastN = (inside && Math.abs(v) > 5000) ? fsFastN + 1 : 0;   // only a clearly-abnormal fling, not a brisk read-scroll
-        if (inside && !nearExit && fsFastN >= 3 && now - fsFling > 900) {
-          fsFastN = 0; fsFling = now;
-          fsExit(v > 0 ? 1 : -1);
+      // ---- which of the four views is on show ----
+      const fsMobile = () => window.matchMedia('(max-width: 760px)').matches;
+      let fsActive = 0, fsScrollT = 0;
+      const fsMarkDots = (n) => fsDots.forEach((d, i) => d.classList.toggle('is-active', i === n));
+      function fsGoView(n, smooth) {
+        if (!fsViews.length) return;
+        fsActive = clamp(n, 0, fsViews.length - 1);
+        fsMarkDots(fsActive);
+        if (fsMobile()) {
+          fsScrollT = performance.now();
+          fsTrack.scrollTo({ left: fsViews[fsActive].el.offsetLeft, behavior: (smooth && !reduce) ? 'smooth' : 'auto' });
+        } else {
+          fsViews.forEach((v) => v.el.classList.toggle('is-below', v.i > fsActive));
         }
       }
+      if (fsTrack) fsTrack.addEventListener('scroll', () => {
+        fsScrollT = performance.now();
+        if (!fsMobile()) return;
+        fsHintOff();
+        const c = fsTrack.scrollLeft + fsTrack.clientWidth / 2;
+        let best = 0, bd = Infinity;
+        fsViews.forEach((v) => { const d = Math.abs(v.el.offsetLeft + v.el.offsetWidth / 2 - c); if (d < bd) { bd = d; best = v.i; } });
+        if (best !== fsActive) { fsActive = best; fsMarkDots(best); }
+      }, { passive: true });
+      fsDots.forEach((d, n) => d.addEventListener('click', () => { fsHintOff(); fsGoView(n, true); }));
 
-      // ---- Touch: one swipe = exactly one act ----
-      // A single flick on a phone travels far enough to cross two state bands, so acts were being
-      // skipped. While the frame covers the screen the swipe is taken over: the page is held still and
-      // each gesture jumps the scroll by exactly one band — invisible, because the frame is pinned.
-      const fsTouch = !window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-      const fsBandTop = (i) => {
-        const total = fshow.offsetHeight - window.innerHeight;
-        return Math.round(fsRect().top + window.scrollY + (0.03 + ((i + 0.5) / STATES.length) * 0.90) * total);
-      };
-      const covers = (el) => { const r = el.getBoundingClientRect(); return r.top <= 0 && r.bottom >= window.innerHeight; };
-
-      // The rule, used by BOTH pinned sections: while the section covers the screen the page is
-      // held still and one finger swipe — long or short — advances exactly one step. Two quick
-      // swipes the same way skip the whole section instead. Pushing past either end also leaves.
-      //   step()   -> the step the reader is on now
-      //   stopY(i) -> the absolute scroll position that step i lives at
-      function oneSwipeOneStep(sec, step, stopY, last, land) {
-        let sy = 0, moved = 0, armed = false, lastEnd = 0, lastDir = 0;
-        sec.addEventListener('touchstart', (e) => {
-          if (reduce || e.touches.length !== 1) { armed = false; return; }
-          armed = covers(sec) && performance.now() > fsRelease;
-          sy = e.touches[0].clientY; moved = 0;
-        }, { passive: true });
-        sec.addEventListener('touchmove', (e) => {
-          if (!armed || e.touches.length !== 1) return;
-          moved = sy - e.touches[0].clientY;
-          if (e.cancelable) e.preventDefault();   // hold the page still; the swipe drives the story
-        }, { passive: false });
-        sec.addEventListener('touchend', () => {
-          if (!armed) return;
-          armed = false;
-          if (Math.abs(moved) < 18) return;                    // a tap, or an accidental nudge
-          const dir = moved > 0 ? 1 : -1, now = performance.now();
-          const secondInARow = now - lastEnd < 700 && lastDir === dir;
-          lastEnd = now; lastDir = dir;
-          if (secondInARow) { sectionExit(sec, dir); return; }
-          const to = step() + dir;
-          if (to < 0 || to > last) { sectionExit(sec, dir); return; }
-          fsLock = performance.now() + 240;      // the jump below is bookkeeping, not a reader scrolling
-          window.scrollTo(0, stopY(to));
-          if (land) land(to);
-        }, { passive: true });
-        sec.addEventListener('touchcancel', () => { armed = false; }, { passive: true });
+      // ---- taps ----
+      // A click that lands right after the track moved is the tail of a sideways swipe, not a tap.
+      function bindZones(root, onStep) {
+        root.querySelectorAll('.tl-zone').forEach((z) => z.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (performance.now() - fsScrollT < 260) return;
+          onStep(+z.dataset.step);
+        }));
       }
+      fsViews.forEach((v) => { fsZones(v, 0); renderSeg(v.typeEl, v.acts[0].seg, segLen(v.acts[0].seg)); bindZones(v.el, (d) => { fsHintOff(); fsStep(v, d); }); });
 
-      if (fshow && fsTouch) {
-        oneSwipeOneStep(fshow, () => fsWant, fsBandTop, STATES.length - 1,
-          (to) => { fsWant = to; fsEngine(); });
-      }
+      // ---- the dark hint on the first view ----
+      const fsHint = fshow && fshow.querySelector('[data-hint]');
+      const fsHintAt = fsViews.length ? fsViews[0].el.querySelector('.tl-frame__stage') : null;
+      let fsHintDone = false;
+      function fsHintOff() { fsHintDone = true; if (fsHint) fsHint.classList.remove('is-on'); }
+      fsGoView(0, false);
 
-      // Scrolly "Before" card — a pinned, three-act mark-up of the home screen:
-      //  Act 1 (scrubbed by scroll): red pencil lassos the broken flow, then the verdict grows the grey frame.
-      //  Acts 2 & 3 (scroll TRIGGERS, then they self-play): the pencil jumps to the next component while the
-      //  critique erases back to "Home." and the new line types itself out — no need to keep scrolling.
+      // "Before" card — a three-act mark-up of the home screen, stepped by tapping the image:
+      //  the red pencil lassos the component in question, the verdict grows out from under the card,
+      //  and each further tap erases that line and writes the next one while the pencil jumps across.
       const scrolly = document.querySelector('[data-scrolly]');
       const marks = {};
       if (scrolly) scrolly.querySelectorAll('.tl-pencil__p').forEach((p) => { marks[p.dataset.mark] = p; });
@@ -1136,8 +1183,10 @@
         2: { marks: ['quiz'],          text: 'The weekly quiz lacked motivation and clear incentives for participation.' },
         3: { marks: ['prog'],          text: 'The progress bar tracked completion, but never showed students what they were working toward.' },
       };
-      const T1 = 0.40, T2 = 0.70, TRIGGER_ACT1 = 0.08;   // scroll fractions that start acts 1, 2 and 3
-      if (reduce && suffixEl) suffixEl.textContent = ACTS[1].text;
+      const bfHint = scrolly && scrolly.querySelector('[data-hint]');
+      const bfHintAt = scrolly && scrolly.querySelector('.tl-scard__fig');
+      let bfHintDone = false;
+      function bfHintOff() { bfHintDone = true; if (bfHint) bfHint.classList.remove('is-on'); }
 
       const setMark = (name, shown, drawn) => {
         const p = marks[name]; if (!p) return;
@@ -1151,13 +1200,10 @@
       function scrollyLayout() {
         if (!scrolly) return;
         Object.values(marks).forEach((p) => p.style.setProperty('--len', p.getTotalLength()));
-        // scroll room so the card stays pinned through all three acts (mobile + tablet get it too; only reduced-motion is static)
-        if (reduce) { scrolly.style.height = ''; }
-        else { scrolly.style.height = (window.innerHeight + Math.round(window.innerHeight * 2.7)) + 'px'; }
       }
 
       // ---- self-playing engine (all three acts) ----
-      let displayAct = 0, wantAct = 0, anim = null, engineOwns = false, engineRAF = null;
+      let displayAct = 0, wantAct = 0, anim = null, engineRAF = null;
       const caret = (on) => caretEl && caretEl.classList.toggle('is-on', on);
       function startTransition(to) {
         const fromText = displayAct === 0 ? '' : ACTS[displayAct].text;
@@ -1193,51 +1239,58 @@
       }
       const requestEngine = () => { if (!engineRAF) engineRAF = requestAnimationFrame(engineLoop); };
 
-      function scrollyUpdate() {
-        if (!scrolly || reduce) return;
-        const r = scrolly.getBoundingClientRect();
-        const total = scrolly.offsetHeight - window.innerHeight;
-        const p = clamp(-r.top / (total || 1), 0, 1);
-        const draw = (a, b) => easeOutCubic(clamp((p - a) / (b - a), 0, 1));
-
-        if (p < TRIGGER_ACT1) {                  // ---- Clean state: wait for scroll ----
-          engineOwns = false; wantAct = 0; displayAct = 0;
-          if (anim) { anim = null; caret(false); }
-          setMark('top', 0, 0); setMark('bottom', 0, 0); setMark('quiz', 0, 0); setMark('prog', 0, 0);
-          suffixEl.textContent = '';
-          reveal.style.maxHeight = '1px'; reveal.style.opacity = 0;
-        } else if (p < T1) {                     // ---- Act 1: self-playing ----
-          if (!engineOwns) { engineOwns = true; reveal.style.opacity = 1; reveal.style.maxHeight = (reveal.scrollHeight + 4) + 'px'; }
-          wantAct = 1;
-          requestEngine();
-        } else {                                  // ---- Acts 2 & 3: scroll picks the act, engine plays it ----
-          wantAct = p < T2 ? 2 : 3;
-          requestEngine();
-        }
+      // ---- the four steps: the clean screen, then each of the three notes ----
+      const scZones = () => scrolly && scrolly.querySelectorAll('.tl-zone').forEach((z) => {
+        const t = wantAct + (+z.dataset.step); z.disabled = t < 0 || t > 3;
+      });
+      function scReset() {                        // back to the untouched screenshot
+        if (engineRAF) { cancelAnimationFrame(engineRAF); engineRAF = null; }
+        anim = null; caret(false); displayAct = 0; wantAct = 0;
+        Object.keys(marks).forEach((n) => setMark(n, 0, 0));
+        suffixEl.textContent = '';
+        reveal.style.maxHeight = '1px'; reveal.style.opacity = 0;
+        scZones();
       }
+      function scStep(d) {
+        const to = clamp(wantAct + d, 0, 3);
+        if (to === wantAct) return;
+        if (to === 0) { scReset(); return; }
+        wantAct = to; scZones();
+        reveal.style.opacity = 1;
+        if (reduce) {                             // no drawing, no typing — just the finished note
+          if (engineRAF) { cancelAnimationFrame(engineRAF); engineRAF = null; }
+          anim = null; displayAct = to; caret(false);
+          showActMarks(to, 1);
+          suffixEl.textContent = ACTS[to].text;
+          reveal.style.maxHeight = (reveal.scrollHeight + 4) + 'px';
+          return;
+        }
+        reveal.style.maxHeight = (reveal.scrollHeight + 4) + 'px';
+        requestEngine();
+      }
+      if (scrolly) { bindZones(scrolly, (d) => { bfHintOff(); scStep(d); }); scReset(); }
 
-      // "Before" runs on the same rule. Its four steps are: clean, then each of the three acts —
-      // SC_AT are the progress thresholds the acts begin at, SC_STOPS where a step comes to rest.
-      const SC_AT = [0, TRIGGER_ACT1, T1, T2], SC_STOPS = [0.015, 0.24, 0.55, 0.85];
-      const scStep = () => {
-        const total = scrolly.offsetHeight - window.innerHeight;
-        const p = clamp(-scrolly.getBoundingClientRect().top / (total || 1), 0, 1);
-        let i = 0; while (i < SC_AT.length - 1 && p >= SC_AT[i + 1]) i++;
-        return i;
+      // ---- the dark hints ----
+      // Each one shows itself once, the moment the view it explains settles into the middle of the
+      // screen, and stays until the reader takes it up on the offer.
+      const centred = (el) => {
+        const r = el.getBoundingClientRect(), vh = window.innerHeight;
+        return Math.abs((r.top + r.bottom) / 2 - vh / 2) < vh * 0.26;
       };
-      const scStopY = (i) => {
-        const total = scrolly.offsetHeight - window.innerHeight;
-        return Math.round(scrolly.getBoundingClientRect().top + window.scrollY + SC_STOPS[i] * total);
-      };
-      if (scrolly && fsTouch) oneSwipeOneStep(scrolly, scStep, scStopY, SC_STOPS.length - 1);
+      function hintUpdate() {
+        if (bfHint && !bfHintDone && bfHintAt && centred(bfHintAt)) bfHint.classList.add('is-on');
+        if (fsHint && !fsHintDone && fsHintAt && centred(fsHintAt)) fsHint.classList.add('is-on');
+      }
 
       let ticking = false;
       function onScroll() {
         if (ticking) return; ticking = true;
-        requestAnimationFrame(() => { railUpdate(); journeyUpdate(); duoUpdate(); soloUpdate(); fsUpdate(); fsFlingCheck(); scrollyUpdate(); heroFade(); ticking = false; });
+        requestAnimationFrame(() => { railUpdate(); journeyUpdate(); duoUpdate(); soloUpdate(); hintUpdate(); heroFade(); ticking = false; });
       }
       window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('resize', () => { journeyLayout(); scrollyLayout(); fsLayout(); onScroll(); });
+      // crossing the mobile/desktop line swaps the views between a swipe row and a rising stack —
+      // re-seat whichever one is showing so neither mode inherits the other's leftovers
+      window.addEventListener('resize', () => { journeyLayout(); scrollyLayout(); fsGoView(fsActive, false); onScroll(); });
 
       // Count-up metrics
       const nums = Array.from(document.querySelectorAll('[data-count]'));
@@ -1276,8 +1329,8 @@
         (hero || tablet).addEventListener('pointerleave', () => { if (!ready) return; tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(apply); });
       }
 
-      journeyLayout(); scrollyLayout(); fsLayout(); onScroll();
-      window.addEventListener('load', () => { journeyLayout(); scrollyLayout(); fsLayout(); onScroll(); });
+      journeyLayout(); scrollyLayout(); onScroll();
+      window.addEventListener('load', () => { journeyLayout(); scrollyLayout(); onScroll(); });
       window.addEventListener('resize', () => {
         if (thread) { threadLen = thread.getTotalLength(); thread.style.strokeDasharray = threadLen; }
       });
