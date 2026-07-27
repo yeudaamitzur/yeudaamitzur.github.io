@@ -241,13 +241,12 @@ function drawDots() {
   // so the dots are still visibly drifting for as long as any of them is on screen
   const scatter = clamp(window.scrollY / Math.max(1, ch * 0.9), 0, 1);
   for (let i = 0; i < letterHot.length; i++) {
-    // Colour is a sticky toggle, so it still crossfades — but at 0.2/frame that took ~30 frames
-    // (~500ms) to arrive, which read as the letter answering late. 0.5 lands it in ~5 frames.
-    letterHot[i] += ((letterOn[i] ? 1 : 0) - letterHot[i]) * 0.5;
-    // The lift/push is the letter's DIRECT answer to the cursor being on it, so it is not eased at
-    // all — the letter is raised on the very first frame the pointer is inside it, and drops the
-    // frame it leaves. Anything else is a delay between the mouse and the thing it is touching.
-    letterLift[i] = (i === hoverLetter) ? 1 : 0;
+    // Both of these are eased at 0.2/frame ON PURPOSE — Yehuda wants the wordmark to answer the
+    // cursor slowly, so the dots swell and settle rather than snap. They were once sped up to
+    // 0.5/instant to kill "lag"; that was the wrong call here and was put back. The no-lag rule
+    // applies to the pointer follower (the photo), not to this.
+    letterHot[i]  += ((letterOn[i] ? 1 : 0) - letterHot[i]) * 0.2;          // colour — sticky
+    letterLift[i] += ((i === hoverLetter ? 1 : 0) - letterLift[i]) * 0.2;   // motion — hover only
   }
 
   const half = spriteSize / 2, FADE = 190;   // px of self-fade at the canvas foot

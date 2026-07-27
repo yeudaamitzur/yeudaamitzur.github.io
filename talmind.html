@@ -12,7 +12,7 @@
   <!-- favicon: the same ring as the site cursor — purple stroke, lighter purple fill -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
   <link rel="canonical" href="https://yeudaamitzur.github.io/talmind.html" />
-  <link rel="stylesheet" href="styles.css?v=28" />
+  <link rel="stylesheet" href="styles.css?v=29" />
 
   <style>
     /* =========================================================
@@ -25,6 +25,12 @@
           --tl-shadow-lift: 0 46px 84px -40px rgba(40,37,30,0.5);
           --tl-liked: linear-gradient(135deg, #efe8f6, #f6f2ec); /* the ToI card colour */
           --tl-mut: rgba(40,37,30,0.55);
+          /* one screen size for the whole page: --fw is the grey frame card, --stagew the screen
+             inside it. The flat "Before" shot is sized to --stagew so both sections show the
+             product at exactly the same scale. */
+          --mat: clamp(10px, 1.4vw, 20px);
+          --fw: min(94vw, 1108px, calc((100svh - 300px) * 1.6));
+          --stagew: calc(var(--fw) - var(--mat) * 2);
     }
     .tl-wrap { width: 100%; max-width: 1180px; margin-inline: auto; padding-inline: var(--pad); }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
@@ -221,9 +227,7 @@
        back drops the view that no longer applies straight back down and out of frame. Mobile: the
        very same views become a snap-scrolling row you swipe sideways. In both, the notes inside a
        view are advanced by tapping the right half of the screen (left half steps back). */
-    .tl-frameshow { --mat: clamp(10px, 1.4vw, 20px);
-      --fw: min(94vw, 1108px, calc((100svh - 300px) * 1.6));
-      margin-top: clamp(1.75rem, 3.5vw, 2.75rem); position: relative; }
+    .tl-frameshow { margin-top: clamp(1.75rem, 3.5vw, 2.75rem); position: relative; }
 
     /* dots hang in the left gutter (desktop) or in a row under the views (mobile) */
     .tl-fsstage { position: relative; width: max-content; max-width: 100%; margin-inline: auto; }
@@ -240,7 +244,13 @@
     .tl-frame { position: relative; width: var(--fw);
       background: #d5d5d5; border-radius: clamp(20px, 2.4vw, 34px); padding: var(--mat);
       box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 10px 36px rgba(0,0,0,0.11); }
-    .tl-frame__stage { position: relative; aspect-ratio: 16 / 10; border-radius: 18px; overflow: clip; background: #d0ccc3; }
+    /* The screenshots carry their OWN rounded corners baked in, with white squares outside the
+       curve. A clip whose radius is smaller than that baked one leaves those white wedges sitting
+       in the corners — which is why the frame read as "not really round". Clipping at a radius at
+       least as large as the baked one (measured: up to 2.04% of the shot's width) swallows them
+       whole, with no zoom and no re-cropping, so every overlay coordinate stays valid. */
+    .tl-frame__stage { position: relative; aspect-ratio: 16 / 10; overflow: clip; background: #d0ccc3;
+      border-radius: max(18px, calc(var(--stagew) * 0.024)); }
 
     /* one screen per view now — it simply fills its own stage */
     .tl-frame__screen { position: absolute; inset: 0; z-index: 1; }
@@ -285,8 +295,11 @@
     @keyframes tlWave { 0%{transform:rotate(0) scale(1)} 16%{transform:rotate(-12deg) scale(1.07)} 32%{transform:rotate(10deg) scale(1.09)}
       48%{transform:rotate(-9deg) scale(1.08)} 64%{transform:rotate(6deg) scale(1.05)} 82%{transform:rotate(-3deg) scale(1.03)} 100%{transform:rotate(0) scale(1)} }
 
-    /* caption under the frame — persistent bold label + typed suffix; brand-purple caret */
-    .tl-frame__cap { width: var(--fw); margin: 0; min-height: 4.9em;
+    /* caption under the frame — persistent bold label + typed suffix; brand-purple caret.
+       The height is BOXED at the tallest line any view will ever type (measured in JS → --capH),
+       because a caption that grows as it types would shove the dots, and the whole next section,
+       up and down while you read. */
+    .tl-frame__cap { width: var(--fw); margin: 0; height: var(--capH, auto); overflow: hidden;
       color: #28251e; font-family: var(--f-body); font-size: clamp(1rem, 1.25vw, 1.125rem); line-height: 1.6; text-align: left; }
     .tl-frame__cap b { color: #18160f; font-weight: 600; }
     .tl-frame__cap .tl-caret { background: var(--brand); }
@@ -298,20 +311,37 @@
       .tl-fsview { grid-area: v; background: var(--bg); will-change: transform, opacity;
         transition: transform .82s cubic-bezier(.2,.72,.2,1), opacity .42s ease; }
       .tl-fsview.is-below { transform: translateY(116%); opacity: 0; }
+      /* Only the view you can actually see casts a shadow. All four sit in the same cell, and a
+         frame's shadow spills past its own backing, so leaving them all on stacked four shadows
+         around the top card and made its edge look muddy. */
+      .tl-fsview .tl-frame { box-shadow: none; }
+      .tl-fsview.is-on .tl-frame,
+      .tl-fsview.is-below .tl-frame { box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 10px 36px rgba(0,0,0,0.11); }
     }
 
-    /* ---- mobile: the same four views, swiped sideways ---- */
+    /* ---- mobile: the same four views, swiped sideways, edge to edge ---- */
     @media (max-width: 760px) {
-      .tl-frameshow { --fw: 100%; }
+      .tl { --fw: 100%; }
       .tl-fsstage { width: auto; display: flex; flex-direction: column; }
-      /* padding/margin pair gives the frame's shadow room the overflow would otherwise shave off */
-      .tl-fsviews { order: 1; position: relative; display: flex; gap: clamp(14px, 4vw, 22px);
+      /* The swipe track runs the FULL width of the phone, not the text grid, so the next screen
+         comes in from the very edge. Each slide is a whole viewport wide and carries the page
+         gutter as its own padding, which is what keeps the frames apart.
+         The padding/margin pair gives the frame's shadow room the overflow would otherwise shave off. */
+      .tl-fsviews { order: 1; position: relative; display: flex; gap: 0;
+        width: 100vw; margin-inline: calc(50% - 50vw);
         overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
         padding-block: 20px; margin-block: -20px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
       .tl-fsviews::-webkit-scrollbar { display: none; }
-      .tl-fsview, .tl-fsview.is-below { flex: 0 0 100%; scroll-snap-align: center; transform: none; opacity: 1; }
-      .tl-frame__cap { min-height: 6.5em; font-size: 0.95rem; }
+      .tl-fsview, .tl-fsview.is-below { flex: 0 0 100vw; padding-inline: var(--pad);
+        scroll-snap-align: center; transform: none; opacity: 1; }
+      .tl-frame__cap { font-size: 0.95rem; }
+      /* --fw is a percentage here, so the calc above would resolve per-axis and bend the corner
+         into an ellipse. A phone stage never needs more than 18px to swallow the baked corner. */
+      .tl-frame__stage { border-radius: 18px; }
+      /* the dots are a fixed landmark — they sit under the track and never move with the caption */
       .tl-dots { order: 2; position: static; height: auto; margin: 16px 0 0; flex-direction: row; justify-content: center; }
+      /* the section starts further down, so it is clearly its own thing and not the tail of "Before" */
+      #product { padding-top: clamp(3.5rem, 10vw, 5rem); }
       /* the hero tablet is the first thing you see — let it use the full width of the phone
          instead of sitting inside the text gutter. EXACTLY 100vw: a single pixel wider and the
          document scrolls sideways under your finger, which drags the whole page off-centre. */
@@ -326,17 +356,23 @@
 
     /* ---------- Tap zones — the right half of a screen advances its notes, the left half steps back ----------
        They sit above the artwork and the pencil, below the dark hint that explains them. */
-    .tl-zone { position: absolute; top: 0; bottom: 0; width: 50%; z-index: 4; border: 0; padding: 0; margin: 0;
+    /* the arrows ride low — down in the bottom quarter of the screen, out of the artwork's way —
+       and stay semi-transparent so they read as a hint rather than as chrome bolted on top */
+    .tl-zone { position: absolute; top: 0; bottom: 0; width: 50%; z-index: 4; border: 0; margin: 0;
       background: none; cursor: pointer; -webkit-tap-highlight-color: transparent;
-      display: flex; align-items: center; opacity: 0; transition: opacity .26s ease; }
+      display: flex; align-items: flex-end; padding-block: 0 clamp(10px, 1.9vw, 24px);
+      opacity: 0; transition: opacity .26s ease; }
     .tl-zone--prev { left: 0;  justify-content: flex-start; padding-left: clamp(10px, 1.6vw, 20px); }
     .tl-zone--next { right: 0; justify-content: flex-end;   padding-right: clamp(10px, 1.6vw, 20px); }
     .tl-zone:disabled { cursor: default; }
     .tl-zone__i { display: grid; place-items: center; width: clamp(30px, 3.2vw, 40px); aspect-ratio: 1; border-radius: 50%;
-      background: rgba(12,8,28,0.5); color: #fff; -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+      background: rgba(12,8,28,0.34); color: rgba(255,255,255,0.92); -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
       font-family: var(--f-display); font-size: clamp(.95rem, 1.4vw, 1.15rem); line-height: 1; }
-    @media (hover: hover) and (pointer: fine) { .tl-zone:hover:not(:disabled) { opacity: 1; } }
-    .tl-zone:focus-visible { opacity: 1; outline: 2px solid var(--brand); outline-offset: -5px; border-radius: 16px; }
+    @media (hover: hover) and (pointer: fine) {
+      .tl-zone:hover:not(:disabled) { opacity: .62; }
+      .tl-zone:hover:not(:disabled) .tl-zone__i { background: rgba(12,8,28,0.42); }
+    }
+    .tl-zone:focus-visible { opacity: .85; outline: 2px solid var(--brand); outline-offset: -5px; border-radius: 16px; }
 
     /* ---------- The dark hint — shown once, when the first view settles into the middle of the screen ---------- */
     .tl-hint { position: absolute; inset: 0; z-index: 5; border-radius: inherit; pointer-events: none;
@@ -385,9 +421,10 @@
        leaving just the image (with its own shadow + modest radius) and the caption below it */
     .tl-scard--before-flat { position: static; top: auto; transform: none; opacity: 1; z-index: auto; gap: 0; align-self: flex-start;
       background: none; padding: 0; box-shadow: none; border-radius: 0; overflow: visible;
-      /* the whole card tracks the (smaller) image width, so the caption lines up under it.
-         Its section now carries .tl-wrap, so 100% here IS the grid — the frame can't spill past it. */
-      width: 100%; max-width: min(100%, calc((100svh - 300px) * 1.6 * 0.72)); margin-inline: auto; }
+      /* the shot is shown at exactly the size the screens in "Inside the project" are shown at
+         (--stagew = the frame card minus its mat), so the product reads at one scale all page.
+         Its section carries .tl-wrap, so 100% here IS the grid — the image can't spill past it. */
+      width: 100%; max-width: min(100%, var(--stagew)); margin-inline: auto; }
     .tl-scard--before-flat .tl-scard__fig { position: relative; max-width: 100%; border-radius: 20px; }
     /* radius matches the page's screenshot images (.tl-scard__fig img = 20px); shadow no longer clipped */
     .tl-scard--before-flat .tl-scard__fig > img { border-radius: 20px; box-shadow: 0 18px 40px -12px rgba(40,37,30,0.28); }
@@ -398,8 +435,11 @@
       filter: drop-shadow(0 1px 1.5px rgba(150,18,18,0.28));
       stroke-dasharray: var(--len, 3000); stroke-dashoffset: var(--len, 3000); opacity: 0; }
 
-    /* the verdict — its wrapper grows from 0 → full, expanding the grey frame downward */
-    .tl-scard--before-flat .tl-scard__reveal { overflow: hidden; max-height: 0; opacity: 0; will-change: max-height, opacity; }
+    /* The verdict's box is BOXED at the tallest note it will ever hold (measured in JS → --revealH)
+       and reserved from the very first paint, so a note appearing, growing or erasing never shoves
+       "Inside the project" down the page and back up again. Only its opacity moves. */
+    .tl-scard--before-flat .tl-scard__reveal { overflow: hidden; height: var(--revealH, auto); opacity: 0;
+      transition: opacity .35s ease; will-change: opacity; }
     .tl-scard--before-flat .tl-scard__reveal .tl-scard__cap { padding-top: clamp(16px, 2.6vw, 28px); margin: 0; min-height: 1.6em; }
     /* the typed critique + a blinking pencil-red caret while it writes */
     .tl-scard__type { color: #28251e; }
@@ -409,7 +449,7 @@
     @keyframes tlCaret { 50% { opacity: 0; } }
 
     @media (prefers-reduced-motion: reduce) {
-      .tl-scard--before-flat .tl-scard__reveal { max-height: none; opacity: 1; }
+      .tl-scard--before-flat .tl-scard__reveal { transition: none; }
       .tl-caret { display: none; }
     }
 
@@ -917,7 +957,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=28"></script>
+  <script src="script.js?v=29"></script>
   <script>
     /* ---- Talmind case-study interactions (page-scoped) ---- */
     (function () {
@@ -1076,8 +1116,12 @@
         disp: 0, want: 0, anim: null, raf: null,
       })) : [];
 
-      // the arrows grey out at the ends, so a tap that can't do anything never looks like a dead screen
-      const fsZones = (v, i) => v.zones.forEach((z) => { const t = i + (+z.dataset.step); z.disabled = t < 0 || t >= v.acts.length; });
+      // The arrows only grey out at the very ends of the whole show: running out of notes on one
+      // screen isn't a dead end any more, it carries you to the next screen (see fsStep).
+      const fsZones = (v, i) => v.zones.forEach((z) => {
+        const d = +z.dataset.step, t = i + d;
+        z.disabled = (t < 0 || t >= v.acts.length) && (v.i + d < 0 || v.i + d >= fsViews.length);
+      });
       function fsApply(v, i) {
         const fx = v.acts[i].fx;
         if (v.i === 0) {
@@ -1113,8 +1157,14 @@
         if (v.anim || v.disp !== v.want) v.raf = requestAnimationFrame((t) => fsLoop(v, t));
       }
       function fsStep(v, d) {
-        const to = clamp(v.want + d, 0, v.acts.length - 1);
-        if (to === v.want) return;
+        const to = v.want + d;
+        // past the last note of a screen — keep going, into the next screen (and the same backwards).
+        // On desktop it rises from below; on a phone the track swipes across to it.
+        if (to < 0 || to >= v.acts.length) {
+          const n = v.i + d;
+          if (n >= 0 && n < fsViews.length) fsGoView(n, true);
+          return;
+        }
         v.want = to; fsZones(v, to);
         if (reduce) {
           if (v.raf) { cancelAnimationFrame(v.raf); v.raf = null; }
@@ -1133,6 +1183,7 @@
         if (!fsViews.length) return;
         fsActive = clamp(n, 0, fsViews.length - 1);
         fsMarkDots(fsActive);
+        fsViews.forEach((v) => v.el.classList.toggle('is-on', v.i === fsActive));   // only this one casts a shadow
         if (fsMobile()) {
           fsScrollT = performance.now();
           fsTrack.scrollTo({ left: fsViews[fsActive].el.offsetLeft, behavior: (smooth && !reduce) ? 'smooth' : 'auto' });
@@ -1147,7 +1198,10 @@
         const c = fsTrack.scrollLeft + fsTrack.clientWidth / 2;
         let best = 0, bd = Infinity;
         fsViews.forEach((v) => { const d = Math.abs(v.el.offsetLeft + v.el.offsetWidth / 2 - c); if (d < bd) { bd = d; best = v.i; } });
-        if (best !== fsActive) { fsActive = best; fsMarkDots(best); }
+        if (best !== fsActive) {
+          fsActive = best; fsMarkDots(best);
+          fsViews.forEach((v) => v.el.classList.toggle('is-on', v.i === best));   // stays right if you rotate to desktop
+        }
       }, { passive: true });
       fsDots.forEach((d, n) => d.addEventListener('click', () => { fsHintOff(); fsGoView(n, true); }));
 
@@ -1228,7 +1282,6 @@
           suffixEl.textContent = a.toText.slice(0, Math.min(shown, a.toText.length));
           if (shown >= a.toText.length) { suffixEl.textContent = a.toText; displayAct = a.to; anim = null; caret(false); }
         }
-        reveal.style.maxHeight = (reveal.scrollHeight + 4) + 'px';
       }
       function engineLoop(now) {
         engineRAF = null;
@@ -1248,7 +1301,7 @@
         anim = null; caret(false); displayAct = 0; wantAct = 0;
         Object.keys(marks).forEach((n) => setMark(n, 0, 0));
         suffixEl.textContent = '';
-        reveal.style.maxHeight = '1px'; reveal.style.opacity = 0;
+        reveal.style.opacity = 0;      // the box keeps its reserved height — only the ink fades out
         scZones();
       }
       function scStep(d) {
@@ -1262,13 +1315,41 @@
           anim = null; displayAct = to; caret(false);
           showActMarks(to, 1);
           suffixEl.textContent = ACTS[to].text;
-          reveal.style.maxHeight = (reveal.scrollHeight + 4) + 'px';
           return;
         }
-        reveal.style.maxHeight = (reveal.scrollHeight + 4) + 'px';
         requestEngine();
       }
       if (scrolly) { bindZones(scrolly, (d) => { bfHintOff(); scStep(d); }); scReset(); }
+
+      // ---- reserve the caption space up front ----
+      // Both captions type themselves out, so their height changes while you read them. Left to
+      // grow they would shove whatever sits underneath — the four dots, and the whole next section
+      // — down the page and back up again. So each caption box is measured against the tallest
+      // thing it will ever hold and boxed at that height from the first paint; nothing below one
+      // ever moves. Re-measured on resize, because the tallest line depends on the column width.
+      function capReserve() {
+        if (fshow && fsViews.length) {
+          let max = 0;
+          fsViews.forEach((v) => {
+            const cap = v.el.querySelector('.tl-frame__cap');
+            const keep = v.typeEl.innerHTML;
+            cap.style.height = 'auto';
+            v.acts.forEach((a) => { renderSeg(v.typeEl, a.seg, segLen(a.seg)); max = Math.max(max, cap.scrollHeight); });
+            v.typeEl.innerHTML = keep;
+            cap.style.height = '';
+          });
+          fshow.style.setProperty('--capH', Math.ceil(max) + 'px');
+        }
+        if (scrolly && suffixEl && reveal) {
+          const keep = suffixEl.textContent;
+          reveal.style.height = 'auto';
+          let max = 0;
+          for (const k of [1, 2, 3]) { suffixEl.textContent = ACTS[k].text; max = Math.max(max, reveal.scrollHeight); }
+          suffixEl.textContent = keep;
+          reveal.style.height = '';
+          scrolly.style.setProperty('--revealH', Math.ceil(max) + 'px');
+        }
+      }
 
       // ---- the dark hints ----
       // Each one shows itself once, the moment the view it explains settles into the middle of the
@@ -1290,7 +1371,7 @@
       window.addEventListener('scroll', onScroll, { passive: true });
       // crossing the mobile/desktop line swaps the views between a swipe row and a rising stack —
       // re-seat whichever one is showing so neither mode inherits the other's leftovers
-      window.addEventListener('resize', () => { journeyLayout(); scrollyLayout(); fsGoView(fsActive, false); onScroll(); });
+      window.addEventListener('resize', () => { journeyLayout(); scrollyLayout(); capReserve(); fsGoView(fsActive, false); onScroll(); });
 
       // Count-up metrics
       const nums = Array.from(document.querySelectorAll('[data-count]'));
@@ -1329,8 +1410,10 @@
         (hero || tablet).addEventListener('pointerleave', () => { if (!ready) return; tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(apply); });
       }
 
-      journeyLayout(); scrollyLayout(); onScroll();
-      window.addEventListener('load', () => { journeyLayout(); scrollyLayout(); onScroll(); });
+      journeyLayout(); scrollyLayout(); capReserve(); onScroll();
+      // fonts land after first paint and change how the captions wrap — re-measure once they have
+      window.addEventListener('load', () => { journeyLayout(); scrollyLayout(); capReserve(); onScroll(); });
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(capReserve);
       window.addEventListener('resize', () => {
         if (thread) { threadLen = thread.getTotalLength(); thread.style.strokeDasharray = threadLen; }
       });
