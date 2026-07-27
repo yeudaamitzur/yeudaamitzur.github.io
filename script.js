@@ -92,6 +92,12 @@ const cursorEl = document.querySelector('.hero__cursor');
 const hdrAvatar = document.querySelector('.hdr__avatar');
 const hdrAvatarImg = document.querySelector('.hdr__avatar-img');
 
+// Both hero loops (the wordmark dots and the drifting halos) pause the moment the hero leaves the
+// viewport and resume when it comes back. There is nothing to look at while it is off screen, and
+// the frames they were spending are frames the browser can hand to the pointer instead.
+let heroOnScreen = true, dotsRaf = null, driftRaf = null;
+let resumeDrift = () => {};   // assigned below, once the halos exist
+
 // ---- Two drifting halos that roam the whole hero ----
 const orbA = document.querySelector('.hero__orb--a');
 const orbB = document.querySelector('.hero__orb--b');
@@ -114,9 +120,10 @@ if ((orbA || orbB) && !reduced) {
       `translate(${((Math.sin(t) * 70 + Math.sin(t * 0.6) * 22) * ax).toFixed(1)}%, ${(Math.cos(t * 0.8) * 42 * ay).toFixed(1)}%) scale(${(1 + Math.sin(t * 0.5) * 0.12).toFixed(3)})`;
     if (orbB) orbB.style.transform =
       `translate(${((Math.cos(t * 0.7) * 66 - 12) * ax).toFixed(1)}%, ${(Math.sin(t * 0.9) * 40 * ay).toFixed(1)}%) scale(${(1 + Math.cos(t * 0.6) * 0.14).toFixed(3)})`;
-    requestAnimationFrame(drift);
+    driftRaf = heroOnScreen ? requestAnimationFrame(drift) : null;
   };
-  requestAnimationFrame(drift);
+  driftRaf = requestAnimationFrame(drift);
+  resumeDrift = () => { if (driftRaf === null) driftRaf = requestAnimationFrame(drift); };
 }
 
 // ---- "UX/UI Designer" as living particles across the whole hero ----
@@ -267,7 +274,11 @@ function drawDots() {
     ctx.globalAlpha = d._hot * d._fade; ctx.drawImage(purpleSprite, x - half, y - half, spriteSize, spriteSize);   // crisp purple — no blur/halo
   }
   ctx.globalAlpha = 1;
-  if (!reduced) requestAnimationFrame(drawDots);
+  // Only keep painting while the hero is actually on screen. This used to re-queue itself
+  // unconditionally, so the wordmark canvas repainted every single frame for the whole session —
+  // still burning the main thread while the reader was down at the footer, which is main-thread
+  // time that is not going to their mouse. The footer particles already gate themselves this way.
+  if (!reduced && heroOnScreen) dotsRaf = requestAnimationFrame(drawDots); else dotsRaf = null;
 }
 
 if (canvas && ctx) {
@@ -284,6 +295,16 @@ if (canvas && ctx) {
     lastVW = window.innerWidth;
     clearTimeout(rt); rt = setTimeout(() => { buildDots(); if (reduced) drawDots(); }, 160);
   });
+}
+
+// ---- Park the hero's two animation loops whenever the hero is off screen ----
+if (hero && !reduced && 'IntersectionObserver' in window) {
+  new IntersectionObserver((entries) => {
+    heroOnScreen = entries[0].isIntersecting;
+    if (!heroOnScreen) return;
+    if (canvas && ctx && dotsRaf === null) dotsRaf = requestAnimationFrame(drawDots);
+    resumeDrift();
+  }, { threshold: 0 }).observe(hero);
 }
 
 // ---- Phones: the wordmark colours itself in, then answers your finger ----
@@ -395,14 +416,25 @@ if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
     kick();
   };
 
-  const overLine2 = (x, y) => { const r = line2.getBoundingClientRect(); return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; };
+  // Both rects used to be read on EVERY pointermove. Reading layout inside an input handler forces
+  // a synchronous style+layout flush, and the halo loop dirties style every frame, so it was never
+  // free — it put a measurable stall between the mouse moving and anything drawing. They are cached
+  // and only re-read when something can actually have moved them.
+  let r2 = null, rh = null;
+  const dropRects = () => { r2 = null; rh = null; };
+  addEventListener('scroll', dropRects, { passive: true });
+  addEventListener('resize', dropRects, { passive: true });
+  const line2Rect = () => (r2 || (r2 = line2.getBoundingClientRect()));
+  const heroRect = () => (rh || (rh = hero.getBoundingClientRect()));
+
+  const overLine2 = (x, y) => { const r = line2Rect(); return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; };
 
   document.addEventListener('pointermove', (e) => {
     if (e.pointerType === 'touch') return;
     if (overLine2(e.clientX, e.clientY)) {
       if (!active) flyOut(e.clientX, e.clientY); else { tx = e.clientX; ty = e.clientY; kick(); }
       // which letter is under the cursor (+ feed the cursor position to the dots)
-      const hr = hero.getBoundingClientRect();
+      const hr = heroRect();
       const lx = e.clientX - hr.left;
       mouseHX = lx; mouseHY = e.clientY - hr.top;
       let found = -1;
@@ -416,28 +448,37 @@ if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
       if (active) flyHome();
       hoverLetter = -1; mouseHX = -9999; mouseHY = -9999;
     }
-  });
+  }, { passive: true });   // never calls preventDefault — let the browser composite without waiting on it
   window.addEventListener('blur', () => { if (active) flyHome(); hoverLetter = -1; mouseHX = -9999; mouseHY = -9999; });
 }
 
 // ---- Glimpse: 3D mouse parallax on the photos ----
 const glimpse = document.querySelector('[data-glimpse]');
 if (glimpse && !reduced) {
-  const depthFigs = Array.from(glimpse.querySelectorAll('[data-depth]'));
+  // The rect and each photo's inner element are resolved ONCE, not on every pointer move: this
+  // handler writes transforms, so re-reading layout on the next move forced a full style+layout
+  // flush every time (read → write → read → write), which is exactly the kind of thrash that shows
+  // up as the mouse feeling heavy over this section.
+  const depthFigs = Array.from(glimpse.querySelectorAll('[data-depth]'))
+    .map((fig) => ({ inner: fig.querySelector('img, svg'), d: parseFloat(fig.dataset.depth) || 20 }))
+    .filter((f) => f.inner);
+  let gr = null;
+  const dropGlimpseRect = () => { gr = null; };
+  addEventListener('scroll', dropGlimpseRect, { passive: true });
+  addEventListener('resize', dropGlimpseRect, { passive: true });
+
   glimpse.addEventListener('pointermove', (e) => {
     if (e.pointerType === 'touch') return;
-    const r = glimpse.getBoundingClientRect();
+    const r = gr || (gr = glimpse.getBoundingClientRect());
     const mx = (e.clientX - r.left) / r.width - 0.5;
     const my = (e.clientY - r.top) / r.height - 0.5;
-    depthFigs.forEach((fig) => {
-      const d = parseFloat(fig.dataset.depth) || 20;
-      const inner = fig.querySelector('img, svg');
-      if (inner) inner.style.transform =
-        `scale(1.12) translate(${(-mx * d).toFixed(1)}px, ${(-my * d).toFixed(1)}px) rotateX(${(-my * 5).toFixed(2)}deg) rotateY(${(mx * 5).toFixed(2)}deg)`;
-    });
-  });
+    for (const f of depthFigs) {
+      f.inner.style.transform =
+        `scale(1.12) translate(${(-mx * f.d).toFixed(1)}px, ${(-my * f.d).toFixed(1)}px) rotateX(${(-my * 5).toFixed(2)}deg) rotateY(${(mx * 5).toFixed(2)}deg)`;
+    }
+  }, { passive: true });
   glimpse.addEventListener('pointerleave', () => {
-    depthFigs.forEach((fig) => { const inner = fig.querySelector('img, svg'); if (inner) inner.style.transform = 'scale(1.12)'; });
+    for (const f of depthFigs) f.inner.style.transform = 'scale(1.12)';
   });
 }
 
@@ -464,30 +505,46 @@ if (reduced || !('IntersectionObserver' in window)) {
   document.documentElement.classList.add('has-cursor');   // hide native cursor only once the dot exists
 
   const interactive = 'a, button, [role="button"], input, textarea, label, summary, .tl-ucard, .case, .tl-scard';
-  let mx = innerWidth / 2, my = innerHeight / 2, cx = mx, cy = my;
+  let mx = innerWidth / 2, my = innerHeight / 2;
   let shown = false, inside = true, hover = false, down = false;
-  let cs = 1;   // smoothed scale — eased toward its target so grow/shrink is gentle, not a hard jump
-  const followEase = reduced ? 1 : 0.2;
-  const scaleEase = reduced ? 1 : 0.16;
+  let cs = 1, raf = null;
+  // The ring sits EXACTLY on the pointer. It used to ease toward it at 0.2/frame, which closes
+  // only 20% of the gap per frame — ~350ms to catch up after a fast flick — and since the native
+  // cursor is hidden site-wide, that trail read as the whole interface lagging. Position is now
+  // written straight from the mousemove event, in the same frame the browser delivers it.
+  const targetS = () => (hover ? 1.7 : 1) * (down ? 0.82 : 1);
 
-  addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; shown = true; }, { passive: true });
-  addEventListener('mouseover', (e) => { hover = !!(e.target.closest && e.target.closest(interactive)); }, { passive: true });
-  document.addEventListener('mouseleave', () => { inside = false; });
-  document.addEventListener('mouseenter', () => { inside = true; });
-  addEventListener('mousedown', () => { down = true; });
-  addEventListener('mouseup', () => { down = false; });
-
-  (function loop() {
-    cx += (mx - cx) * followEase;
-    cy += (my - cy) * followEase;
+  const render = () => {
     const heroActive = document.documentElement.classList.contains('hero-ava-on');   // only while actually over the name
     dot.style.opacity = (shown && inside && !heroActive) ? '1' : '0';
     dot.classList.toggle('is-hover', hover);
-    const targetS = (hover ? 1.7 : 1) * (down ? 0.82 : 1);
-    cs += (targetS - cs) * scaleEase;   // ease toward target → smooth grow & shrink
-    dot.style.transform = `translate3d(${(cx - 12.5).toFixed(2)}px, ${(cy - 12.5).toFixed(2)}px, 0) scale(${cs.toFixed(3)})`;
-    requestAnimationFrame(loop);
-  })();
+    dot.style.transform = `translate3d(${(mx - 12.5).toFixed(2)}px, ${(my - 12.5).toFixed(2)}px, 0) scale(${cs.toFixed(3)})`;
+  };
+
+  // Only the SCALE is animated, and only while it is actually settling — no permanent rAF loop
+  // sitting between the pointer and the screen. It is quick enough (~5 frames) to read as instant.
+  const scaleEase = reduced ? 1 : 0.45;
+  const settle = () => {
+    const t = targetS();
+    cs += (t - cs) * scaleEase;
+    if (Math.abs(t - cs) < 0.003) { cs = t; raf = null; } else { raf = requestAnimationFrame(settle); }
+    render();
+  };
+  const kick = () => { if (raf === null) raf = requestAnimationFrame(settle); };
+
+  addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; shown = true; render(); }, { passive: true });
+  // render() FIRST in each of these, so the state change (the hover tint, the press) is on screen
+  // in the same event — kick() only starts the scale easing behind it. Waiting for the rAF to do
+  // both would put a frame of delay on every hover, which is the thing being fixed here.
+  addEventListener('mouseover', (e) => {
+    const h = !!(e.target.closest && e.target.closest(interactive));
+    if (h !== hover) { hover = h; render(); kick(); }
+  }, { passive: true });
+  document.addEventListener('mouseleave', () => { inside = false; render(); });
+  document.addEventListener('mouseenter', () => { inside = true; render(); });
+  addEventListener('mousedown', () => { down = true; render(); kick(); });
+  addEventListener('mouseup', () => { down = false; render(); kick(); });
+  render();
 })();
 
 // ---- "Back to top" links actually scroll to the top (the #top anchor sits on the fixed header, so it alone won't) ----
@@ -677,8 +734,14 @@ document.querySelectorAll('a[href="#top"]').forEach((a) => {
     }
   }
 
+  // cached for the same reason as the others — this fires on every mouse move anywhere on the page
+  let cr = null;
+  const dropCanvasRect = () => { cr = null; };
+  addEventListener('scroll', dropCanvasRect, { passive: true });
+  addEventListener('resize', dropCanvasRect, { passive: true });
+
   window.addEventListener('mousemove', (e) => {
-    const r = canvas.getBoundingClientRect();
+    const r = cr || (cr = canvas.getBoundingClientRect());
     const nx = e.clientX - r.left, ny = e.clientY - r.top;
     if (px1 > -9000) { mvx = nx - px1; mvy = ny - py1; }
     px0 = px1; py0 = py1; px1 = nx; py1 = ny;
