@@ -12,7 +12,7 @@
   <!-- favicon: the same ring as the site cursor — purple stroke, lighter purple fill -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
   <link rel="canonical" href="https://yeudaamitzur.github.io/design-system.html" />
-  <link rel="stylesheet" href="styles.css?v=20" />
+  <link rel="stylesheet" href="styles.css?v=21" />
 
   <style>
     /* =========================================================
@@ -75,12 +75,23 @@
     .ds-hero__sub { color: var(--ds-mut); font-family: var(--f-display); font-weight: 500;
       font-size: clamp(1rem, 1.5vw, 1.2rem); line-height: 1.5; margin-top: 1.35rem; max-width: 46rem; }
     .ds-hero__sub b { color: var(--ink); font-weight: 600; }
-    /* hero art — no shadow; drifts with the cursor like the other case-study heroes */
+    /* Hero art — the same two-beat opening as Bianca's dashboard: the title lands first, then
+       the art rises into place behind it. Quicker here, because this page's whole entrance is
+       quicker (its header arrives at .2s where Bianca's waits 1.5s) — the hero is resolved by
+       ~2s instead of Bianca's ~4.15s. It drifts with the cursor once it has settled.
+       The box-shadow sits on this element, not the <img>: this is the box with `overflow:
+       hidden`, so a shadow on the child would be clipped away. */
     .ds-hero__shot { margin: clamp(2rem, 4.5vw, 3.25rem) auto 0;   /* centred */
       width: 100%; max-width: 880px;              /* a step up from Bianca's 782px hero tablet */
       border-radius: clamp(12px, 1.5vw, 20px); overflow: hidden;   /* matches the image cards elsewhere */
-      transform-style: preserve-3d; will-change: transform; }
+      box-shadow: 0 44px 90px -46px rgba(40,37,30,0.55);           /* same lift as .bn-tablet__img */
+      transform-style: preserve-3d; will-change: transform, opacity;
+      animation: dsShotIn .95s cubic-bezier(.2,.7,.2,1) 1.05s both; }
     .ds-hero__shot img { display: block; width: 100%; height: auto; border-radius: inherit; }
+    @keyframes dsShotIn {
+      from { opacity: 0; transform: translateY(72px) scale(1.1); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
     .ds-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1.25rem 2.5rem;
       border-bottom: 1px solid var(--line); padding-block: clamp(1.15rem, 2.6vw, 1.7rem); margin-top: clamp(1.75rem, 3.5vw, 2.5rem); }
     .ds-meta div { display: flex; flex-direction: column; gap: .28rem; }
@@ -208,6 +219,8 @@
     }
     @media (prefers-reduced-motion: reduce) {
       .ds .hdr--float { animation: none !important; }
+      /* the entrance fills backwards from opacity 0 — without this the art never appears */
+      .ds-hero__shot { animation: none !important; opacity: 1 !important; transform: none !important; }
       /* fall back to a normal scrolling hero (no pinned video), same as the other case studies */
       .ds-hero__bg { position: absolute; }
     }
@@ -269,8 +282,10 @@
       </div>
 
       <div data-hero-head><p class="ds-hero__title reveal">A design system built to <em>extend</em></p></div>
-      <figure class="ds-hero__shot reveal" data-hero-art>
-        <img src="ds-hero.jpg?v=20" width="1974" height="1398" alt="Talmind Design System &amp; Handoff — colours, typography and components" />
+      <!-- no .reveal here: the timed entrance owns this element's opacity and transform, the way
+           Bianca's .bn-tablet does. Two of them would fight over the same two properties. -->
+      <figure class="ds-hero__shot" data-hero-art>
+        <img src="ds-hero.jpg?v=21" width="2000" height="1414" alt="Talmind Design System &amp; Handoff — colours, typography and components" />
       </figure>
     </section>
 
@@ -420,7 +435,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=20"></script>
+  <script src="script.js?v=21"></script>
   <script>
     /* ---- Hero backdrop: a drifting field of settings cogs ----
        This is a page about a system, so the marks behind the title are the settings glyph:
@@ -544,14 +559,23 @@
       let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { layout(); kick(); }, 150); });
     })();
 
-    /* ---- Hero art: cursor parallax (same drift as the other case-study heroes) ---- */
+    /* ---- Hero art: cursor parallax, handed over from the timed entrance ----
+       Same drift as the other case-study heroes. It cannot start until `dsShotIn` has finished:
+       that animation fills forwards, so its transform would beat the inline one set here and the
+       art would simply refuse to move. Bianca solves this with a hardcoded delay; here the
+       animation's own end event does it, so retuning the timing can't desynchronise the two. */
     (function () {
       const art = document.querySelector('[data-hero-art]');
       if (!art) return;
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
       const hero = art.closest('.ds-hero') || art;
-      let raf = null, tx = 0, ty = 0, cx = 0, cy = 0;
+      let raf = null, tx = 0, ty = 0, cx = 0, cy = 0, ready = false;
+      // dropping the animation reverts to the base style, which is where its last keyframe
+      // already left the element — so the handoff is invisible
+      const settle = () => { if (ready) return; art.style.animation = 'none'; ready = true; };
+      art.addEventListener('animationend', (e) => { if (e.animationName === 'dsShotIn') settle(); });
+      setTimeout(settle, 2600);   // fallback: the entrance never ran (skipped, or the tab opened hidden)
       const apply = () => {
         cx += (tx - cx) * 0.12; cy += (ty - cy) * 0.12;
         art.style.transform = 'translate3d(' + cx.toFixed(1) + 'px,' + cy.toFixed(1) + 'px,0) rotateX(' +
@@ -559,12 +583,13 @@
         if (Math.hypot(tx - cx, ty - cy) > 0.3) raf = requestAnimationFrame(apply); else raf = null;
       };
       hero.addEventListener('pointermove', (e) => {
+        if (!ready) return;
         const r = hero.getBoundingClientRect();
         tx = ((e.clientX - r.left) / r.width - 0.5) * 40;
         ty = ((e.clientY - r.top) / r.height - 0.5) * 26;
         if (!raf) raf = requestAnimationFrame(apply);
       });
-      hero.addEventListener('pointerleave', () => { tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(apply); });
+      hero.addEventListener('pointerleave', () => { if (!ready) return; tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(apply); });
     })();
 
     /* ---- Design System — right-side progress rail (page-scoped) ---- */
