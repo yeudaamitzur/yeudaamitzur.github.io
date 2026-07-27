@@ -12,7 +12,7 @@
   <!-- favicon: the same ring as the site cursor — purple stroke, lighter purple fill -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
   <link rel="canonical" href="https://yeudaamitzur.github.io/talmind.html" />
-  <link rel="stylesheet" href="styles.css?v=18" />
+  <link rel="stylesheet" href="styles.css?v=19" />
 
   <style>
     /* =========================================================
@@ -360,7 +360,10 @@
 
     /* ---------- CTA (left-aligned) ---------- */
     /* the extra bottom room keeps the footer's ring pile (~56px tall) clear of the CTA and its links */
-    .tl-cta { padding-top: clamp(3.25rem, 6.5vw, 5.5rem); padding-bottom: calc(clamp(3.25rem, 6.5vw, 5.5rem) + 84px);
+    /* margin-top, not more padding: the closing rule has to sit clearly apart from the last
+       piece of content above it, instead of reading as that section's own bottom edge */
+    .tl-cta { margin-top: clamp(1.75rem, 4vw, 3.25rem);
+      padding-top: clamp(3.25rem, 6.5vw, 5.5rem); padding-bottom: calc(clamp(3.25rem, 6.5vw, 5.5rem) + 84px);
       border-top: 1px solid var(--line-soft); }
     .tl-cta h2 { font-family: var(--f-display); font-weight: 700; font-size: clamp(2.2rem, 7vw, 4.5rem); letter-spacing: -0.03em; line-height: 1; max-width: 16ch; }
     .tl-cta .pill { margin-top: 2.25rem; }
@@ -488,12 +491,12 @@
   <!-- ===== HEADER (floating pill → collapses to a status badge on scroll) ===== -->
   <header class="hdr hdr--float" id="top">
     <div class="hdr__pill">
-      <a class="hdr__logo" href="index.html" aria-label="Yehuda Amitzur — home">
+      <a class="hdr__logo" href="index.html#top" aria-label="Yehuda Amitzur — home">
         <span class="hdr__avatar"><img class="hdr__avatar-img" src="profile.png" alt="Yehuda Amitzur" width="46" height="46" /></span>
       </a>
       <div class="hdr__expand">
         <nav class="hdr__nav" aria-label="Primary">
-          <a href="index.html">Home</a>
+          <a href="index.html#top">Home</a>
           <a href="index.html#work">Work</a>
           <a href="cv-yehuda-amitzur.pdf" target="_blank" rel="noopener">CV</a>
         </nav>
@@ -507,7 +510,7 @@
         <span class="hdr__drawer-ava"><img src="profile.png" alt="" width="46" height="46" /></span>
         <button class="hdr__drawer-close" type="button" aria-label="Close menu"><span></span><span></span></button>
       </div>
-      <a href="index.html">Home</a>
+      <a href="index.html#top">Home</a>
       <a href="index.html#work">Projects</a>
       <a href="cv-yehuda-amitzur.pdf" target="_blank" rel="noopener">My cv</a>
       <a class="hdr__drawer-contact" href="index.html#contact">Contact</a>
@@ -793,7 +796,7 @@
     <section class="tl-cta tl-wrap">
       <h2 class="reveal">Liked this project?</h2>
       <div class="reveal"><a class="pill" href="index.html#contact"><span>Let's work together</span></a></div>
-      <div><a class="tl-backall" href="index.html#work"><span aria-hidden="true">←</span> Back to all work</a></div>
+      <div><a class="tl-backall" href="index.html#top"><span aria-hidden="true">←</span> Back to all work</a></div>
     </section>
     </div><!-- /.tl-cover -->
   </main>
@@ -805,7 +808,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=18"></script>
+  <script src="script.js?v=19"></script>
   <script>
     /* ---- Talmind case-study interactions (page-scoped) ---- */
     (function () {

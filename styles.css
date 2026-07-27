@@ -215,8 +215,12 @@ ul, ol { list-style: none; padding: 0; }
 }
 .hdr--float.is-scrolled .hdr__pill { padding: 8px 20px 8px 10px; }
 .hdr--float .hdr__avatar { width: 46px; height: 46px; flex: none; }
+/* overflow:hidden is what lets this collapse to width 0 on scroll — but it also clips the
+   Contact button, which is exactly as tall as this box. The 5px block padding (cancelled again
+   by an equal negative margin, so the pill's height is untouched) opens the clip box just enough
+   for the button's 1px hover lift and its focus ring to stay whole. */
 .hdr__expand { display: inline-flex; align-items: center; gap: 40px;
-  max-width: 560px; opacity: 1; overflow: hidden; padding: 0 0 0 40px;
+  max-width: 560px; opacity: 1; overflow: hidden; padding: 5px 0 5px 40px; margin-block: -5px;
   transition: max-width .55s cubic-bezier(.2,.7,.2,1), opacity .35s ease, padding .5s cubic-bezier(.2,.7,.2,1); }
 .hdr--float .hdr__nav { display: flex; gap: clamp(1.4rem, 2.2vw, 1.75rem); }
 .hdr--float .hdr__nav a { font-size: 1rem; white-space: nowrap; }
@@ -229,12 +233,12 @@ ul, ol { list-style: none; padding: 0; }
   font-family: var(--f-display); font-weight: 500; font-size: 1rem; color: var(--ink);
   transition: max-width .55s cubic-bezier(.2,.7,.2,1), opacity .35s ease .05s, padding .5s cubic-bezier(.2,.7,.2,1); }
 .hdr__dot { width: 11px; height: 11px; border-radius: 50%; background: #2fbf5b; box-shadow: 0 0 0 4px rgba(47,191,91,0.18); }
-.hdr--float.is-scrolled .hdr__expand { max-width: 0; opacity: 0; padding: 0; }
+.hdr--float.is-scrolled .hdr__expand { max-width: 0; opacity: 0; padding-inline: 0; }
 .hdr--float.is-scrolled .hdr__status { max-width: 260px; opacity: 1; padding: 0 0 0 12px; }
 /* ---- Mobile + tablet: the floating pill expands into ONE connected menu card ---- */
 @media (max-width: 1024px) {
   .hdr--float .hdr__nav, .hdr--float .hdr__cta { display: none; }
-  .hdr--float .hdr__expand, .hdr--float.is-scrolled .hdr__expand { max-width: none; opacity: 1; padding: 0 .3rem 0 .55rem; }
+  .hdr--float .hdr__expand, .hdr--float.is-scrolled .hdr__expand { max-width: none; opacity: 1; padding: 5px .3rem 5px .55rem; }
   .hdr--float .hdr__status, .hdr--float.is-scrolled .hdr__status { max-width: 0; opacity: 0; padding: 0; }
   .hdr--float .hdr__menu { display: flex; width: 40px; height: 40px; }
 

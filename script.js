@@ -487,6 +487,34 @@ document.querySelectorAll('a[href="#top"]').forEach((a) => {
   });
 });
 
+// ---- Arriving from a case study on "index.html#top": land on the very first pixel ----
+// Every way back to the homepage — the header avatar, "Home" in the nav and the drawer, and the
+// "Back to all work" link that closes each case study — points here. On a phone that landing kept
+// coming out approximate: #top resolves against the FIXED header, the browser restores its own
+// scroll on a reload, and the page keeps growing for a second or two after it opens (the hero
+// wordmark canvas measures itself once the display font is ready, the tile images decode). So the
+// top is HELD rather than jumped to, and the first real scroll input from the reader releases it.
+(function () {
+  if (location.hash !== '#top') return;
+  const hadRestore = 'scrollRestoration' in history;
+  if (hadRestore) history.scrollRestoration = 'manual';
+  let live = true;
+  const pin = () => { if (live && window.scrollY !== 0) window.scrollTo(0, 0); };
+  const iv = setInterval(pin, 100);
+  const ro = 'ResizeObserver' in window ? new ResizeObserver(pin) : null;
+  if (ro) ro.observe(document.body);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(pin).catch(() => {});
+  window.addEventListener('load', pin);
+  const end = () => {
+    if (!live) return;
+    live = false; clearInterval(iv); if (ro) ro.disconnect();
+    if (hadRestore) history.scrollRestoration = 'auto';
+  };
+  setTimeout(end, 3000);
+  ['wheel', 'touchstart', 'keydown'].forEach((ev) => window.addEventListener(ev, end, { passive: true, once: true }));
+  pin();
+})();
+
 // ---- "Let's work together" lands on the footer's top rule ----
 // Every Contact button — here and on the case studies (index.html#contact) — aims at the last
 // section on the page. The landing spot is the line the rings pile up on: the footer's top edge
