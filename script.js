@@ -96,13 +96,24 @@ const hdrAvatarImg = document.querySelector('.hdr__avatar-img');
 const orbA = document.querySelector('.hero__orb--a');
 const orbB = document.querySelector('.hero__orb--b');
 if ((orbA || orbB) && !reduced) {
+  // A translate in % is a share of the ORB, not of the screen. On a phone the orbs take a far
+  // bigger share of the hero (see the max-width:700px block in the CSS), so the same percentages
+  // would fling them clean off the screen and leave long dead stretches with nothing in view.
+  // These factors bring the swept distance back to roughly the share of the hero it covers on
+  // desktop — a bit less sideways, nearly all of the vertical, since a phone hero is tall.
+  const phone = window.matchMedia('(max-width: 700px)');
+  let ax = 1, ay = 1;
+  const setAmp = () => { ax = phone.matches ? 0.52 : 1; ay = phone.matches ? 0.85 : 1; };
+  setAmp();
+  phone.addEventListener('change', setAmp);
+
   let t = Math.random() * 100;
   const drift = () => {
     t += 0.005;
     if (orbA) orbA.style.transform =
-      `translate(${(Math.sin(t) * 70 + Math.sin(t * 0.6) * 22).toFixed(1)}%, ${(Math.cos(t * 0.8) * 42).toFixed(1)}%) scale(${(1 + Math.sin(t * 0.5) * 0.12).toFixed(3)})`;
+      `translate(${((Math.sin(t) * 70 + Math.sin(t * 0.6) * 22) * ax).toFixed(1)}%, ${(Math.cos(t * 0.8) * 42 * ay).toFixed(1)}%) scale(${(1 + Math.sin(t * 0.5) * 0.12).toFixed(3)})`;
     if (orbB) orbB.style.transform =
-      `translate(${(Math.cos(t * 0.7) * 66 - 12).toFixed(1)}%, ${(Math.sin(t * 0.9) * 40).toFixed(1)}%) scale(${(1 + Math.cos(t * 0.6) * 0.14).toFixed(3)})`;
+      `translate(${((Math.cos(t * 0.7) * 66 - 12) * ax).toFixed(1)}%, ${(Math.sin(t * 0.9) * 40 * ay).toFixed(1)}%) scale(${(1 + Math.cos(t * 0.6) * 0.14).toFixed(3)})`;
     requestAnimationFrame(drift);
   };
   requestAnimationFrame(drift);

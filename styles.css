@@ -321,19 +321,31 @@ ul, ol { list-style: none; padding: 0; }
   animation: glowIn 1.6s ease .1s both;
 }
 
-/* Two drifting blurred halos that roam the whole hero (JS-driven) */
+/* Two drifting blurred halos that roam the whole hero (JS-driven).
+   The blur is a FRACTION of the orb, never a fixed 64px: a fixed blur that leaves a
+   readable core on a 560px desktop orb is a third of the width of the same orb on a
+   phone, and smears it into a flat wash you can't see moving. */
 .hero__orb {
   position: absolute; z-index: 0; pointer-events: none;
-  width: min(46vw, 560px); aspect-ratio: 1; border-radius: 50%;
-  filter: blur(64px); will-change: transform;
+  width: var(--orb); aspect-ratio: 1; border-radius: 50%;
+  filter: blur(calc(var(--orb) * var(--orb-blur))); will-change: transform;
 }
 .hero__orb--a {
+  --orb: min(46vw, 560px); --orb-blur: .115;
   top: 6%; left: 6%;
   background: radial-gradient(circle at 50% 50%, rgba(150,148,158,0.55) 0%, rgba(150,148,158,0.26) 38%, rgba(150,148,158,0) 70%);
 }
 .hero__orb--b {
-  top: 26%; left: 52%; width: min(40vw, 480px);
+  --orb: min(40vw, 480px); --orb-blur: .133;
+  top: 26%; left: 52%;
   background: radial-gradient(circle at 50% 50%, rgba(181,117,223,0.30) 0%, rgba(181,117,223,0.14) 40%, rgba(181,117,223,0) 70%);
+}
+/* phones: the orbs take a much bigger share of the (narrow, short) hero, so the drift
+   sweeps a real distance across the screen instead of jiggling in one corner */
+@media (max-width: 700px) {
+  .hero__orb--a { --orb: 86vw; top: 1%;  left: -16%; }
+  .hero__orb--b { --orb: 72vw; top: 20%; left: 34%;
+    background: radial-gradient(circle at 50% 50%, rgba(181,117,223,0.38) 0%, rgba(181,117,223,0.18) 40%, rgba(181,117,223,0) 70%); }
 }
 
 /* Particle "UX/UI Designer" — the canvas covers the whole hero so dots can fly across it */
