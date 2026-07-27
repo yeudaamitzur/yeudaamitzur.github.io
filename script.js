@@ -241,8 +241,13 @@ function drawDots() {
   // so the dots are still visibly drifting for as long as any of them is on screen
   const scatter = clamp(window.scrollY / Math.max(1, ch * 0.9), 0, 1);
   for (let i = 0; i < letterHot.length; i++) {
-    letterHot[i]  += ((letterOn[i] ? 1 : 0) - letterHot[i]) * 0.2;          // colour — sticky
-    letterLift[i] += ((i === hoverLetter ? 1 : 0) - letterLift[i]) * 0.2;   // motion — hover only
+    // Colour is a sticky toggle, so it still crossfades — but at 0.2/frame that took ~30 frames
+    // (~500ms) to arrive, which read as the letter answering late. 0.5 lands it in ~5 frames.
+    letterHot[i] += ((letterOn[i] ? 1 : 0) - letterHot[i]) * 0.5;
+    // The lift/push is the letter's DIRECT answer to the cursor being on it, so it is not eased at
+    // all — the letter is raised on the very first frame the pointer is inside it, and drops the
+    // frame it leaves. Anything else is a delay between the mouse and the thing it is touching.
+    letterLift[i] = (i === hoverLetter) ? 1 : 0;
   }
 
   const half = spriteSize / 2, FADE = 190;   // px of self-fade at the canvas foot
@@ -369,10 +374,14 @@ if (!reduced) {
 
 // ---- Only the header PHOTO flies to the cursor; per-letter glow; Instagram-style return ----
 if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
-  const SIZE = 80, HOME_S = 46 / 80, RET = 760;
+  const SIZE = 80, HOME_S = 46 / 80, RET = 760, FLY = 300;   // FLY = the header→cursor hand-off
   let tx = 0, ty = 0, cx = 0, cy = 0, cs = HOME_S;
   let active = false, returning = false, raf = null, homeX = 0, homeY = 0;
   let retStart = 0, rfx = 0, rfy = 0, rfs = HOME_S;
+  // The photo flies from the header to the cursor — that hand-off is the effect and stays eased.
+  // But once it has ARRIVED it becomes the cursor, and a thing that IS the cursor may not trail it.
+  // From that moment it is locked to the pointer and drawn from the pointermove event itself.
+  let locked = false, flyStart = 0;
 
   const render = () => {
     cursorEl.style.transform = `translate(${(cx - SIZE / 2).toFixed(1)}px, ${(cy - SIZE / 2).toFixed(1)}px) scale(${cs.toFixed(3)})`;
@@ -391,9 +400,24 @@ if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
       if (t >= 1) { returning = false; cursorEl.style.opacity = '0'; hdrAvatarImg.style.opacity = ''; raf = null; return; }
       raf = requestAnimationFrame(loop); return;
     }
-    cx += (tx - cx) * 0.26; cy += (ty - cy) * 0.26; cs += (ts() - cs) * 0.26;
+    if (locked) { cx = tx; cy = ty; } else {
+      // The hand-off is time-boxed, NOT distance-based. Keyed off distance it would never finish
+      // while the pointer keeps moving — the gap never closes — and the photo would trail forever,
+      // which is the lag being reported. The follow strength ramps 0.26 → 1 across the flight, so
+      // it arrives exactly on the pointer rather than snapping the last few pixels.
+      const k = clamp((performance.now() - flyStart) / FLY, 0, 1);
+      const a = 0.26 + 0.74 * k * k;
+      cx += (tx - cx) * a; cy += (ty - cy) * a;
+      if (k >= 1) { cx = tx; cy = ty; locked = true; }
+    }
+    cs += (ts() - cs) * 0.26;
     render();
-    if (active || Math.hypot(tx - cx, ty - cy) > 0.6) { raf = requestAnimationFrame(loop); } else { raf = null; }
+    // Once it is locked AND done growing there is nothing left to animate: the loop stands down and
+    // pointermove draws it, so there is no rAF hop between the mouse and the photo.
+    const scaling = Math.abs(ts() - cs) > 0.002;
+    if ((active && (!locked || scaling)) || (!active && Math.hypot(tx - cx, ty - cy) > 0.6)) {
+      raf = requestAnimationFrame(loop);
+    } else { raf = null; }
   };
   const ts = () => (active ? 1 : HOME_S);
   const kick = () => { if (!raf) raf = requestAnimationFrame(loop); };
@@ -402,7 +426,7 @@ if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
     const r = hdrAvatar.getBoundingClientRect();
     homeX = r.left + r.width / 2; homeY = r.top + r.height / 2;
     if (!active && !returning) { cx = homeX; cy = homeY; cs = HOME_S; render(); }
-    active = true; returning = false;
+    active = true; returning = false; locked = false; flyStart = performance.now();   // flies across first
     document.documentElement.classList.add('hero-ava-on');
     cursorEl.style.opacity = '1';
     hdrAvatarImg.style.opacity = '0';    // only the photo lifts off; the ring stays
@@ -410,7 +434,7 @@ if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
   };
   const flyHome = () => {
     if (!active) return;
-    active = false; returning = true;
+    active = false; returning = true; locked = false;
     document.documentElement.classList.remove('hero-ava-on');   // round cursor comes back immediately
     retStart = performance.now(); rfx = cx; rfy = cy; rfs = cs;
     kick();
@@ -432,7 +456,12 @@ if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
   document.addEventListener('pointermove', (e) => {
     if (e.pointerType === 'touch') return;
     if (overLine2(e.clientX, e.clientY)) {
-      if (!active) flyOut(e.clientX, e.clientY); else { tx = e.clientX; ty = e.clientY; kick(); }
+      if (!active) flyOut(e.clientX, e.clientY);
+      else {
+        tx = e.clientX; ty = e.clientY;
+        // locked = it IS the cursor now, so draw it in this event, not on the next frame
+        if (locked) { cx = tx; cy = ty; render(); } else kick();
+      }
       // which letter is under the cursor (+ feed the cursor position to the dots)
       const hr = heroRect();
       const lx = e.clientX - hr.left;
