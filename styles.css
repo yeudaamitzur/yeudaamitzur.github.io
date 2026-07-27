@@ -450,7 +450,10 @@ ul, ol { list-style: none; padding: 0; }
 .wtile--bianca  { --wt-tint: linear-gradient(155deg, #F3E4D1, #F8F3EC); --wt-sh1: rgba(178,110,38,.16); --wt-sh2: rgba(178,110,38,.40); }
 /* Design System sits at hue 100 — the green of its own hero artwork. Same saturation and
    lightness as the lilac it replaced, so it reads as one of the family, just a different hue. */
-.wtile--ds      { --wt-tint: linear-gradient(155deg, #DFF2D6, #F5FBF2); --wt-sh1: rgba(106,175,72,.16); --wt-sh2: rgba(106,175,72,.40); }
+/* DS: #B3ECD2 is Yehuda's own pick for the mat; the other two values are derived from it the way
+   the tiles above are built — the light stop is the same hue taken to near-white, and the shadow
+   is the same hue again at L~43%, where talmind's and bianca's shadows both sit. */
+.wtile--ds      { --wt-tint: linear-gradient(155deg, #B3ECD2, #EFFBF5); --wt-sh1: rgba(49,170,115,.16); --wt-sh2: rgba(49,170,115,.40); }
 
 /* short viewports: keep the row inside the first screen */
 @media (max-height: 760px) and (min-width: 701px) { .hero-work { max-width: 810px; } }
