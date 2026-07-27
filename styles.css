@@ -1,0 +1,837 @@
+/* =========================================================
+   Yehuda Amitzur — UX Designer portfolio
+   Light, warm-neutral palette. Gradients kept for depth,
+   strokes, and motion. Hero/header/cards mirror amitux.in.
+   ========================================================= */
+
+:root {
+  /* ---- Light palette ---- */
+  --bg:        #f0efe9;   /* warm off-white page */
+  --bg-deep:   #e8e6df;   /* slightly deeper (alt / gradient stop) */
+  --surface:   #ffffff;   /* cards */
+  --surface-2: #f8f7f2;
+  --line:      #e2e0d7;   /* hairline stroke */
+  --line-soft: #eae8e0;
+
+  --ink:       #18160f;   /* near-black warm */
+  --ink-mute:  rgba(40, 37, 30, 0.62);
+  --ink-faint: rgba(40, 37, 30, 0.42);
+
+  --gold:      #9a7522;   /* warm secondary accent */
+  --gold-lit:  #ba8d31;
+  --copper:    #bd7636;
+
+  /* ---- Brand ---- */
+  --brand:      #773F9C;  /* primary brand accent */
+  --brand-lit:  #9a5fc0;  /* brand hover */
+  --brand-soft: rgba(119, 63, 156, 0.10);
+
+  /* tag tints — light pills, saturated text */
+  --t-gold-bg:   #f2ead4;  --t-gold-fg:   #856318;
+  --t-green-bg:  #e6efdc;  --t-green-fg:  #4c7434;
+  --t-blue-bg:   #e1eaf0;  --t-blue-fg:   #3c6076;
+  --t-mauve-bg:  #eee6f1;  --t-mauve-fg:  #755683;
+  --t-copper-bg: #f6e5d5;  --t-copper-fg: #a25c28;
+
+  /* ---- Type ---- */
+  --f-display: 'Hanken Grotesk', system-ui, sans-serif;
+  --f-serif:   'Instrument Serif', Georgia, serif;
+  --f-body:    'Inter', system-ui, sans-serif;
+
+  /* ---- Layout ---- */
+  --wrap: 1300px;
+  --pad:  clamp(1.25rem, 5vw, 3rem);
+  --sec-y: clamp(4.5rem, 11vw, 9rem);
+  --radius: 18px;
+  --hdr-h: 90px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; scroll-padding-top: var(--hdr-h); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 1rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+ul, ol { list-style: none; padding: 0; }
+
+.wrap { width: 100%; max-width: var(--wrap); margin-inline: auto; padding-inline: var(--pad); }
+
+/* Parked ABOVE the page, not to the left of it: at `left: -999px` this widened the document by
+   ~30px, and on a phone that is a page you can drag sideways with one finger. */
+.skip-link {
+  position: absolute; left: 0; top: 0;
+  transform: translateY(-250%);
+  background: var(--brand); color: #fff; padding: .6rem 1rem;
+  border-radius: 0 0 8px 0; z-index: 200; font-weight: 600;
+}
+.skip-link:focus { transform: none; }
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; border-radius: 4px; }
+
+/* =========================================================
+   Type helpers
+   ========================================================= */
+.eyebrow {
+  font-family: var(--f-body);
+  font-size: .78rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--brand); font-weight: 600;
+  display: inline-flex; align-items: center; gap: .6em;
+}
+.eyebrow::before { content: ""; width: 26px; height: 1px; background: linear-gradient(90deg, var(--brand), transparent); }
+
+.sec-head { max-width: 46rem; margin-bottom: clamp(2.5rem, 5vw, 3.75rem); }
+.sec-title {
+  font-family: var(--f-display); font-weight: 600;
+  font-size: clamp(1.9rem, 4.4vw, 3rem); line-height: 1.05;
+  letter-spacing: -0.02em; margin-top: 1rem;
+}
+.sec-sub { color: var(--ink-mute); margin-top: 1.1rem; font-size: 1.05rem; max-width: 40rem; }
+.sec-head--center { margin-inline: auto; text-align: center; }
+.sec-head--center .sec-sub { margin-inline: auto; }
+.section { padding-block: var(--sec-y); }
+
+/* bordered pill eyebrow (Glimpse) */
+.pill-eyebrow {
+  display: inline-flex; align-items: center;
+  font-family: var(--f-body); font-size: .74rem; font-weight: 600;
+  letter-spacing: .18em; text-transform: uppercase; color: var(--ink-mute);
+  padding: .6em 1.15em; border: 1px solid var(--line); border-radius: 999px;
+  background: var(--surface-2);
+}
+
+/* =========================================================
+   Header
+   ========================================================= */
+.hdr {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 60;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 22px clamp(20px, 4vw, 44px);
+  background-color: rgba(243, 242, 237, 0.10);
+  background-image: linear-gradient(
+    rgba(119, 63, 156, 0.11) 0%,
+    rgba(119, 63, 156, 0.03) 60%,
+    rgba(119, 63, 156, 0) 100%);
+  backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+  animation: hdrIn .8s cubic-bezier(.2,.7,.2,1) both;
+}
+.hdr__logo { display: inline-flex; }
+.hdr__avatar {
+  display: block; width: 46px; height: 46px; border-radius: 50%;
+  border: 1.5px solid var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+  overflow: hidden; position: relative;
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+.hdr__avatar-img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 50%; transition: opacity .18s ease; }
+.hdr__logo:hover .hdr__avatar { transform: scale(1.06); box-shadow: 0 0 0 5px var(--brand-soft); }
+
+
+.hdr__nav { display: flex; gap: clamp(1.5rem, 3vw, 2.5rem); }
+.hdr__nav a {
+  font-family: var(--f-display); font-weight: 500; font-size: 1.02rem;
+  color: var(--ink); position: relative; padding: 4px 0;
+}
+.hdr__nav a::after {
+  content: ""; position: absolute; left: 0; right: 100%; bottom: -2px; height: 3px;
+  background: var(--brand); transition: right .3s ease;
+}
+.hdr__nav a:hover::after { right: 0; }
+
+.hdr__contact { display: flex; align-items: center; gap: .5rem; }
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; border-radius: 50%; color: var(--ink);
+  border: 1px solid transparent;
+  transition: background .25s ease, border-color .25s ease, transform .25s ease, color .25s ease;
+}
+.icon-btn:hover { background: var(--brand-soft); border-color: rgba(119,63,156,0.35); color: var(--brand); transform: translateY(-2px); }
+
+.hdr__menu { display: none; flex-direction: column; gap: 5px; width: 44px; height: 44px; align-items: center; justify-content: center; background: none; border: 0; cursor: pointer; }
+.hdr__menu span { width: 22px; height: 2px; background: var(--ink); border-radius: 2px; transition: transform .3s ease; }
+.hdr__menu[aria-expanded="true"] span:first-child { transform: translateY(7px) rotate(45deg); }
+.hdr__menu[aria-expanded="true"] span:last-child { transform: translateY(-7px) rotate(-45deg); }
+
+.hdr__drawer {
+  position: fixed; top: var(--hdr-h); left: 0; right: 0; z-index: 59;
+  display: flex; flex-direction: column;
+  padding: .5rem clamp(20px,5vw,40px) 1.5rem;
+  background: rgba(240,239,233,0.97);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.hdr__drawer[hidden] { display: none; }
+.hdr__drawer a { font-family: var(--f-display); font-weight: 500; font-size: 1.2rem; padding: .9rem 0; border-bottom: 1px solid var(--line-soft); }
+.hdr__drawer a:last-child { border-bottom: 0; }
+
+/* the collapsed header "flows" open downward, links stagger in */
+.hdr__drawer:not([hidden]) { animation: drawerDrip .5s cubic-bezier(.2,.7,.2,1) both; transform-origin: top center; }
+.hdr__drawer:not([hidden]) a { animation: drawerLinkIn .5s cubic-bezier(.2,.7,.2,1) both; }
+.hdr__drawer:not([hidden]) a:nth-child(1) { animation-delay: .06s; }
+.hdr__drawer:not([hidden]) a:nth-child(2) { animation-delay: .12s; }
+.hdr__drawer:not([hidden]) a:nth-child(3) { animation-delay: .18s; }
+.hdr__drawer:not([hidden]) a:nth-child(4) { animation-delay: .24s; }
+.hdr__drawer:not([hidden]) a:nth-child(5) { animation-delay: .30s; }
+.hdr__drawer:not([hidden]) a:nth-child(6) { animation-delay: .36s; }
+@keyframes drawerDrip {
+  from { opacity: 0; clip-path: inset(0 0 100% 0 round 0 0 24px 24px); }
+  55%  { opacity: 1; }
+  to   { opacity: 1; clip-path: inset(0 0 0 0 round 0 0 24px 24px); }
+}
+@keyframes drawerLinkIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+@keyframes hdrIn { from { opacity: 0; transform: translateY(-18px); } to { opacity: 1; transform: none; } }
+
+/* ---- Floating pill header (shared by home + case study) ---- */
+.hdr--float { justify-content: center; padding: 16px 20px;
+  background: none; background-image: none; -webkit-backdrop-filter: none; backdrop-filter: none; pointer-events: none; }
+.hdr--float > * { pointer-events: auto; }
+.hdr__pill { display: inline-flex; align-items: center; gap: 0;
+  padding: 8px 10px; border-radius: 40px;
+  background-color: rgba(243, 242, 237, 0.42);   /* frosted enough to read as glass at any width / over any background */
+  background-image: linear-gradient(
+    rgba(119, 63, 156, 0.11) 0%,
+    rgba(119, 63, 156, 0.03) 60%,
+    rgba(119, 63, 156, 0) 100%);
+  -webkit-backdrop-filter: blur(13px) saturate(130%); backdrop-filter: blur(13px) saturate(130%);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 12px 32px 0 rgba(24, 22, 15, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  transition: padding .5s cubic-bezier(.2,.7,.2,1); }
+/* fallback: if the browser can't blur the backdrop, make the pill a solid frosted panel
+   so the content behind never shows through sharply */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .hdr__pill { background-color: rgba(243, 242, 237, 0.92); }
+}
+.hdr--float.is-scrolled .hdr__pill { padding: 8px 20px 8px 10px; }
+.hdr--float .hdr__avatar { width: 46px; height: 46px; flex: none; }
+.hdr__expand { display: inline-flex; align-items: center; gap: 40px;
+  max-width: 560px; opacity: 1; overflow: hidden; padding: 0 0 0 40px;
+  transition: max-width .55s cubic-bezier(.2,.7,.2,1), opacity .35s ease, padding .5s cubic-bezier(.2,.7,.2,1); }
+.hdr--float .hdr__nav { display: flex; gap: clamp(1.4rem, 2.2vw, 1.75rem); }
+.hdr--float .hdr__nav a { font-size: 1rem; white-space: nowrap; }
+.hdr__cta { display: inline-flex; align-items: center; white-space: nowrap;
+  background: var(--ink); color: var(--bg); font-family: var(--f-display); font-weight: 600; font-size: .98rem;
+  padding: .68em 1.35em; border-radius: 999px; transition: transform .25s ease, background .25s ease; }
+.hdr__cta:hover { transform: translateY(-1px); background: var(--brand); }
+.hdr__status { display: inline-flex; align-items: center; gap: .65rem; white-space: nowrap; overflow: hidden;
+  max-width: 0; opacity: 0; padding: 0;
+  font-family: var(--f-display); font-weight: 500; font-size: 1rem; color: var(--ink);
+  transition: max-width .55s cubic-bezier(.2,.7,.2,1), opacity .35s ease .05s, padding .5s cubic-bezier(.2,.7,.2,1); }
+.hdr__dot { width: 11px; height: 11px; border-radius: 50%; background: #2fbf5b; box-shadow: 0 0 0 4px rgba(47,191,91,0.18); }
+.hdr--float.is-scrolled .hdr__expand { max-width: 0; opacity: 0; padding: 0; }
+.hdr--float.is-scrolled .hdr__status { max-width: 260px; opacity: 1; padding: 0 0 0 12px; }
+/* ---- Mobile + tablet: the floating pill expands into ONE connected menu card ---- */
+@media (max-width: 1024px) {
+  .hdr--float .hdr__nav, .hdr--float .hdr__cta { display: none; }
+  .hdr--float .hdr__expand, .hdr--float.is-scrolled .hdr__expand { max-width: none; opacity: 1; padding: 0 .3rem 0 .55rem; }
+  .hdr--float .hdr__status, .hdr--float.is-scrolled .hdr__status { max-width: 0; opacity: 0; padding: 0; }
+  .hdr--float .hdr__menu { display: flex; width: 40px; height: 40px; }
+
+  /* when the menu is open, the pill gives way so the card reads as the bar expanded (one unit) */
+  .hdr--float.menu-open .hdr__pill { opacity: 0; visibility: hidden; pointer-events: none; }
+
+  /* the drawer grows straight out of the bar — same top position, one continuous frosted unit */
+  .hdr--float .hdr__drawer {
+    position: fixed; top: 12px; left: 50%; right: auto; transform: translateX(-50%); z-index: 61;
+    width: min(340px, calc(100% - 24px));
+    display: flex; flex-direction: column; align-items: stretch; gap: clamp(26px, 6vw, 34px);
+    padding: 14px 16px 26px;
+    background-color: rgba(243, 242, 237, 0.90);
+    background-image: linear-gradient(rgba(119, 63, 156, 0.11) 0%, rgba(119, 63, 156, 0.03) 60%, rgba(119, 63, 156, 0) 100%);
+    -webkit-backdrop-filter: blur(16px) saturate(125%); backdrop-filter: blur(16px) saturate(125%);
+    border: 1px solid #DADADA; border-radius: 34px;
+    box-shadow: 0 26px 64px -22px rgba(24, 22, 15, 0.28);
+    transform-origin: top center;
+  }
+  .hdr--float .hdr__drawer[hidden] { display: none; }
+  .hdr--float .hdr__drawer:not([hidden]) { animation: drawerExpand .44s cubic-bezier(.22,.61,.28,1) both; }
+  .hdr--float .hdr__drawer.is-closing { animation: drawerCollapse .32s cubic-bezier(.5,0,.78,.36) both; pointer-events: none; }
+
+  .hdr__drawer-top { display: flex; align-items: center; justify-content: space-between; }
+  .hdr__drawer-ava { width: 46px; height: 46px; border-radius: 50%; overflow: hidden; border: 1.5px solid var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
+  .hdr__drawer-ava img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  /* subtle close — two thin bars (no loud purple circle) that arrive from the hamburger and cross into an X */
+  .hdr__drawer-close { position: relative; width: 40px; height: 40px; border: 0; background: none; cursor: pointer; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center; transition: background .2s ease; }
+  .hdr__drawer-close:hover { background: rgba(119, 63, 156, 0.10); }
+  .hdr__drawer-close span { position: absolute; width: 19px; height: 2px; border-radius: 2px; background: var(--ink-mute); }
+  .hdr__drawer-close span:first-child { transform: rotate(45deg); }
+  .hdr__drawer-close span:last-child  { transform: rotate(-45deg); }
+  .hdr__drawer-close:hover span { background: var(--ink); }
+  .hdr--float .hdr__drawer:not([hidden]):not(.is-closing) .hdr__drawer-close span:first-child { animation: closeBar1 .46s cubic-bezier(.2,.7,.2,1) both; }
+  .hdr--float .hdr__drawer:not([hidden]):not(.is-closing) .hdr__drawer-close span:last-child  { animation: closeBar2 .46s cubic-bezier(.2,.7,.2,1) both; }
+
+  .hdr--float .hdr__drawer a { text-align: center; border-bottom: 0; padding: 0; font-size: 1.4rem; color: var(--ink);
+    font-family: var(--f-display); font-weight: 500; }
+  /* the CTA has to out-specify the blanket `a` rule above — otherwise it loses its white
+     label and its side padding and reads as a bare purple blob behind black text */
+  .hdr--float .hdr__drawer a.hdr__drawer-contact,
+  .hdr__drawer-contact { align-self: center; display: inline-flex; align-items: center; justify-content: center; margin: 8px 0 6px;
+    background: var(--brand); color: #fff; font-family: var(--f-display); font-weight: 600; font-size: 1.1rem;
+    padding: .85em 2.1em; border-radius: 999px; box-shadow: 0 10px 24px -10px rgba(119, 63, 156, 0.6);
+    transition: transform .2s ease, background .2s ease, box-shadow .2s ease; }
+  .hdr--float .hdr__drawer a.hdr__drawer-contact:hover,
+  .hdr__drawer-contact:hover { transform: translateY(-2px); background: var(--brand-lit); box-shadow: 0 14px 28px -10px rgba(119, 63, 156, 0.7); }
+}
+/* the drawer opens as if the pill itself stretches out (grows from the pill footprint at top-centre) … */
+@keyframes drawerExpand {
+  from { opacity: .55; clip-path: inset(0 calc(50% - 60px) calc(100% - 54px) calc(50% - 60px) round 30px); }
+  60%  { opacity: 1; }
+  to   { opacity: 1; clip-path: inset(0 0 0 0 round 34px); }
+}
+/* … and closes with a firm contraction back down into that same small pill shape */
+@keyframes drawerCollapse {
+  from { opacity: 1; clip-path: inset(0 0 0 0 round 34px); }
+  to   { opacity: 0; clip-path: inset(0 calc(50% - 60px) calc(100% - 54px) calc(50% - 60px) round 30px); }
+}
+@keyframes closeBar1 { from { transform: translateY(-4px) rotate(0deg); opacity: .35; } 45% { opacity: 1; } to { transform: translateY(0) rotate(45deg); } }
+@keyframes closeBar2 { from { transform: translateY(4px) rotate(0deg); opacity: .35; } 45% { opacity: 1; } to { transform: translateY(0) rotate(-45deg); } }
+
+/* =========================================================
+   Hero
+   ========================================================= */
+.hero {
+  position: relative; min-height: 100svh;
+  /* column so the project tiles can sit under the wordmark, still inside the first screen */
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: calc(var(--hdr-h) + 2rem) var(--pad) 3rem;
+  overflow: clip; overflow-clip-margin: 480px;   /* let the dots fly on past the hero, down through the stats bar */
+}
+.hero__glow {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(52% 48% at 64% 42%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 60%),
+    radial-gradient(46% 40% at 60% 44%, rgba(119, 63, 156, 0.12) 0%, transparent 62%),
+    radial-gradient(70% 60% at 50% 30%, rgba(0,0,0,0.03) 0%, transparent 65%);
+  animation: glowIn 1.6s ease .1s both;
+}
+
+/* Two drifting blurred halos that roam the whole hero (JS-driven) */
+.hero__orb {
+  position: absolute; z-index: 0; pointer-events: none;
+  width: min(46vw, 560px); aspect-ratio: 1; border-radius: 50%;
+  filter: blur(64px); will-change: transform;
+}
+.hero__orb--a {
+  top: 6%; left: 6%;
+  background: radial-gradient(circle at 50% 50%, rgba(150,148,158,0.55) 0%, rgba(150,148,158,0.26) 38%, rgba(150,148,158,0) 70%);
+}
+.hero__orb--b {
+  top: 26%; left: 52%; width: min(40vw, 480px);
+  background: radial-gradient(circle at 50% 50%, rgba(181,117,223,0.30) 0%, rgba(181,117,223,0.14) 40%, rgba(181,117,223,0) 70%);
+}
+
+/* Particle "UX/UI Designer" — the canvas covers the whole hero so dots can fly across it */
+.hero__line--2 { position: relative; width: 100%; }
+.hero__dots {
+  position: absolute; top: 0; left: 0;   /* width/height set by JS so the canvas can extend below the hero */
+  z-index: 2; pointer-events: none;
+  animation: dotsIn .6s ease both;
+}
+@keyframes dotsIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* The header avatar "flies" here to the cursor; JS drives the transform (no CSS transform transition) */
+.hero__cursor {
+  position: fixed; top: 0; left: 0; z-index: 80;
+  width: 80px; height: 80px; margin: 0;
+  border-radius: 50%; overflow: hidden; border: 0;
+  box-shadow: 0 20px 40px -18px rgba(40,37,30,0.45);
+  pointer-events: none;
+  opacity: 0; transform: translate(-120px, -120px) scale(0.5);
+  transition: opacity .3s ease;
+  will-change: transform, opacity;
+}
+.hero__cursor img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
+
+/* Per-letter hover for "UX Designer" — vivid tint + external glow */
+.hero__letter { display: inline-block; transition: color .3s ease, text-shadow .35s ease, transform .3s cubic-bezier(.2,.9,.3,1.4); will-change: color, transform; }
+.hero__letter.is-lit { transform: translateY(-0.09em) scale(1.09); }
+@keyframes glowIn { from { opacity: 0; } to { opacity: 1; } }
+
+.hero__stage { position: relative; z-index: 1; width: 100%; max-width: var(--wrap); margin-inline: auto; display: flex; flex-direction: column; }
+.hero__line { display: block; font-family: var(--f-display); line-height: 1.0; letter-spacing: -0.02em; will-change: transform; }
+.hero__rev { display: inline-block; animation: heroRev .95s cubic-bezier(.2,.7,.2,1) both; }
+.hero__line--1 { font-weight: 250; font-size: clamp(2.35rem, 7.2vw, 5.4rem); align-self: center; margin-left: -4%; }
+.hero__line--1 .hero__rev { animation-delay: .15s; }
+.hero__line--2 { align-self: stretch; width: 100%; margin: .06em 0 0; }
+.hero__sub {
+  align-self: flex-start; margin-top: 2rem; max-width: 30rem;
+  font-family: var(--f-display); font-weight: 400;
+  font-size: clamp(1rem, 1.5vw, 1.25rem); line-height: 1.5; color: var(--ink-mute);
+  will-change: transform;
+}
+.hero__sub .hero__rev { animation-delay: 1.9s; }   /* appears only after the dots assemble */
+.hero__sub strong { color: var(--ink); font-weight: 700; }
+@media (min-width: 1150px) {
+  .hero__sub {
+    max-width: 34rem; margin-top: 2.25rem;
+    font-size: clamp(1.3rem, 1.7vw, 1.7rem);
+    line-height: 1.4; font-weight: 500;
+  }
+}
+
+@keyframes heroRev { from { opacity: 0; transform: translateY(34px); } to { opacity: 1; transform: none; } }
+
+/* =========================================================
+   Stats (centered)
+   ========================================================= */
+/* The stats bar rides ON TOP of the hero's dot canvas (z 2) but only starts veiling it
+   part-way down: transparent at its top edge, fully on --bg by the time the numbers begin.
+   Same "sheet fades in over the hero" move as .tl-cover / .bn-cover on the case studies. */
+/* =========================================================
+   Hero project tiles — the work index, sitting in the first screen.
+   Each tile is a button: project-tinted frame, cover, name + one line.
+   (The previous sticky-stacking .case concept is kept below, unused —
+    the full original page is also saved as index-cards-backup.html)
+   ========================================================= */
+.hero-work {
+  position: relative; z-index: 3;              /* above the dot canvas (z-index 2) */
+  width: 100%; max-width: 1000px; margin-inline: auto;
+  margin-top: clamp(1.75rem, 4.5vh, 3.25rem);
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: clamp(.9rem, 2.2vw, 2rem);
+  scroll-margin-top: calc(var(--hdr-h) + 1rem);
+}
+/* the dots finish assembling at ~1.9s, so the tiles ease up into place just after that:
+   a long, soft rise + fade (no scale pop), each one close behind the last — then they breathe
+   continuously, the same gentle float the Glimpse photos use. */
+@keyframes wtIn { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes wtBreathe { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-9px) scale(1.008); } }
+
+.wtile { display: flex; flex-direction: column; align-items: center; text-align: center; gap: .8rem; min-width: 0;
+  animation: wtIn 1.5s cubic-bezier(.22,.61,.36,1) both, wtBreathe 7s ease-in-out infinite; }
+/* two delays per rule: [entrance, breath]. The breath starts once that tile's entrance has landed. */
+.wtile:nth-child(1) { animation-delay: 2.00s, 3.60s; animation-duration: 1.5s, 7.0s; }
+.wtile:nth-child(2) { animation-delay: 2.13s, 3.73s; animation-duration: 1.5s, 8.2s; }
+.wtile:nth-child(3) { animation-delay: 2.26s, 3.86s; animation-duration: 1.5s, 7.6s; }
+/* The frame does NOT set its own ratio. It is a mat that wraps the screenshot, and the
+   screenshot keeps its intrinsic proportions (height: auto, no object-fit) — so there is
+   nothing left in the box that can crop it, on any engine, whatever box-sizing does to
+   aspect-ratio. All three tiles are 1200x750, so they still come out exactly equal height. */
+.wtile__frame {
+  display: block; width: 100%; flex: none;
+  padding: clamp(5px, .7vw, 9px);
+  border-radius: clamp(14px, 1.7vw, 22px);
+  background: var(--wt-tint);
+  box-shadow: 0 2px 6px var(--wt-sh1), 0 18px 34px -16px var(--wt-sh2);
+  transition: transform .38s cubic-bezier(.2,.7,.2,1), box-shadow .38s ease;
+}
+.wtile__img { display: block; width: 100%; height: auto; border-radius: clamp(7px, .8vw, 10px); }
+.wtile__name { font-family: var(--f-display); font-weight: 700; letter-spacing: -0.01em;
+  font-size: clamp(1rem, 1.35vw, 1.18rem); color: var(--ink); transition: color .25s ease; }
+.wtile__desc { font-size: clamp(.78rem, .95vw, .88rem); line-height: 1.4; color: var(--ink-mute); max-width: 24ch; }
+
+@media (hover: hover) and (pointer: fine) {
+  .wtile:hover .wtile__frame { transform: translateY(-8px);
+    box-shadow: 0 4px 10px var(--wt-sh1), 0 30px 52px -18px var(--wt-sh2); }
+  .wtile:hover .wtile__name { color: var(--brand); }
+}
+.wtile:active .wtile__frame { transform: translateY(-2px) scale(.988); transition-duration: .12s; }
+.wtile:focus-visible { outline: none; }
+.wtile:focus-visible .wtile__frame { outline: 2px solid var(--brand); outline-offset: 4px; }
+
+/* per-project tint + shadow hue, taken from each case study's own palette */
+.wtile--talmind { --wt-tint: linear-gradient(155deg, #D9DFF1, #F2F4FE); --wt-sh1: rgba(74,86,150,.16);  --wt-sh2: rgba(74,86,150,.42); }
+.wtile--bianca  { --wt-tint: linear-gradient(155deg, #F3E4D1, #F8F3EC); --wt-sh1: rgba(178,110,38,.16); --wt-sh2: rgba(178,110,38,.40); }
+.wtile--ds      { --wt-tint: linear-gradient(155deg, #E4D6F2, #F6F2FB); --wt-sh1: rgba(126,72,175,.16); --wt-sh2: rgba(126,72,175,.40); }
+
+/* short viewports: keep the row inside the first screen */
+@media (max-height: 760px) and (min-width: 701px) { .hero-work { max-width: 810px; } }
+
+/* phones: swipeable row instead of three cramped columns */
+@media (max-width: 700px) {
+  .hero-work {
+    grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 62vw;
+    overflow-x: auto; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch;
+    /* edge to edge: the row runs the full width of the phone with no side gutter, so the
+       tiles are cut by the screen edges and read as a strip you can push. The hero is a
+       centred flex column, so the row has to stretch out of that centring, not just take
+       negative margins — a centred item just re-centres itself inside them. */
+    align-self: stretch; width: auto; max-width: none;
+    /* the TRACK is full-bleed (tiles run off both screen edges as you push it) but the row still
+       opens and closes on a gutter — the first tile never sits flush against the left bezel, and
+       there is air after the last one. align-self matters: .hero is a centred flex column, and a
+       centred item just re-centres itself inside negative margins. */
+    padding-inline: var(--pad); margin-inline: calc(var(--pad) * -1);
+    scroll-padding-inline: var(--pad);
+    gap: 1.6rem;                                 /* more air between the three than the desktop row */
+    /* overflow-x: auto also makes the Y axis scrollable, which would CLIP the frames:
+       the breathing float lifts each tile 9px and the frame casts a 34px shadow, so the
+       row keeps headroom top and bottom instead of shaving the top edge off every card. */
+    padding-block: 26px 14px;                    /* clears the 9px breathing lift + its shadow */
+    scrollbar-width: none;                       /* no scrollbar under the tiles */
+  }
+  .hero-work::-webkit-scrollbar { display: none; }
+  .wtile { scroll-snap-align: center; }
+  /* the grey mat around each screenshot is the frame you actually see on a phone — at 5px it
+     read as a hairline, so it gets real width here */
+  .wtile__frame { padding: 10px; border-radius: 20px; }
+  .wtile__img { border-radius: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wtile { animation: none; }
+  .wtile__frame, .wtile__name { transition: none; }
+  .wtile:hover .wtile__frame, .wtile:active .wtile__frame { transform: none; }
+}
+
+/* the stats band now sits after Experience, so it no longer needs the hero-veil gradient */
+.stats-sec { padding-block: clamp(2.5rem, 5vw, 4rem); }
+.stats {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: clamp(2rem, 7vw, 6rem);
+  padding-block: 2.25rem; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  text-align: center;
+}
+.stat { display: flex; flex-direction: column; gap: .3rem; align-items: center; }
+.stat__num { font-family: var(--f-serif); font-style: italic; font-weight: 700; font-synthesis: weight; -webkit-text-stroke: 0.6px currentColor; font-size: clamp(2.7rem, 5.2vw, 3.9rem); line-height: 1; letter-spacing: -0.01em; }
+.stat__plus { color: var(--brand); }
+.stat__label { font-size: .88rem; color: var(--ink-mute); }
+
+/* =========================================================
+   Tags
+   ========================================================= */
+.tags { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: auto; }
+.tag { font-size: .82rem; font-weight: 600; padding: .4em .85em; border-radius: 999px; border: 1px solid transparent; white-space: nowrap; }
+.tag--gold   { background: var(--t-gold-bg);   color: var(--t-gold-fg); }
+.tag--green  { background: var(--t-green-bg);  color: var(--t-green-fg); }
+.tag--blue   { background: var(--t-blue-bg);   color: var(--t-blue-fg); }
+.tag--mauve  { background: var(--t-mauve-bg);  color: var(--t-mauve-fg); }
+.tag--copper { background: var(--t-copper-bg); color: var(--t-copper-fg); }
+
+/* =========================================================
+   Work  (sticky-stacking + grow-on-scroll)
+   ========================================================= */
+.work { border-top: 1px solid var(--line-soft); overflow: clip; }
+.cases { display: flex; flex-direction: column; gap: 40px; }
+
+.case {
+  position: sticky;
+  transform: scale(var(--card-scale, .33));
+  transform-origin: center top;
+  opacity: var(--card-opacity, 1);
+  will-change: transform, opacity;
+}
+.case:nth-child(1) { top: var(--hdr-h); z-index: 1; }
+.case:nth-child(2) { top: calc(var(--hdr-h) + 40px); z-index: 2; }
+.case:nth-child(3) { position: relative; top: 0; z-index: 3; }
+.cases .case:last-child { position: relative; top: 0; }   /* last card scrolls away instead of sticking */
+
+.case__inner {
+  position: relative;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: clamp(1.5rem, 4vw, 3rem); align-items: stretch;
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 48px;
+  padding: clamp(1.1rem, 2.5vw, 1.6rem);
+  min-height: clamp(460px, 46vw, 620px);   /* ~25% taller frames */
+}
+/* one soft shadow via a pseudo layer — its opacity fades when the card gets covered,
+   so stacked cards never pile shadow-on-shadow */
+.case__inner::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: -1;
+  box-shadow: 0 30px 60px -34px rgba(40, 37, 30, 0.4);   /* soft, like the personal photos */
+  opacity: var(--sh, 1);
+  transition: opacity .25s ease, box-shadow .3s ease;
+}
+.case:nth-child(even) .case__media { order: 2; }
+
+/* directional tint — the brand colour sits on the image side for contrast (no white patch) */
+.case__inner--talmind { background: linear-gradient(to right, #D9DFF1, #F2F4FE 60%); }
+.case__inner--bianca  { background: linear-gradient(to left,  #F3E4D1, #F8F3EC 60%); }
+.case__inner--tesi    { background: linear-gradient(to right, #D8E2F2, #EFF3F9 60%); }
+.case__inner--ds      { background: linear-gradient(to right, #E4D6F2, #F6F2FB 60%); }
+
+/* clickable case (opens a project page) — no hover stroke, just a shadow lift */
+a.case__inner { color: inherit; text-decoration: none; cursor: pointer; }
+a.case__inner:hover::after { box-shadow: 0 42px 74px -32px rgba(40, 37, 30, 0.5); }
+.case__open {
+  display: inline-flex; align-items: center; gap: .5em; align-self: flex-start;
+  margin-top: 1.9rem; padding: .7em 1.35em; border-radius: 999px;
+  border: 1px solid var(--brand); color: var(--brand);
+  font-family: var(--f-display); font-weight: 600; font-size: .95rem;
+  transition: background .25s ease, color .25s ease;
+}
+.case__open span { transition: transform .3s ease; }
+a.case__inner:hover .case__open { background: var(--brand); color: #fff; }
+a.case__inner:hover .case__open span { transform: translateX(3px); }
+
+/* the screenshot sits clean on the card tint — no box, no shadow */
+.case__media { position: relative; display: flex; align-items: center; justify-content: center; padding: clamp(.75rem, 2vw, 1.6rem); }
+.case__img {
+  width: 100%; height: auto; max-height: clamp(300px, 38vw, 500px);
+  object-fit: contain; display: block; border-radius: 18px;
+}
+.case__media--talmind { background: radial-gradient(120% 120% at 20% 0%, #3a2f45 0%, #201a26 55%, #14111a 100%); }
+.case__media--fintech { background: radial-gradient(120% 120% at 80% 0%, #23303a 0%, #182229 55%, #10161a 100%); }
+.case__media--system  { background: radial-gradient(120% 120% at 30% 0%, #33301f 0%, #211f15 55%, #15140e 100%); }
+
+.mock { position: absolute; inset: clamp(14px, 4%, 30px) clamp(14px, 4%, 30px) 0; background: #101012; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px 12px 0 0; box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow: hidden; transition: transform .4s ease; }
+.mock__bar { display: flex; gap: 6px; padding: 11px 13px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.mock__bar span { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.18); }
+.mock__body { padding: 16px; }
+.mock__chat { display: flex; flex-direction: column; gap: 10px; }
+.mock__bubble { height: 16px; border-radius: 8px; }
+.mock__bubble--in  { width: 72%; background: rgba(179,159,192,0.28); }
+.mock__bubble--out { width: 55%; align-self: flex-end; background: rgba(166,145,83,0.4); }
+.mock__bubble.short { width: 40%; }
+.mock__form { display: flex; flex-direction: column; gap: 12px; }
+.mock__field { height: 26px; border-radius: 7px; background: rgba(148,161,170,0.16); }
+.mock__cta { height: 30px; width: 45%; border-radius: 7px; background: var(--copper); opacity: .85; }
+.mock__swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
+.mock__swatches span { aspect-ratio: 1; border-radius: 8px; }
+.mock__swatches span:nth-child(1){ background:#a69153;} .mock__swatches span:nth-child(2){ background:#8fb072;}
+.mock__swatches span:nth-child(3){ background:#94a1aa;} .mock__swatches span:nth-child(4){ background:#c28951;}
+.mock__swatches span:nth-child(5){ background:#b39fc0;} .mock__swatches span:nth-child(6){ background:#3a3a36;}
+.mock__swatches span:nth-child(7){ background:#56534a;} .mock__swatches span:nth-child(8){ background:#f7f7f7;}
+
+.case__body { padding: clamp(1rem, 2.5vw, 2rem) clamp(.75rem, 2vw, 1.75rem); display: flex; flex-direction: column; justify-content: center; }
+.case__year { font-family: var(--f-display); font-size: .78rem; color: var(--ink-faint); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 1rem; }
+.case__title { font-family: var(--f-display); font-weight: 600; font-size: clamp(1.5rem, 2.8vw, 2.1rem); line-height: 1.12; letter-spacing: -0.015em; }
+.case__desc { color: var(--ink-mute); margin-top: 1rem; font-size: 1.02rem; line-height: 1.6; }
+
+/* ---- Pill CTA (dark button on light, soft glow) ---- */
+.cta-row { display: flex; justify-content: center; margin-top: clamp(3rem, 7vw, 5rem); }
+.pill {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--f-display); font-weight: 500; font-size: 1.15rem; color: #fff;
+  background: var(--brand); padding: 22px 46px; border-radius: 999px;
+  box-shadow: 0 18px 34px -16px rgba(119, 63, 156, 0.55);
+  transition: transform .3s cubic-bezier(.2,.7,.2,1), box-shadow .3s ease, background .3s ease, color .3s ease;
+}
+/* a bright glint that travels AROUND the stroke only (angle animates, element never rotates) */
+@property --pill-a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+.pill::before {
+  content: ""; position: absolute; inset: 0; border-radius: 999px; padding: 2px; pointer-events: none;
+  background: conic-gradient(from var(--pill-a), rgba(255,255,255,0) 0deg, rgba(255,255,255,0) 298deg, rgba(255,255,255,0.95) 338deg, rgba(255,255,255,0) 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: pillOrbit 3.2s linear infinite;
+}
+.pill span { position: relative; z-index: 1; }
+.pill:hover { transform: translateY(-3px) scale(1.02); background: var(--brand-lit);
+  box-shadow: 0 24px 42px -16px rgba(119, 63, 156, 0.62); }
+.pill:active { background: var(--brand-lit); transform: translateY(-1px) scale(.99); }
+@keyframes pillOrbit { to { --pill-a: 360deg; } }
+
+/* =========================================================
+   Experience  (big title + bio)
+   ========================================================= */
+/* Experience sits a little higher, and everything after it runs a touch tighter */
+.experience { padding-top: clamp(2.75rem, 6.5vw, 5rem); padding-bottom: clamp(3.25rem, 7.5vw, 6rem); }
+.experience__grid { display: flex; flex-direction: column; align-items: flex-start; gap: clamp(1.5rem, 3vw, 2.25rem); }
+.experience__title { font-family: var(--f-display); font-weight: 600; font-size: clamp(2.6rem, 7vw, 5rem); line-height: 1; letter-spacing: -0.03em; }
+.experience__body { display: flex; flex-direction: column; gap: 1.4rem; max-width: 52rem; }
+.experience__body p { color: var(--ink-mute); font-size: clamp(1.05rem, 1.5vw, 1.22rem); line-height: 1.65; }
+.experience__body p:first-child { color: var(--ink); }
+
+/* =========================================================
+   Glimpse  (eyebrow pill + title + text + two photos)
+   ========================================================= */
+.glimpse { padding-block: clamp(3.25rem, 7.5vw, 6rem); }
+.glimpse__wrap { display: flex; flex-direction: column; align-items: center; perspective: 1200px; }
+
+/* Glimpse load/scroll reveal (staggered) */
+.glimpse__anim { opacity: 0; transform: translateY(34px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
+.glimpse__anim.is-in { opacity: 1; transform: none; }
+.glimpse__anim:nth-child(1) { transition-delay: .05s; }
+.glimpse__body .glimpse__anim { transition-delay: .15s; }
+.glimpse__right .glimpse__anim { transition-delay: .28s; }
+
+/* photos fade in (opacity only) then breathe with a gentle continuous float */
+.glimpse__photo.glimpse__anim { transform: none; }
+.glimpse__photo.glimpse__anim.is-in { animation: glimpseFloat 7s ease-in-out infinite; }
+.glimpse__photo--tall.glimpse__anim.is-in { animation-duration: 8.5s; animation-delay: -2.5s; }
+@keyframes glimpseFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-13px) scale(1.015); }
+}
+.pill-eyebrow { margin-bottom: 1.75rem; }
+.glimpse__title {
+  align-self: stretch; text-align: left;
+  font-family: var(--f-display); font-weight: 600;
+  font-size: clamp(1.9rem, 4.4vw, 3rem); line-height: 1.05; letter-spacing: -0.02em;
+}
+.glimpse__body {
+  align-self: stretch; margin-top: clamp(1.75rem, 4vw, 2.5rem);
+  display: grid; grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  gap: clamp(1.5rem, 3vw, 2.75rem); align-items: end;
+}
+.glimpse__left { display: flex; flex-direction: column; gap: clamp(1.75rem, 4vw, 3rem); }
+.glimpse__text { display: flex; flex-direction: column; gap: 1.25rem; max-width: 30rem; }
+.glimpse__text p { color: var(--ink-mute); font-size: 1.05rem; line-height: 1.6; }
+.glimpse__photo { border-radius: 32px; overflow: hidden; border: 1px solid var(--line); box-shadow: 0 30px 60px -34px rgba(40,37,30,0.4); perspective: 800px; }
+.glimpse__photo svg,
+.glimpse__photo img {
+  width: 100%; height: 100%; display: block; object-fit: cover;
+  transform: scale(1.12); transform-origin: center;
+  transition: transform .5s cubic-bezier(.2,.7,.2,1);
+  will-change: transform;
+}
+.glimpse__photo--portrait { aspect-ratio: 3 / 2; max-width: 340px; align-self: flex-start; }
+.glimpse__photo--tall { aspect-ratio: 3 / 2; max-width: 480px; margin-left: auto; }   /* the big piano photo on the right */
+
+/* =========================================================
+   Contact  (headline + centered socials)
+   ========================================================= */
+/* the ring pile settles on the footer's top rule and stands ~56px over it, so the last block on
+   the page keeps that much clear air plus a margin — the rings never reach the links */
+.contact { text-align: center; padding-block: clamp(3.5rem, 8vw, 6.25rem); padding-bottom: calc(clamp(3.5rem, 8vw, 6.25rem) + 84px); }
+.contact__headline {
+  display: block; font-family: var(--f-display); font-weight: 700;
+  font-size: clamp(3.2rem, 15vw, 10rem); line-height: 0.92; letter-spacing: -0.04em;
+  transition: opacity .3s ease;
+}
+.contact__headline:hover { opacity: .85; }
+.contact__accent { display: block; font-family: var(--f-serif); font-style: italic; font-weight: 400; color: var(--brand); letter-spacing: -0.01em; }
+.socials {
+  display: flex; justify-content: center; align-items: flex-start;
+  gap: 46px; flex-wrap: wrap;
+  margin-top: clamp(2.5rem, 6vw, 4rem);
+}
+.socials a {
+  position: relative; color: var(--ink-mute);
+  font-size: 1.02rem; font-family: var(--f-display); font-weight: 500;
+  padding-bottom: 4px;
+  transition: color .25s ease, transform .25s ease;
+}
+.socials a::after {
+  content: ""; position: absolute; left: 0; right: 100%; bottom: 0; height: 3px;
+  background: var(--brand); transition: right .3s cubic-bezier(.2,.7,.2,1);
+}
+.socials a:hover { color: var(--brand); transform: translateY(-2px); }
+.socials a:hover::after { right: 0; }
+
+/* =========================================================
+   Case-study progress bar (phones + tablets)
+   ========================================================= */
+/* The right-hand rail is hidden under 1024px, so the same journey is drawn as a hairline across
+   the very top of the screen instead. It is fed by that page's own rail maths, so it starts and
+   ends on exactly the same scroll positions. 3px is the weight of the underline that swipes in
+   under the contact links. */
+.pgbar {
+  display: none; position: fixed; top: 0; left: 0; right: 0; height: 3px;
+  z-index: 62; pointer-events: none;
+  opacity: 0; transition: opacity .35s ease;
+}
+.pgbar > span {
+  display: block; height: 100%; width: 0;
+  background: var(--brand); border-radius: 0 3px 3px 0;
+}
+.pgbar.is-on { opacity: 1; }
+@media (max-width: 1024px) { .pgbar { display: block; } }
+@media (prefers-reduced-motion: reduce) { .pgbar { transition: none; } }
+
+/* =========================================================
+   Footer
+   ========================================================= */
+/* footer keeps its original size — the ring canvas is absolutely positioned and sits BEHIND
+   every element (z-index -1), so it adds no height and shifts nothing. It reaches well above
+   the footer so the rings can be knocked upward out of frame. */
+/* z-index 3 puts the whole footer — including its ring canvas — above the case-study page
+   sheets (.tl-cover / .bn-cover sit at z-index 2 with an opaque background, which was hiding
+   the pile completely on those pages). The canvas still paints behind the footer's own text. */
+.foot { position: relative; z-index: 3; border-top: 1px solid var(--line-soft); padding-block: 2rem; }
+.foot__dots { position: absolute; left: 0; bottom: 0; width: 100%; height: 150vh;
+  z-index: -1; pointer-events: none; }
+.foot__inner { position: relative; z-index: 1; }
+.foot__inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; color: var(--ink-faint); font-size: .88rem; }
+.foot__inner a:hover { color: var(--ink); }
+
+/* =========================================================
+   Reveal
+   ========================================================= */
+.reveal { opacity: 0; transform: translateY(18px); }
+.reveal.is-in { opacity: 1; transform: none; transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); }
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+@media (max-width: 900px) {
+  .case__inner, .case:nth-child(even) .case__inner { grid-template-columns: 1fr; }
+  /* drop the tall min-height on mobile — it created dead space that hid the description */
+  .case__inner { min-height: 0; padding: clamp(.9rem, 3vw, 1.4rem); gap: clamp(1rem, 3vw, 1.5rem); }
+  .case:nth-child(even) .case__media { order: 0; }
+  .case__media { aspect-ratio: 16 / 10; overflow: hidden; min-width: 0; padding: clamp(.5rem, 2vw, 1rem); }
+  .case__body { min-width: 0; justify-content: flex-start; padding: clamp(.5rem, 2vw, 1rem) clamp(.5rem, 2vw, 1rem) clamp(.75rem, 2.5vw, 1.25rem); }
+  .case__desc { margin-top: .6rem; }
+  .case__open { margin-top: 1.1rem; }
+  .case__img { max-width: 100%; }
+  /* stacked cards rise flush to the first card's top edge so each card's full bottom (incl. its button) shows */
+  .case:nth-child(1), .case:nth-child(2) { top: var(--hdr-h); }
+  .glimpse__body { grid-template-columns: 1fr; align-items: stretch; }
+  .glimpse__right { order: -1; }
+  /* sticky-stacking + grow behaviour is kept on tablet & mobile (same as desktop) */
+}
+
+@media (max-width: 760px) {
+  .hdr__nav { display: none; }
+  .hdr__menu { display: flex; }
+  /* the "EdTech · 2026" / "SaaS · 2025" eyebrow is dropped on phones to save vertical room */
+  .case__year { display: none; }
+  .hero { min-height: auto; padding-top: calc(var(--hdr-h) + 3rem); padding-bottom: 3.5rem; }
+  .hero__stage { align-items: flex-start; }
+  .hero__line { align-self: flex-start !important; margin: 0 !important; text-align: left; }
+  .hero__line--2 { margin-top: .05em !important; }
+  .hero__sub { position: static; margin-top: 1.75rem; max-width: 32rem; transform: none !important; }
+  .hero__line--1, .hero__line--2 { transform: none !important; }
+}
+
+@media (max-width: 520px) {
+  .stats { gap: 1.5rem 2.5rem; }
+}
+/* four contact links don't fit on one line on a phone, so they sit as a balanced 2 x 2 block
+   rather than 3 + 1 with a lone link underneath */
+@media (max-width: 560px) {
+  .socials { display: grid; grid-template-columns: repeat(2, auto); justify-content: center;
+    justify-items: center; gap: 1.3rem 2.5rem; }
+}
+
+/* phones: the footer reads bottom-up — the action first, the small print under it */
+@media (max-width: 700px) {
+  .foot__inner { flex-direction: column-reverse; align-items: flex-start; gap: .55rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .hero__rev, .hdr, .hero__glow { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .hero__orb { animation: none !important; }
+  .hero__cursor { display: none !important; }
+  .hero__line, .hero__sub { transform: none !important; }
+  .pill::before { animation: none !important; }
+  .hdr__drawer:not([hidden]) { animation: none !important; clip-path: none !important; opacity: 1 !important; }
+  .hdr__drawer:not([hidden]) a { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .case { transform: none !important; opacity: 1 !important; }
+  .glimpse__anim { opacity: 1 !important; transform: none !important; }
+  .glimpse__photo.glimpse__anim.is-in { animation: none !important; }
+  .glimpse__photo img, .glimpse__photo svg { transform: scale(1.02) !important; }
+}
+
+/* =========================================================
+   Custom round cursor (fine-pointer devices only)
+   ========================================================= */
+@media (hover: hover) and (pointer: fine) {
+  html.has-cursor, html.has-cursor * { cursor: none !important; }
+}
+.cursor-dot {
+  position: fixed; top: 0; left: 0; z-index: 9999;
+  width: 25px; height: 25px; border-radius: 50%;
+  pointer-events: none; opacity: 0;
+  background: rgba(119, 63, 156, 0.30);
+  border: 1.5px solid rgba(119, 63, 156, 0.85);
+  transition: opacity .25s ease, background .2s ease, border-color .2s ease;
+  will-change: transform, opacity;
+}
+.cursor-dot.is-hover { background: rgba(119, 63, 156, 0.14); border-color: rgba(119, 63, 156, 0.6); }

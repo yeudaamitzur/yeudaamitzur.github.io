@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Design System — Case study · Yehuda Amitzur</title>
+  <meta name="description" content="Talmind Design System — building a scalable design system from 72 base tokens: variables, semantic tokens, a component library and a developer handoff. A UX/UI case study by Yehuda Amitzur." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <!-- favicon: the same ring as the site cursor — purple stroke, lighter purple fill -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css?v=18" />
+
+  <style>
+    /* =========================================================
+       Design System — case study (page-scoped, reuses shared tokens)
+       Same light system as Talmind / Bianca: warm-neutral bg, brand
+       purple chrome, open editorial layout (no content boxes).
+       The signature here is that the system is RENDERED, not pictured:
+       real swatches, real tokens, a real type scale, real tables.
+       ========================================================= */
+    .ds { --ds-mut: rgba(40,37,30,0.6);
+          --ds-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace; }
+    .ds-wrap { width: 100%; max-width: 1180px; margin-inline: auto; padding-inline: var(--pad); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+    .ds-section { padding-block: clamp(2.75rem, 5.5vw, 4.75rem); scroll-margin-top: var(--hdr-h); }
+
+    .ds-eyebrow { display: inline-flex; align-items: center; gap: .6em;
+      font-family: var(--f-body); font-size: .76rem; font-weight: 600;
+      letter-spacing: .18em; text-transform: uppercase; color: var(--brand); }
+    .ds-eyebrow::before { content: ""; width: 26px; height: 1px; background: linear-gradient(90deg, var(--brand), transparent); }
+    .ds-h2 { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.9rem, 4.4vw, 3rem); line-height: 1.04; letter-spacing: -0.02em; margin-top: 1rem; max-width: 24ch; }
+    .ds-lead { color: rgba(40,37,30,0.72); font-family: var(--f-display); font-weight: 400;
+      font-size: clamp(1.06rem, 1.5vw, 1.3rem); line-height: 1.55; margin-top: 1.1rem; max-width: 60rem; }
+    .ds-lead strong { color: var(--ink); font-weight: 600; }
+    .ds-lead code, .ds-inline-code { font-family: var(--ds-mono); font-size: .88em; font-weight: 500;
+      color: var(--brand); background: var(--brand-soft); padding: .12em .45em; border-radius: 6px; letter-spacing: -0.02em; }
+
+    /* ---------- Hero — title over the learning dashboard, then a meta strip ---------- */
+    /* ---------- Hero: same construction as Talmind / Bianca — a pinned video behind everything,
+       the gradient veil locked onto it, and the page sheet scrolling up over the pair ---------- */
+    .ds-hero { position: relative; z-index: 1; overflow: visible;
+      padding-top: calc(var(--hdr-h) + clamp(2rem, 6vw, 4.5rem)); padding-bottom: clamp(1rem, 3vw, 2rem); }
+    .ds-hero > :not(.ds-hero__bg) { position: relative; z-index: 2; }
+
+    /* drifting colour circles — PINNED to the viewport, so only the page moves */
+    .ds-hero__bg { position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+      width: 100vw; height: clamp(600px, 56vw, 820px); z-index: 0; overflow: hidden; pointer-events: none; }
+    .ds-hero__orbs { display: block; width: 100%; height: 100%; }
+    /* the veil is LOCKED onto the video so the two never separate on scroll. Its top stop is a
+       lilac wash — this project's own colour, where Bianca's is the restaurant's warm orange. */
+    .ds-hero__bg::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(170,124,209,0.48) 0%, rgba(255,255,255,0.70) 56.49%, #F0EFE9 100%),
+        linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 50.24%, #F0EFE9 100%); }
+
+    /* the sheet the rest of the page rides on — fades in from transparent so the meta row sits
+       on the video instead of cutting a hard seam (same as .tl-cover / .bn-cover) */
+    .ds-cover { position: relative; z-index: 2;
+      background: linear-gradient(180deg, rgba(240,239,233,0) 0, var(--bg) clamp(200px, 26vh, 340px)); }
+    .ds-hero__chip { align-self: flex-start; display: inline-flex; align-items: center; gap: .55em;
+      font-family: var(--f-display); font-weight: 700; font-size: .8rem; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--brand); background: var(--brand-soft); padding: .5em 1.05em; border-radius: 999px; }
+    .ds-hero__chip::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--brand); }
+    /* same size + weight as the Bianca hero title, so the case studies open alike */
+    .ds-hero__title { font-family: var(--f-display); font-weight: 500; color: var(--ink);
+      font-size: clamp(1.35rem, 2.35vw, 2.15rem); line-height: 1.3; letter-spacing: -0.018em; margin-top: 1.15rem; max-width: 34ch; }
+    .ds-hero__title em { font-family: var(--f-serif); font-style: italic; font-weight: 400; color: var(--brand); letter-spacing: 0; }
+    .ds-hero__sub { color: var(--ds-mut); font-family: var(--f-display); font-weight: 500;
+      font-size: clamp(1rem, 1.5vw, 1.2rem); line-height: 1.5; margin-top: 1.35rem; max-width: 46rem; }
+    .ds-hero__sub b { color: var(--ink); font-weight: 600; }
+    /* hero art — no shadow; drifts with the cursor like the other case-study heroes */
+    .ds-hero__shot { margin: clamp(2rem, 4.5vw, 3.25rem) auto 0;   /* centred */
+      width: 100%; max-width: 880px;              /* a step up from Bianca's 782px hero tablet */
+      border-radius: clamp(12px, 1.5vw, 20px); overflow: hidden;   /* matches the image cards elsewhere */
+      transform-style: preserve-3d; will-change: transform; }
+    .ds-hero__shot img { display: block; width: 100%; height: auto; border-radius: inherit; }
+    .ds-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1.25rem 2.5rem;
+      border-bottom: 1px solid var(--line); padding-block: clamp(1.15rem, 2.6vw, 1.7rem); margin-top: clamp(1.75rem, 3.5vw, 2.5rem); }
+    .ds-meta div { display: flex; flex-direction: column; gap: .28rem; }
+    .ds-meta dt { font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; color: var(--brand); font-weight: 600; }
+    .ds-meta dd { font-family: var(--f-display); font-weight: 500; font-size: .98rem; color: var(--ink); }
+
+    /* wordmark + id section (matches Talmind / Bianca) */
+    .ds-idsection { padding-top: clamp(1rem, 3vw, 2rem); padding-bottom: 0; }
+    .ds-wordmark { font-family: var(--f-display); font-weight: 800; letter-spacing: -0.02em;
+      font-size: clamp(2.6rem, 8vw, 5.6rem); line-height: .92; color: var(--ink); }
+
+    /* documentation sheets — laid down flat: no frame, no shadow of any kind */
+    .ds-figure--flat { margin-top: clamp(1.6rem, 3vw, 2.25rem); }
+    /* left-aligned in the grid by default; the two component maps opt into centring */
+    .ds-figure { margin-inline: 0; }
+    .ds-figure--center { margin-inline: auto; }
+    .ds-figintro { font-family: var(--f-display); font-weight: 400; color: rgba(40,37,30,0.82);
+      font-size: clamp(1.02rem, 1.4vw, 1.2rem); line-height: 1.5;
+      margin-top: clamp(3rem, 6vw, 4.75rem);      /* air between the previous image and this label */
+      max-width: 58rem; }
+    .ds-figintro b { color: var(--ink); font-weight: 700; }
+    .ds-figintro + .ds-figure { margin-top: clamp(1.25rem, 2.2vw, 1.9rem); }
+    /* the two component maps need to read as separate blocks, not one long strip */
+    .ds-figstack { gap: clamp(3rem, 6vw, 4.75rem); }
+    .ds-figure + .ds-h2, .ds-figure + .ds-subhead { margin-top: clamp(3rem, 6vw, 4.5rem); }
+
+    /* ---------- Colour primitives — real swatch rows ---------- */
+    .ds-note { display: inline-flex; align-items: center; gap: .5em; margin-top: 1.25rem;
+      font-family: var(--f-body); font-size: .82rem; color: var(--ds-mut); }
+    .ds-note::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--brand); opacity: .5; }
+    .ds-scales { margin-top: clamp(1.75rem, 3.5vw, 2.5rem); }
+    .ds-scale { display: grid; grid-template-columns: 150px 1fr; gap: clamp(.9rem, 2vw, 1.75rem); align-items: center;
+      padding-block: clamp(.9rem, 1.7vw, 1.25rem); border-top: 1px solid var(--line); }
+    .ds-scale:last-child { border-bottom: 1px solid var(--line); }
+    .ds-scale__label code { font-family: var(--ds-mono); font-size: .85rem; font-weight: 600; color: var(--ink); letter-spacing: -0.02em; }
+    .ds-swatches { display: grid; grid-template-columns: repeat(11, minmax(0, 1fr)); gap: 8px; }
+    .ds-sw { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .ds-sw__chip { display: flex; align-items: flex-end; height: clamp(46px, 5vw, 70px); border-radius: 10px; padding: 7px 8px;
+      font-family: var(--ds-mono); font-size: .68rem; font-weight: 600; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.07); }
+    .ds-sw__hex { font-family: var(--ds-mono); font-size: .58rem; color: var(--ds-mut); letter-spacing: -0.03em; white-space: nowrap; }
+
+    /* ---------- Semantic tokens — grouped rows, each points to one primitive ---------- */
+    .ds-tokens { margin-top: clamp(1.75rem, 3.5vw, 2.5rem); display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(1.5rem, 4vw, 3rem) clamp(2rem, 5vw, 4rem); }
+    .ds-tokengroup__title { font-family: var(--f-display); font-weight: 700; font-size: 1.05rem; letter-spacing: -0.01em; color: var(--ink); margin-bottom: .35rem; }
+    .ds-tokenlist { display: flex; flex-direction: column; }
+    .ds-token { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; align-items: center; gap: .35rem .7rem;
+      padding-block: .6rem; border-top: 1px solid var(--line-soft); }
+    .ds-token__chip { width: 16px; height: 16px; border-radius: 5px; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
+    .ds-token__name { font-family: var(--ds-mono); font-size: .82rem; font-weight: 600; color: var(--ink); letter-spacing: -0.02em; overflow-wrap: anywhere; }
+    .ds-token__hex { font-family: var(--ds-mono); font-size: .74rem; color: var(--ds-mut); text-align: right; }
+    .ds-token__arrow { grid-column: 2; color: var(--brand); opacity: .55; font-size: .8rem; }
+    .ds-token__prim { grid-column: 3; font-family: var(--ds-mono); font-size: .74rem; color: var(--brand); text-align: right; white-space: nowrap; }
+
+    /* ---------- Typography — a live, rendered scale ---------- */
+    .ds-type { margin-top: clamp(1.75rem, 3.5vw, 2.5rem); }
+    .ds-typerow { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 1rem 2rem;
+      padding-block: clamp(1rem, 2.2vw, 1.5rem); border-top: 1px solid var(--line); }
+    .ds-typerow:last-child { border-bottom: 1px solid var(--line); }
+    .ds-type__sample { color: var(--ink); min-width: 0; letter-spacing: -0.01em; }
+    .ds-type__meta { text-align: right; }
+    .ds-type__tok { display: block; font-family: var(--ds-mono); font-size: .8rem; font-weight: 600; color: var(--brand); }
+    .ds-type__spec { display: block; font-family: var(--ds-mono); font-size: .72rem; color: var(--ds-mut); margin-top: .25rem; white-space: nowrap; }
+
+    /* ---------- Flat imagery (icons + component maps) — no frame box, just the artwork ---------- */
+    .ds-figure { margin-top: clamp(1.75rem, 3.5vw, 2.5rem); }
+    .ds-figure img { display: block; width: 100%; height: auto; border-radius: 0; box-shadow: none; }
+    .ds-figure figcaption { margin-top: .9rem; font-family: var(--f-body); font-size: .9rem; color: var(--ds-mut); }
+    .ds-figure figcaption b { color: var(--ink); font-weight: 600; }
+    .ds-figstack { display: grid; gap: clamp(2rem, 4vw, 3rem); margin-top: clamp(1.75rem, 3.5vw, 2.5rem); }
+    .ds-figstack .ds-figure { margin-top: 0; }
+
+    /* ---------- Handoff tables — open, hairline-ruled ---------- */
+    .ds-tablewrap { margin-top: clamp(1.5rem, 3vw, 2.25rem); overflow-x: auto; }
+    .ds-table { width: 100%; border-collapse: collapse; min-width: 640px; }
+    .ds-table th, .ds-table td { text-align: left; vertical-align: top; padding: .85rem 1rem .85rem 0; border-top: 1px solid var(--line); }
+    .ds-table thead th { border-top: 0; border-bottom: 1.5px solid var(--ink); padding-top: 0;
+      font-family: var(--f-body); font-size: .7rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--brand); }
+    .ds-table td.ds-td-name { font-family: var(--ds-mono); font-size: .84rem; font-weight: 600; color: var(--ink); white-space: nowrap; }
+    .ds-table td { font-family: var(--f-body); font-size: .92rem; line-height: 1.5; color: rgba(40,37,30,0.82); }
+    .ds-table .ds-usedin { font-family: var(--ds-mono); font-size: .8rem; color: var(--ds-mut); white-space: nowrap; }
+    .ds-vpills { display: flex; flex-wrap: wrap; gap: .3rem; }
+    .ds-vpills span { font-family: var(--f-body); font-size: .74rem; font-weight: 600; color: var(--brand);
+      background: var(--brand-soft); padding: .2em .6em; border-radius: 999px; white-space: nowrap; }
+    .ds-mono-cell { font-family: var(--ds-mono); font-size: .8rem; color: var(--ink); white-space: nowrap; }
+    .ds-subhead { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.15rem, 2vw, 1.45rem); letter-spacing: -0.01em; color: var(--ink); margin-top: clamp(2.25rem, 4.5vw, 3.25rem); }
+    .ds-subhead:first-of-type { margin-top: clamp(1.75rem, 3.5vw, 2.5rem); }
+    .ds-subhead__note { display: block; font-family: var(--f-body); font-size: .82rem; font-weight: 400; color: var(--ds-mut); letter-spacing: 0; margin-top: .35rem; }
+
+    /* ---------- CTA (left-aligned, matches Talmind / Bianca) ---------- */
+    /* the extra bottom room keeps the footer's ring pile (~56px tall) clear of the CTA and its links */
+    .ds-cta { padding-top: clamp(3.25rem, 6.5vw, 5.5rem); padding-bottom: calc(clamp(3.25rem, 6.5vw, 5.5rem) + 84px);
+      border-top: 1px solid var(--line-soft); }
+    .ds-cta h2 { font-family: var(--f-display); font-weight: 700; font-size: clamp(2.2rem, 7vw, 4.5rem); letter-spacing: -0.03em; line-height: 1; max-width: 16ch; }
+    .ds-cta .pill { margin-top: 2.25rem; }
+    .ds-backall { display: inline-flex; align-items: center; gap: .5em; margin-top: 2.5rem; color: var(--ds-mut); font-family: var(--f-display); font-weight: 500; font-size: .95rem; transition: color .25s ease, gap .25s ease; }
+    .ds-backall:hover { color: var(--brand); gap: .8em; }
+
+    /* ---------- Right-side scroll progress rail (shared pattern) ---------- */
+    .ds-rail { position: fixed; right: max(10px, calc((100vw - 1180px) / 2 - 50px)); top: 50%; transform: translateY(-50%); z-index: 55; height: min(58vh, 480px); display: flex; align-items: center;
+      opacity: 0; pointer-events: none; transition: opacity .4s ease; }
+    .ds-rail.is-on { opacity: 1; pointer-events: auto; }
+    .ds-rail__bar { position: relative; width: 2px; height: 100%; background: var(--line); border-radius: 2px; }
+    .ds-rail__fill { position: absolute; left: 0; top: 0; width: 2px; height: 0; background: var(--brand); border-radius: 2px; }
+    .ds-rail__dots { position: absolute; left: 50%; top: 0; height: 100%; width: 0; transform: translateX(-50%); display: block; }
+    .ds-rail__dot { position: absolute; left: 0; top: var(--pos, 0%); margin: -4.5px 0 0 -4.5px; width: 9px; height: 9px; border-radius: 50%; background: var(--bg); box-shadow: 0 0 0 2px var(--line); transition: transform .3s ease, box-shadow .3s ease, background .3s ease; }
+    .ds-rail__cap { top: 100%; }
+    .ds-rail__dot.is-done { background: var(--brand); box-shadow: 0 0 0 2px var(--brand); }
+    .ds-rail__dot.is-active { background: var(--brand); box-shadow: 0 0 0 4px var(--brand-soft); transform: scale(1.55); }
+
+    .ds .hdr--float { animation: hdrIn 1.15s cubic-bezier(.2,.7,.2,1) .2s both; }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 1024px) { .ds-rail { display: none; } }
+    @media (max-width: 820px) {
+      .ds-tokens { grid-template-columns: 1fr; }
+      /* swatch rows stack: label above, chips scroll horizontally so all 11 stay legible */
+      .ds-scale { grid-template-columns: 1fr; gap: .7rem; }
+      .ds-swatches { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 58px; overflow-x: auto; padding-bottom: 6px; scroll-snap-type: x proximity; }
+      .ds-typerow { grid-template-columns: 1fr; gap: .5rem; }
+      .ds-type__meta { text-align: left; }
+      .ds-type__spec { white-space: normal; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ds .hdr--float { animation: none !important; }
+      /* fall back to a normal scrolling hero (no pinned video), same as the other case studies */
+      .ds-hero__bg { position: absolute; }
+    }
+  </style>
+</head>
+<body class="ds">
+  <!-- phones: the side rail is hidden, so progress runs along the top edge instead -->
+  <div class="pgbar" aria-hidden="true"><span></span></div>
+  <a class="skip-link" href="#color">Skip to content</a>
+
+  <!-- ===== HEADER (shared floating pill) ===== -->
+  <header class="hdr hdr--float" id="top">
+    <div class="hdr__pill">
+      <a class="hdr__logo" href="index.html" aria-label="Yehuda Amitzur — home">
+        <span class="hdr__avatar"><img class="hdr__avatar-img" src="profile.png" alt="Yehuda Amitzur" width="46" height="46" /></span>
+      </a>
+      <div class="hdr__expand">
+        <nav class="hdr__nav" aria-label="Primary">
+          <a href="index.html">Home</a>
+          <a href="index.html#work">Work</a>
+          <a href="cv-yehuda-amitzur.pdf" target="_blank" rel="noopener">CV</a>
+        </nav>
+        <a class="hdr__cta" href="index.html#contact">Contact</a>
+        <button class="hdr__menu" aria-label="Open menu" aria-expanded="false" aria-controls="hdr-drawer"><span></span><span></span></button>
+      </div>
+      <span class="hdr__status" aria-hidden="true"><span>Available for work</span><i class="hdr__dot"></i></span>
+    </div>
+    <div class="hdr__drawer" id="hdr-drawer" hidden>
+      <div class="hdr__drawer-top">
+        <span class="hdr__drawer-ava"><img src="profile.png" alt="" width="46" height="46" /></span>
+        <button class="hdr__drawer-close" type="button" aria-label="Close menu"><span></span><span></span></button>
+      </div>
+      <a href="index.html">Home</a>
+      <a href="index.html#work">Projects</a>
+      <a href="cv-yehuda-amitzur.pdf" target="_blank" rel="noopener">My cv</a>
+      <a class="hdr__drawer-contact" href="index.html#contact">Contact</a>
+    </div>
+  </header>
+
+  <!-- ===== RIGHT-SIDE SCROLL PROGRESS RAIL ===== -->
+  <nav class="ds-rail" aria-label="Section progress">
+    <span class="ds-rail__bar"><span class="ds-rail__fill"></span></span>
+    <span class="ds-rail__dots">
+      <a class="ds-rail__dot" href="#color" aria-label="Colours"></a>
+      <a class="ds-rail__dot" href="#tokens" aria-label="Semantic tokens"></a>
+      <a class="ds-rail__dot" href="#type" aria-label="Type & icons"></a>
+      <a class="ds-rail__dot" href="#components" aria-label="Components"></a>
+      <a class="ds-rail__dot" href="#handoff" aria-label="Handoff"></a>
+      <span class="ds-rail__dot ds-rail__cap" aria-hidden="true"></span>
+    </span>
+  </nav>
+
+  <main>
+    <!-- ===== HERO ===== -->
+    <h1 class="sr-only">Talmind Design System — from 72 base tokens to a full product</h1>
+    <section class="ds-hero ds-wrap">
+      <div class="ds-hero__bg" aria-hidden="true">
+        <canvas class="ds-hero__orbs" data-orbs></canvas>
+      </div>
+
+      <div data-hero-head><p class="ds-hero__title reveal">A design system built to <em>extend</em></p></div>
+      <figure class="ds-hero__shot reveal" data-hero-art>
+        <img src="ds-hero.jpg" width="2534" height="1786" alt="Talmind Design System &amp; Handoff — colours, typography and components" />
+      </figure>
+    </section>
+
+    <!-- everything below the hero rides on an opaque sheet that scrolls up over the pinned video -->
+    <div class="ds-cover">
+    <!-- ===== WORDMARK + META ===== -->
+    <section class="ds-idsection ds-wrap">
+      <p class="ds-wordmark reveal">Design System</p>
+      <dl class="ds-meta reveal">
+        <div><dt>Role</dt><dd>Product Designer · Solo</dd></div>
+        <div><dt>Type</dt><dd>Design system → product</dd></div>
+        <div><dt>Foundation</dt><dd>72 base tokens</dd></div>
+        <div><dt>Tools</dt><dd>Figma · Variables · Claude</dd></div>
+      </dl>
+    </section>
+
+    <!-- ===== FOUNDATIONS — COLOUR PRIMITIVES (rendered) ===== -->
+    <section class="ds-section ds-wrap" id="color">
+      <span class="ds-eyebrow reveal">Foundations</span>
+      <h2 class="ds-h2 reveal">Colors</h2>
+      <p class="ds-lead reveal">Colors were built as Figma Variables, not plain styles. This lets a semantic layer
+        (<code>--color-brand-default</code>) reference a primitive (<code>brand-500</code>) instead of hardcoding it.
+        Change the primitive once, and every screen using that semantic token updates automatically.</p>
+      <figure class="ds-figure ds-figure--flat reveal" style="max-width: 780px;">
+        <img src="ds-colors.jpg" width="1468" height="1710" alt="Talmind colour primitives — Brand, Neutral, UI Accent and Functional scales from 50 to 950" loading="lazy" />
+      </figure>
+    </section>
+
+    <!-- ===== FOUNDATIONS — SEMANTIC TOKENS (rendered) ===== -->
+    <section class="ds-section ds-wrap" id="tokens">
+      <h2 class="ds-h2 reveal">Semantic tokens</h2>
+      <p class="ds-lead reveal">A semantic token is a name that describes a color's role, not its value — like
+        <code>--color-brand-default</code> instead of a raw hex code. Each one maps to exactly one primitive:
+        <code>--color-brand-default</code> is always <code>brand-500</code>, everywhere it's used.</p>
+      <figure class="ds-figure ds-figure--flat reveal" style="max-width: 700px;">
+        <img src="ds-semantic.jpg" width="1168" height="1832" alt="Semantic tokens — Brand and accents, Surfaces and text, Status, and Game category boxes, each mapped to a primitive and hex" loading="lazy" />
+      </figure>
+    </section>
+
+    <!-- ===== TYPOGRAPHY & ICONS ===== -->
+    <section class="ds-section ds-wrap" id="type">
+      <h2 class="ds-h2 reveal">Typography</h2>
+      <figure class="ds-figure ds-figure--flat reveal">
+        <img src="ds-typography.jpg" width="1670" height="1544" alt="Talmind type scale — Display Large, Display, H1, H2, Subtitle, Label, Body, Caption and Tiny with weights, sizes, usage and samples" loading="lazy" />
+      </figure>
+      <h2 class="ds-h2 reveal" style="margin-top: clamp(2.5rem, 5vw, 3.75rem);">Icons &amp; illustration</h2>
+      <figure class="ds-figure ds-figure--flat reveal">
+        <img src="ds-icons.jpg" width="2492" height="1408" alt="Talmind icon and illustration set — line icons plus 3D illustrations (play, backpack, game controller, mascot, trophy, AI robot)" loading="lazy" />
+      </figure>
+    </section>
+
+    <!-- ===== PRIMITIVES → COMPONENTS ===== -->
+    <section class="ds-section ds-wrap" id="components">
+      <span class="ds-eyebrow reveal">System — Components</span>
+      <h2 class="ds-h2 reveal">How a single atom becomes a whole system</h2>
+      <p class="ds-lead reveal">Components build in layers: primitive &rarr; component &rarr; screen template. The
+        DailyPrepCard's three lesson-prep tiles, for example, share a single primitive with defined states (done,
+        in-progress, locked) — change the primitive once, and it updates everywhere.</p>
+      <p class="ds-lead reveal">When the flow needed a new state, I added it as a variant instead of a new component.
+        It inherited the existing typography, spacing, and color tokens automatically, with zero changes to screens
+        already built.</p>
+      <p class="ds-figintro reveal"><b>Primitives.</b> Atoms and small building blocks — badges, text styles, nav items,
+        the InsightItem, and the three ActivityCard states (Video / Quiz / Game) with their progress, done and locked variants.</p>
+      <figure class="ds-figure ds-figure--center reveal">
+        <img src="ds-primitives.jpg" width="1950" height="1774" alt="Primitive components — atoms, content blocks, navigation, leaderboard, lesson topic card and activity cards, each shown with its variants" loading="lazy" />
+      </figure>
+      <p class="ds-figintro reveal"><b>Composed components.</b> The primitives assembled into screen-level pieces used across the product.</p>
+      <figure class="ds-figure ds-figure--center reveal">
+        <img src="ds-components.jpg" width="2520" height="1694" alt="Composed components — Sidebar, TopBar, DailyPrepCard, QuestionCard with all four AnswerOption variants, ScoreCard, TargetZone and more" loading="lazy" />
+      </figure>
+    </section>
+
+    <!-- ===== HANDOFF ===== -->
+    <section class="ds-section ds-wrap" id="handoff">
+      <span class="ds-eyebrow reveal">Handoff</span>
+      <h2 class="ds-h2 reveal">Handed off to developers, not just to myself</h2>
+      <p class="ds-lead reveal">I built a separate Handoff page that documents the system in the language a developer
+        needs — not just "here's how it looks," but exact tokens, states, and edge cases. It includes a component
+        inventory with variants and states per component, and a motion table with exact duration and easing values
+        instead of "there's an animation."</p>
+
+      <h3 class="ds-subhead reveal">Component inventory
+        <span class="ds-subhead__note">15 components · where each is used, its variants, and the implementation note that travels with it</span>
+      </h3>
+      <div class="ds-tablewrap reveal">
+        <table class="ds-table">
+          <thead>
+            <tr><th scope="col">Component</th><th scope="col">Used in</th><th scope="col">Variants / states</th><th scope="col">Implementation notes</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="ds-td-name">Sidebar</td><td class="ds-usedin">All screens</td><td><div class="ds-vpills"><span>Default</span><span>Active item</span></div></td><td>Fixed rail; icon + active pill; avatar with presence dot pinned to the bottom.</td></tr>
+            <tr><td class="ds-td-name">TopBar</td><td class="ds-usedin">Home</td><td><div class="ds-vpills"><span>Default</span></div></td><td>Greeting + points badge + week-day selector + notifications bell.</td></tr>
+            <tr><td class="ds-td-name">Header</td><td class="ds-usedin">Quiz · Lesson</td><td><div class="ds-vpills"><span>Default</span></div></td><td>Back button + title + subtitle; reused on every drill-down screen.</td></tr>
+            <tr><td class="ds-td-name">DailyPrepCard</td><td class="ds-usedin">Home</td><td><div class="ds-vpills"><span>Default</span></div></td><td>Wraps three ActivityCards (Video → Quiz → Game) as the 3-step prep flow.</td></tr>
+            <tr><td class="ds-td-name">WeeklyQuizCard</td><td class="ds-usedin">Home</td><td><div class="ds-vpills"><span>Default</span></div></td><td>Trophy + progress "6 / 30" + Continue link.</td></tr>
+            <tr><td class="ds-td-name">KeepGrowingCard</td><td class="ds-usedin">Home</td><td><div class="ds-vpills"><span>Default</span></div></td><td>Skill pie (Questioning / Solve / Creativity) with legend.</td></tr>
+            <tr><td class="ds-td-name">LeaderboardCard</td><td class="ds-usedin">Home</td><td><div class="ds-vpills"><span>Default</span></div></td><td>Top-3 avatars + score pills.</td></tr>
+            <tr><td class="ds-td-name">LessonTopicCard</td><td class="ds-usedin">Home · Lesson</td><td><div class="ds-vpills"><span>In progress</span><span>Complete</span></div></td><td>Title + progress bar + illustration + arrow; percentage drives the bar.</td></tr>
+            <tr><td class="ds-td-name">WhatToRememberCard</td><td class="ds-usedin">Lesson</td><td><div class="ds-vpills"><span>Default</span></div></td><td>InsightItem list (Ownership / Empathy) beside the AI-helper panel.</td></tr>
+            <tr><td class="ds-td-name">SkillCard</td><td class="ds-usedin">Lesson</td><td><div class="ds-vpills"><span>Questioning</span><span>Solve</span><span>Creativity</span></div></td><td>Metric "104 / 120" + tinted blob; one variant per tracked skill.</td></tr>
+            <tr><td class="ds-td-name">QuestionCard</td><td class="ds-usedin">Quiz</td><td><div class="ds-vpills"><span>Default</span></div></td><td>Prompt + step dots (3 / 8); composes four AnswerOptions.</td></tr>
+            <tr><td class="ds-td-name">AnswerOption</td><td class="ds-usedin">Quiz</td><td><div class="ds-vpills"><span>Default</span><span>Correct</span><span>CorrectReveal</span><span>Wrong</span></div></td><td>One primitive, four states — drives every piece of quiz feedback.</td></tr>
+            <tr><td class="ds-td-name">ScoreCard</td><td class="ds-usedin">Quiz</td><td><div class="ds-vpills"><span>Default</span></div></td><td>Current balance + "+10 pts" chip + monster mascot.</td></tr>
+            <tr><td class="ds-td-name">DraggableCard</td><td class="ds-usedin">Game</td><td><div class="ds-vpills"><span>Idle</span><span>Dragging</span><span>Placed</span></div></td><td>Concept chip dragged into a TargetZone; shadow lifts while dragging.</td></tr>
+            <tr><td class="ds-td-name">TargetZone</td><td class="ds-usedin">Game</td><td><div class="ds-vpills"><span>Torah Source</span><span>Item Status</span><span>Ruling</span><span>Signs</span></div></td><td>Dashed category box; accepts DraggableCards; colour bound to its category token.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="ds-subhead reveal">Motion &amp; animation
+        <span class="ds-subhead__note">every motion documented with its trigger, duration and easing — not "there's an animation"</span>
+      </h3>
+      <div class="ds-tablewrap reveal">
+        <table class="ds-table">
+          <thead>
+            <tr><th scope="col">Element</th><th scope="col">Trigger</th><th scope="col">Duration</th><th scope="col">Animation &amp; easing</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="ds-td-name">Page — app frame</td><td>On load</td><td class="ds-mono-cell">600 ms</td><td>Fade + scale-in 0.98 → 1 · <span class="ds-mono-cell">cubic-bezier(.2,.7,.2,1)</span></td></tr>
+            <tr><td class="ds-td-name">Page — content blocks</td><td>On load (stagger)</td><td class="ds-mono-cell">500 ms · 60 ms step</td><td>Fade + rise 16 px → 0 · <span class="ds-mono-cell">ease-out</span></td></tr>
+            <tr><td class="ds-td-name">Page — exit</td><td>On route change</td><td class="ds-mono-cell">300 ms</td><td>Fade + rise 0 → −12 px · <span class="ds-mono-cell">ease-in</span></td></tr>
+            <tr><td class="ds-td-name">Sidebar nav item</td><td>On select</td><td class="ds-mono-cell">250 ms</td><td>Active pill slides + icon tint crossfade · <span class="ds-mono-cell">ease-out</span></td></tr>
+            <tr><td class="ds-td-name">Back button</td><td>On press</td><td class="ds-mono-cell">200 ms</td><td>Tap scale 0.94 + arrow nudge −3 px · <span class="ds-mono-cell">ease-out</span></td></tr>
+            <tr><td class="ds-td-name">Points badge</td><td>On points earned</td><td class="ds-mono-cell">600 ms</td><td>Count-up + pop 1 → 1.12 → 1 · <span class="ds-mono-cell">cubic-bezier(.34,1.56,.64,1)</span></td></tr>
+            <tr><td class="ds-td-name">"+N" fly chip</td><td>On correct answer</td><td class="ds-mono-cell">900 ms</td><td>Chip flies AnswerOption → points badge · <span class="ds-mono-cell">cubic-bezier(.2,.72,.2,1)</span></td></tr>
+            <tr><td class="ds-td-name">Monster — idle</td><td>Ambient loop</td><td class="ds-mono-cell">7 s · infinite</td><td>Gentle float translateY ±13 px + scale · <span class="ds-mono-cell">ease-in-out</span></td></tr>
+            <tr><td class="ds-td-name">Monster — happy</td><td>On quiz complete</td><td class="ds-mono-cell">1600 ms</td><td>Wave rotate ±12° (keyframed) · <span class="ds-mono-cell">ease-in-out</span></td></tr>
+            <tr><td class="ds-td-name">Sparkles</td><td>On quiz complete</td><td class="ds-mono-cell">1200 ms</td><td>Twinkle scale + opacity, staggered · <span class="ds-mono-cell">ease-in-out</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== CTA ===== -->
+    <section class="ds-cta ds-wrap">
+      <h2 class="reveal">Liked this project?<br>Let's talk.</h2>
+      <div class="reveal"><a class="pill" href="index.html#contact"><span>Let's work together</span></a></div>
+      <div><a class="ds-backall" href="index.html#work"><span aria-hidden="true">←</span> Back to all work</a></div>
+    </section>
+    </div><!-- /.ds-cover -->
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot__inner">
+      <span>© 2026 Yehuda Amitzur — built with Claude</span>
+      <a href="#top">Back to top ↑</a>
+    </div>
+  </footer>
+
+  <script src="script.js?v=18"></script>
+  <script>
+    /* ---- Hero backdrop: filled colour circles drifting at random ----
+       Replaces the video that used to sit behind the veil. Solid, perfectly round discs in the
+       system's own light tints — lilac, green, yellow, grey — at mixed sizes. Each one carries a
+       slow velocity of its own PLUS a wandering term, so no two ever travel the same straight
+       line, and they wrap around the edges so the field never empties. The gradient veil above
+       is untouched: this only changes what it is laid over. */
+    (function () {
+      const cv = document.querySelector('[data-orbs]');
+      if (!cv) return;
+      const ctx = cv.getContext('2d');
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      // held a little richer than "pastel" on purpose: the lilac veil above sits at 0.48, and a
+      // softer green or yellow simply disappears under it
+      const TINTS = [
+        [175, 128, 220],   // light purple
+        [146, 205, 124],   // light green
+        [242, 210, 104],   // light yellow
+        [186, 184, 178],   // light grey
+      ];
+      const rnd = (a, b) => a + Math.random() * (b - a);
+      const cap = (v, a, b) => Math.min(Math.max(v, a), b);
+      let W = 0, H = 0, dpr = 1, orbs = [], raf = null, seeded = false;
+
+      function layout() {
+        const r = cv.getBoundingClientRect();
+        W = Math.max(1, Math.round(r.width)); H = Math.max(1, Math.round(r.height));
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        if (!seeded && W > 1) { seed(); seeded = true; }
+      }
+
+      function seed() {
+        const n = Math.round(cap((W * H) / 9000, 34, 72));
+        // sizes are scaled to the viewport: a 96px disc is a detail on a desktop hero and a
+        // quarter of the screen on a phone, which turns the field into wallpaper
+        const S = Math.max(0.46, Math.min(1, W / 1000));
+        orbs = [];
+        for (let i = 0; i < n; i++) {
+          const big = Math.random() < 0.14;                     // a few large discs, mostly small ones
+          const t = TINTS[(Math.random() * TINTS.length) | 0];
+          const rad = (big ? rnd(40, 96) : rnd(5, 27)) * S;
+          orbs.push({
+            x: rnd(-40, W + 40), y: rnd(-40, H + 40), r: rad,
+            col: 'rgba(' + t[0] + ',' + t[1] + ',' + t[2] + ',' + rnd(0.58, 0.95).toFixed(2) + ')',
+            vx: rnd(-0.30, 0.30), vy: rnd(-0.30, 0.30),         // every direction, no shared drift
+            ph: Math.random() * 6.283, sp: rnd(0.10, 0.34), sw: rnd(0.10, 0.30),
+          });
+        }
+        orbs.sort((a, b) => b.r - a.r);                         // big ones behind the small ones
+      }
+
+      function draw(now) {
+        const t = now / 1000;
+        ctx.clearRect(0, 0, W, H);
+        // a barely-there wash so the veil sits on a surface rather than on the page colour
+        const g = ctx.createLinearGradient(0, 0, 0, H);
+        g.addColorStop(0, '#fbfaf7'); g.addColorStop(1, '#f0efe9');
+        ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+        for (const o of orbs) {
+          o.x += o.vx + Math.sin(t * o.sp + o.ph) * o.sw;
+          o.y += o.vy + Math.cos(t * o.sp * 0.82 + o.ph) * o.sw;
+          const m = o.r + 60;                                    // wrap once fully out of frame
+          if (o.x < -m) o.x = W + m; else if (o.x > W + m) o.x = -m;
+          if (o.y < -m) o.y = H + m; else if (o.y > H + m) o.y = -m;
+          ctx.fillStyle = o.col;
+          ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, 6.283); ctx.fill();
+        }
+      }
+
+      function loop(now) {
+        // the backdrop is pinned and fully hidden behind the page sheet once you scroll past it
+        if (window.scrollY > H + 60) { raf = null; return; }
+        draw(now);
+        raf = requestAnimationFrame(loop);
+      }
+      const kick = () => { if (!raf && !reduce) raf = requestAnimationFrame(loop); };
+
+      layout();
+      draw(performance.now());
+      if (reduce) return;                                        // reduced motion: one still frame
+      kick();
+      window.addEventListener('scroll', kick, { passive: true });
+      let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { layout(); kick(); }, 150); });
+    })();
+
+    /* ---- Hero art: cursor parallax (same drift as the other case-study heroes) ---- */
+    (function () {
+      const art = document.querySelector('[data-hero-art]');
+      if (!art) return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+      const hero = art.closest('.ds-hero') || art;
+      let raf = null, tx = 0, ty = 0, cx = 0, cy = 0;
+      const apply = () => {
+        cx += (tx - cx) * 0.12; cy += (ty - cy) * 0.12;
+        art.style.transform = 'translate3d(' + cx.toFixed(1) + 'px,' + cy.toFixed(1) + 'px,0) rotateX(' +
+          (-cy * 0.05).toFixed(2) + 'deg) rotateY(' + (cx * 0.05).toFixed(2) + 'deg)';
+        if (Math.hypot(tx - cx, ty - cy) > 0.3) raf = requestAnimationFrame(apply); else raf = null;
+      };
+      hero.addEventListener('pointermove', (e) => {
+        const r = hero.getBoundingClientRect();
+        tx = ((e.clientX - r.left) / r.width - 0.5) * 40;
+        ty = ((e.clientY - r.top) / r.height - 0.5) * 26;
+        if (!raf) raf = requestAnimationFrame(apply);
+      });
+      hero.addEventListener('pointerleave', () => { tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(apply); });
+    })();
+
+    /* ---- Design System — right-side progress rail (page-scoped) ---- */
+    (function () {
+      const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // hero title dissolves quickly on scroll, matching the other case studies
+      const heroHead = document.querySelector('[data-hero-head]');
+      function heroFade() {
+        if (!heroHead || reduce) return;
+        const o = clamp(1 - window.scrollY / 90, 0, 1);
+        heroHead.style.opacity = o.toFixed(3);
+        heroHead.style.pointerEvents = o < 0.05 ? 'none' : '';
+      }
+      const rail = document.querySelector('.ds-rail');
+      const fill = document.querySelector('.ds-rail__fill');
+      const dots = Array.from(document.querySelectorAll('.ds-rail__dot')).filter((d) => !d.classList.contains('ds-rail__cap'));
+      const railCap = document.querySelector('.ds-rail__cap');
+      const targets = dots.map((d) => document.querySelector(d.getAttribute('href')));
+      const revealSec = document.querySelector('#color');   // rail appears from Foundations onward
+      const REVEAL = 0.15;   // ...meaning once Foundations has reached the top of the screen
+      const endSec = document.querySelector('.ds-cta');     // ...and ends with the content
+      const pgbar = document.querySelector('.pgbar');
+      const pgfill = pgbar && pgbar.firstElementChild;
+      function railUpdate() {
+        // Progress starts at ZERO the moment the rail reveals — it must never appear already
+        // part-filled. Stops = [reveal point, ...section anchors, end of page], and dot i sits at
+        // ((i+1)/segments)*100, so nothing is lit at p=0 and the end cap closes it out at 100.
+        const doc = document.documentElement;
+        const maxScroll = Math.max(1, doc.scrollHeight - doc.clientHeight);
+        const y = doc.scrollTop, vh = window.innerHeight;
+        // A section counts as reached once its top is just under the header, and the track opens a
+        // hair before the first of them — so the rail turns up AT Foundations, not a screen early.
+        const reach = targets.map((t) => (t ? Math.max(0, t.getBoundingClientRect().top + window.scrollY - vh * 0.10) : 0));
+        let startY = revealSec ? revealSec.getBoundingClientRect().top + window.scrollY - vh * REVEAL : 0;
+        if (!(startY < reach[0])) startY = reach[0] - 1;
+        const stops = [startY].concat(reach, [maxScroll]);
+        const segs = stops.length - 1;
+        let seg = 0;
+        for (let i = 0; i < segs; i++) if (y >= stops[i]) seg = i;
+        const span = stops[seg + 1] - stops[seg];
+        const frac = span > 0 ? clamp((y - stops[seg]) / span, 0, 1) : 1;
+        const p = clamp(((seg + frac) / segs) * 100, 0, 100);
+        if (fill) fill.style.height = p + '%';
+        let idx = -1;
+        dots.forEach((d, i) => {
+          const pos = ((i + 1) / segs) * 100;
+          d.style.setProperty('--pos', pos + '%');
+          if (p + 0.001 >= pos) idx = i;
+        });
+        const started = revealSec ? revealSec.getBoundingClientRect().top < window.innerHeight * REVEAL : true;
+        const ended = endSec ? endSec.getBoundingClientRect().top < window.innerHeight * 0.9 : false;
+        if (rail) rail.classList.toggle('is-on', started && !ended);
+        // the phone bar rides the very same numbers: same start, same end, same fill
+        if (pgfill) { pgfill.style.width = p + '%'; pgbar.classList.toggle('is-on', started && !ended); }
+        dots.forEach((d, i) => { d.classList.toggle('is-active', i === idx); d.classList.toggle('is-done', i < idx); });
+        if (railCap) railCap.classList.toggle('is-done', p >= 99.5);   // the line lands on a dot, not a bare edge
+      }
+      let ticking = false;
+      window.addEventListener('scroll', () => { if (ticking) return; ticking = true; requestAnimationFrame(() => { railUpdate(); heroFade(); ticking = false; }); }, { passive: true });
+      window.addEventListener('resize', railUpdate);
+      railUpdate(); heroFade();
+      window.addEventListener('load', () => { railUpdate(); heroFade(); });
+    })();
+  </script>
+</body>
+</html>

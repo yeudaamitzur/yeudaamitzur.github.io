@@ -1,0 +1,804 @@
+// ---- Header mobile drawer (opens as if the pill stretches out; closes with a firm contraction) ----
+const menuBtn = document.querySelector('.hdr__menu');
+const drawer = document.getElementById('hdr-drawer');
+const hdrForMenu = document.querySelector('.hdr');
+if (menuBtn && drawer) {
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let closeTimer = null;
+  const isOpen = () => menuBtn.getAttribute('aria-expanded') === 'true';
+  const setOpen = (open) => {
+    if (open) {
+      if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+      drawer.classList.remove('is-closing');
+      drawer.hidden = false;
+      menuBtn.setAttribute('aria-expanded', 'true');
+      menuBtn.setAttribute('aria-label', 'Close menu');
+      if (hdrForMenu) hdrForMenu.classList.add('menu-open');   // hide the pill so the card reads as the expanded bar
+    } else {
+      if (drawer.hidden || closeTimer) return;
+      menuBtn.setAttribute('aria-expanded', 'false');
+      menuBtn.setAttribute('aria-label', 'Open menu');
+      const finish = () => {
+        drawer.hidden = true;
+        drawer.classList.remove('is-closing');
+        if (hdrForMenu) hdrForMenu.classList.remove('menu-open');   // the small pill takes over again
+        closeTimer = null;
+      };
+      if (prefersReduced) { finish(); return; }
+      drawer.classList.add('is-closing');       // play the contraction back into the pill, then hide
+      closeTimer = setTimeout(finish, 320);     // matches drawerCollapse duration
+    }
+  };
+  menuBtn.addEventListener('click', () => setOpen(!isOpen()));
+  drawer.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  const closeBtn = drawer.querySelector('.hdr__drawer-close');
+  if (closeBtn) closeBtn.addEventListener('click', () => setOpen(false));
+  // scrolling while the menu is open auto-closes it (with the same contraction)
+  window.addEventListener('scroll', () => { if (isOpen()) setOpen(false); }, { passive: true });
+  window.addEventListener('resize', () => { if (window.innerWidth > 1024) setOpen(false); });
+}
+
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
+const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+// ---- Floating pill header: collapse when scrolling down, re-expand when scrolling up ----
+const hdrFloat = document.querySelector('.hdr--float');
+if (hdrFloat) {
+  let lastY = window.scrollY;
+  const hdrScroll = () => {
+    const y = window.scrollY;
+    if (y < 60) hdrFloat.classList.remove('is-scrolled');            // always expanded near the top
+    else if (y > lastY + 2) hdrFloat.classList.add('is-scrolled');   // scrolling down → collapse to badge
+    else if (y < lastY - 2) hdrFloat.classList.remove('is-scrolled'); // scrolling up → expand again
+    lastY = y;
+  };
+  window.addEventListener('scroll', hdrScroll, { passive: true });
+  hdrScroll();
+}
+
+// ---- Stat numbers grow/count up from a small number to their value ----
+const statVals = Array.from(document.querySelectorAll('.stat__val'));
+if (statVals.length) {
+  if (reduced || !('IntersectionObserver' in window)) {
+    statVals.forEach((el) => (el.textContent = el.dataset.count));
+  } else {
+    statVals.forEach((el) => (el.textContent = '0'));   // start small so the growth is visible
+    const sio = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        const el = e.target, to = +el.dataset.count; let t0 = null; const dur = 1100;
+        (function step(ts) {
+          if (!t0) t0 = ts;
+          const k = clamp((ts - t0) / dur, 0, 1);
+          el.textContent = Math.round(easeOutCubic(k) * to);
+          if (k < 1) requestAnimationFrame(step); else el.textContent = to;
+        })(performance.now());
+        sio.unobserve(el);
+      });
+    }, { threshold: 0.6 });
+    statVals.forEach((el) => sio.observe(el));
+  }
+}
+
+const hero = document.querySelector('.hero');
+const line1 = document.querySelector('.hero__line--1');
+const line2 = document.querySelector('.hero__line--2');
+const heroSub = document.querySelector('.hero__sub');
+const cases = Array.from(document.querySelectorAll('.case'));
+const canvas = document.querySelector('.hero__dots');
+const cursorEl = document.querySelector('.hero__cursor');
+const hdrAvatar = document.querySelector('.hdr__avatar');
+const hdrAvatarImg = document.querySelector('.hdr__avatar-img');
+
+// ---- Two drifting halos that roam the whole hero ----
+const orbA = document.querySelector('.hero__orb--a');
+const orbB = document.querySelector('.hero__orb--b');
+if ((orbA || orbB) && !reduced) {
+  let t = Math.random() * 100;
+  const drift = () => {
+    t += 0.005;
+    if (orbA) orbA.style.transform =
+      `translate(${(Math.sin(t) * 70 + Math.sin(t * 0.6) * 22).toFixed(1)}%, ${(Math.cos(t * 0.8) * 42).toFixed(1)}%) scale(${(1 + Math.sin(t * 0.5) * 0.12).toFixed(3)})`;
+    if (orbB) orbB.style.transform =
+      `translate(${(Math.cos(t * 0.7) * 66 - 12).toFixed(1)}%, ${(Math.sin(t * 0.9) * 40).toFixed(1)}%) scale(${(1 + Math.cos(t * 0.6) * 0.14).toFixed(3)})`;
+    requestAnimationFrame(drift);
+  };
+  requestAnimationFrame(drift);
+}
+
+// ---- "UX/UI Designer" as living particles across the whole hero ----
+const TEXT = canvas ? (canvas.dataset.dots || 'UX/UI Designer') : '';
+const ctx = canvas ? canvas.getContext('2d') : null;
+const offc = document.createElement('canvas');
+const offx = offc.getContext('2d');
+let dots = [], letters = [], letterHot = [], letterOn = [], letterLift = [], cw = 0, ch = 0, dotR = 3;
+let textRight = 0, textMidY = 0, textH = 0, entryStart = 0, hoverLetter = -1, entryDone = false;
+let inkSprite = null, purpleSprite = null, spriteSize = 0;
+let mouseHX = -9999, mouseHY = -9999;   // cursor in hero coords (for the letter "push")
+
+// Pre-render the dot + glowing-dot once, then blit with drawImage (fast, no per-frame blur)
+function makeSprites() {
+  const S = 2;
+  spriteSize = Math.ceil(dotR * 2 + 2);
+  inkSprite = document.createElement('canvas');
+  inkSprite.width = inkSprite.height = spriteSize * S;
+  const ic = inkSprite.getContext('2d'); ic.scale(S, S);
+  ic.fillStyle = 'rgba(24,22,15,1)';      // a touch more contrast than before
+  ic.beginPath(); ic.arc(spriteSize / 2, spriteSize / 2, dotR, 0, 6.283); ic.fill();
+
+  // crisp purple dot for the hovered letter — same tiny footprint, no halo/blur
+  purpleSprite = document.createElement('canvas');
+  purpleSprite.width = purpleSprite.height = spriteSize * S;
+  const pc = purpleSprite.getContext('2d'); pc.scale(S, S);
+  pc.fillStyle = '#B575DF';
+  pc.beginPath(); pc.arc(spriteSize / 2, spriteSize / 2, dotR, 0, 6.283); pc.fill();
+}
+
+function buildDots() {
+  if (!canvas || !ctx || !hero || !line2) return;
+  const heroRect = hero.getBoundingClientRect();
+  cw = Math.round(heroRect.width);
+  // extend the canvas below the hero so scattered dots can drift down to the stats divider
+  // a fixed bleed past the hero; the dots self-fade over the last stretch of the canvas
+  // (see FADE in drawDots), so they dissolve on their own instead of needing a veil below
+  const extraBelow = 240;
+  ch = Math.round(heroRect.height) + extraBelow;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.round(cw * dpr); canvas.height = Math.round(ch * dpr);   // render at device pixels → crisp 2px dots on retina / mobile
+  canvas.style.width = cw + 'px'; canvas.style.height = ch + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  offc.width = cw; offc.height = ch;
+
+  const vw = window.innerWidth;
+  let fs = clamp(vw * 0.16, 52, 200);
+  const setFont = (c) => { c.font = `700 ${fs}px 'Hanken Grotesk', system-ui, sans-serif`; };
+  setFont(offx);
+  const maxW = (line2.clientWidth || cw) - 6;
+  let tw = offx.measureText(TEXT).width;
+  if (tw > maxW) { fs = fs * (maxW / tw); setFont(offx); tw = offx.measureText(TEXT).width; }
+  textH = Math.round(fs * 1.28);
+  line2.style.height = textH + 'px';
+
+  const wrapRect = line2.getBoundingClientRect();
+  textRight = Math.round(wrapRect.right - heroRect.left) - 2;
+  textMidY = Math.round(wrapRect.top + wrapRect.height / 2 - heroRect.top);
+
+  offx.setTransform(1, 0, 0, 1, 0, 0);
+  offx.clearRect(0, 0, cw, ch);
+  offx.fillStyle = '#000';
+  setFont(offx);
+  offx.textBaseline = 'middle'; offx.textAlign = 'right';
+  offx.fillText(TEXT, textRight, textMidY);
+
+  letters = [];
+  const leftEdge = textRight - tw;
+  for (let i = 0; i < TEXT.length; i++) {
+    letters.push({ x0: leftEdge + offx.measureText(TEXT.slice(0, i)).width, x1: leftEdge + offx.measureText(TEXT.slice(0, i + 1)).width, cx: 0, cy: textMidY });
+  }
+  // letterHot = eased COLOUR (sticky: stays purple until the letter is touched again)
+  // letterLift = eased MOTION (only while the cursor is actually on the letter)
+  // letterOn   = the toggled purple state itself, preserved across rebuilds where possible
+  const prevOn = letterOn;
+  letterHot = new Array(letters.length).fill(0);
+  letterLift = new Array(letters.length).fill(0);
+  letterOn = new Array(letters.length).fill(0).map((v, i) => (prevOn && prevOn[i]) || 0);
+
+  const data = offx.getImageData(0, 0, cw, ch).data;
+  const stepPx = fs >= 130 ? 3 : 2;   // denser grid → ~1.8× more dots on desktop; tightest on mobile so the small type stays clear
+  dotR = 1;                            // 2px dots, capped — small & crisp
+  const maxDist = Math.max(ch * 0.55, 280);
+
+  dots = [];
+  for (let y = 0; y < ch; y += stepPx) {
+    for (let x = 0; x < cw; x += stepPx) {
+      if (data[(y * cw + x) * 4 + 3] > 130) {
+        let li = -1;
+        for (let k = 0; k < letters.length; k++) { if (x >= letters[k].x0 && x < letters[k].x1) { li = k; break; } }
+        const ang = Math.random() * 6.283, dist = 120 + Math.random() * maxDist;
+        // bias the scatter downward so the dots gather behind the project tiles as you scroll
+        const oyBias = dist * 0.55;
+        dots.push({ hx: x, hy: y, li, ox: Math.cos(ang) * dist, oy: Math.sin(ang) * dist * 0.85 + oyBias, ph: Math.random() * 6.28, sp: 0.6 + Math.random() * 1.2, delay: Math.random() * 420, lx: 0, ly: 0 });
+      }
+    }
+  }
+  const sums = {};
+  dots.forEach((d) => { if (d.li < 0) return; const s = sums[d.li] || (sums[d.li] = { x: 0, y: 0, n: 0 }); s.x += d.hx; s.y += d.hy; s.n++; });
+  letters.forEach((L, i) => { const s = sums[i]; if (s) { L.cx = s.x / s.n; L.cy = s.y / s.n; } });
+  dots.forEach((d) => { if (d.li >= 0) { const L = letters[d.li]; let vx = d.hx - L.cx, vy = d.hy - L.cy; const m = Math.hypot(vx, vy) || 1; d.lx = vx / m; d.ly = vy / m; } });
+
+  makeSprites();
+  // Only the FIRST build plays the fly-in. A later rebuild (a real width change) re-seats the
+  // dots already assembled, so scrolling never replays the assembly animation.
+  entryStart = entryDone ? performance.now() - 3000 : performance.now();
+}
+
+function drawDots() {
+  if (!ctx) return;
+  ctx.clearRect(0, 0, cw, ch);
+  const now = performance.now(), nowS = now / 1000;
+  if (!entryDone && now - entryStart > 1980) entryDone = true;   // the fly-in is a one-time event
+  // disperse across the FULL height the canvas occupies (hero + its bleed under the stats bar),
+  // so the dots are still visibly drifting for as long as any of them is on screen
+  const scatter = clamp(window.scrollY / Math.max(1, ch * 0.9), 0, 1);
+  for (let i = 0; i < letterHot.length; i++) {
+    letterHot[i]  += ((letterOn[i] ? 1 : 0) - letterHot[i]) * 0.2;          // colour — sticky
+    letterLift[i] += ((i === hoverLetter ? 1 : 0) - letterLift[i]) * 0.2;   // motion — hover only
+  }
+
+  const half = spriteSize / 2, FADE = 190;   // px of self-fade at the canvas foot
+  const hotDots = [];
+  for (let i = 0; i < dots.length; i++) {
+    const d = dots[i];
+    const entry = easeOutCubic(clamp((now - entryStart - d.delay) / 1500, 0, 1));
+    const disperse = Math.max(1 - entry, scatter);
+    const wob = 1.5 * disperse;   // ambient jitter only while flying in / scattering → dots sit perfectly still & crisp once settled
+    const x = d.hx + d.ox * disperse + Math.sin(nowS * d.sp + d.ph) * wob;
+    const y = d.hy + d.oy * disperse + Math.cos(nowS * d.sp * 0.9 + d.ph) * wob;
+    const hot = d.li >= 0 ? letterHot[d.li] : 0;
+    const lift = d.li >= 0 ? letterLift[d.li] : 0;
+    const fade = y > ch - FADE ? clamp((ch - y) / FADE, 0, 1) : 1;
+    if (fade <= 0.01) continue;
+    if (hot > 0.03 || lift > 0.03) {
+      d._x = x + d.lx * 11 * lift; d._y = y - 20 * lift + d.ly * 11 * lift;
+      d._hot = hot; d._lift = lift; d._fade = fade; hotDots.push(d);
+    } else {
+      ctx.globalAlpha = fade;
+      ctx.drawImage(inkSprite, x - half, y - half, spriteSize, spriteSize);
+    }
+  }
+  for (const d of hotDots) {
+    let x = d._x, y = d._y;
+    const dx = x - mouseHX, dy = y - mouseHY, dd = Math.hypot(dx, dy) || 1;   // cursor pushes the dots outward
+    if (dd < 90) { const push = (1 - dd / 90) * 24 * d._lift; x += dx / dd * push; y += dy / dd * push; }
+    ctx.globalAlpha = d._fade;          ctx.drawImage(inkSprite,    x - half, y - half, spriteSize, spriteSize);   // crisp base
+    ctx.globalAlpha = d._hot * d._fade; ctx.drawImage(purpleSprite, x - half, y - half, spriteSize, spriteSize);   // crisp purple — no blur/halo
+  }
+  ctx.globalAlpha = 1;
+  if (!reduced) requestAnimationFrame(drawDots);
+}
+
+if (canvas && ctx) {
+  const startDots = () => { buildDots(); drawDots(); };
+  if (document.fonts && document.fonts.load) {
+    document.fonts.load("700 100px 'Hanken Grotesk'").then(startDots).catch(startDots);
+  } else { startDots(); }
+  // Rebuild on a real WIDTH change only. On phones the address bar collapsing while you scroll
+  // fires `resize` with a new height — rebuilding there was what made the dots re-assemble
+  // mid-scroll instead of just dispersing.
+  let rt, lastVW = window.innerWidth;
+  window.addEventListener('resize', () => {
+    if (window.innerWidth === lastVW) return;
+    lastVW = window.innerWidth;
+    clearTimeout(rt); rt = setTimeout(() => { buildDots(); if (reduced) drawDots(); }, 160);
+  });
+}
+
+// ---- Phones: the wordmark colours itself in, then answers your finger ----
+// There is no cursor to run across the letters, so once the project tiles have finished landing
+// (~3.8s) the letters take the brand purple one after another, left to right. After that a tap
+// on any letter toggles it back to ink — and back to purple — for as long as you like.
+if (canvas && ctx && !reduced && hero && !window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+  const PAINT_AT = 4000, PER_LETTER = 105;
+  setTimeout(function paintIn() {
+    if (!letters.length) { setTimeout(paintIn, 200); return; }        // wait for the font/build
+    letters.forEach((L, i) => setTimeout(() => { letterOn[i] = 1; }, i * PER_LETTER));
+  }, PAINT_AT);
+
+  hero.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse' || !letters.length) return;
+    const r = hero.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    if (Math.abs(y - textMidY) > textH * 0.55) return;                // only taps on the wordmark itself
+    for (let k = 0; k < letters.length; k++) {
+      if (x >= letters[k].x0 && x < letters[k].x1) { letterOn[k] = letterOn[k] ? 0 : 1; break; }
+    }
+  }, { passive: true });
+}
+
+// ---- Hero scroll parallax + card grow/fade + shadow-fade ----
+function onFrame() {
+  const vh = window.innerHeight;
+  const y = window.scrollY;
+  if (line1) {
+    // dissolves fast on scroll — the same move the Bianca / Talmind hero titles make,
+    // instead of sliding sideways and staying fully legible the whole way down
+    const o = clamp(1 - y / 90, 0, 1);
+    line1.style.opacity = o.toFixed(3);
+    if (heroSub) heroSub.style.opacity = o.toFixed(3);
+  }
+  cases.forEach((card) => {
+    const rect = card.getBoundingClientRect();
+    const enter = clamp((vh - rect.top) / (vh - vh * 0.18), 0, 1);
+    card.style.setProperty('--card-scale', (0.33 + 0.67 * enter).toFixed(3));
+    card.style.setProperty('--card-opacity', clamp((vh - rect.top) / (vh * 0.3), 0, 1).toFixed(3));
+  });
+  for (let i = 0; i < cases.length; i++) {
+    let sh = 1;
+    if (cases[i + 1]) {
+      const cur = cases[i].getBoundingClientRect();
+      const next = cases[i + 1].getBoundingClientRect();
+      sh = 1 - clamp((cur.bottom - next.top) / 60, 0, 1);
+    }
+    const inner = cases[i].querySelector('.case__inner');
+    if (inner) inner.style.setProperty('--sh', sh.toFixed(3));
+  }
+}
+if (!reduced) {
+  let ticking = false;
+  const onScroll = () => { if (ticking) return; ticking = true; requestAnimationFrame(() => { onFrame(); ticking = false; }); };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onFrame);
+  onFrame();
+} else {
+  cases.forEach((c) => { c.style.setProperty('--card-scale', '1'); c.style.setProperty('--card-opacity', '1'); });
+}
+
+// ---- Only the header PHOTO flies to the cursor; per-letter glow; Instagram-style return ----
+if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
+  const SIZE = 80, HOME_S = 46 / 80, RET = 760;
+  let tx = 0, ty = 0, cx = 0, cy = 0, cs = HOME_S;
+  let active = false, returning = false, raf = null, homeX = 0, homeY = 0;
+  let retStart = 0, rfx = 0, rfy = 0, rfs = HOME_S;
+
+  const render = () => {
+    cursorEl.style.transform = `translate(${(cx - SIZE / 2).toFixed(1)}px, ${(cy - SIZE / 2).toFixed(1)}px) scale(${cs.toFixed(3)})`;
+  };
+  const loop = () => {
+    if (returning) {
+      const t = clamp((performance.now() - retStart) / RET, 0, 1);
+      const e = easeInOutCubic(t);
+      cx = rfx + (homeX - rfx) * e;
+      const baseY = rfy + (homeY - rfy) * e;
+      const arc = -Math.sin(t * Math.PI) * 60;                  // soft rounded hop over the top
+      const bounce = Math.sin(t * Math.PI * 3) * (1 - t) * 12;  // two gentle, damped bounces
+      cy = baseY + arc + bounce;
+      cs = rfs + (HOME_S - rfs) * e;
+      render();
+      if (t >= 1) { returning = false; cursorEl.style.opacity = '0'; hdrAvatarImg.style.opacity = ''; raf = null; return; }
+      raf = requestAnimationFrame(loop); return;
+    }
+    cx += (tx - cx) * 0.26; cy += (ty - cy) * 0.26; cs += (ts() - cs) * 0.26;
+    render();
+    if (active || Math.hypot(tx - cx, ty - cy) > 0.6) { raf = requestAnimationFrame(loop); } else { raf = null; }
+  };
+  const ts = () => (active ? 1 : HOME_S);
+  const kick = () => { if (!raf) raf = requestAnimationFrame(loop); };
+
+  const flyOut = (x, y) => {
+    const r = hdrAvatar.getBoundingClientRect();
+    homeX = r.left + r.width / 2; homeY = r.top + r.height / 2;
+    if (!active && !returning) { cx = homeX; cy = homeY; cs = HOME_S; render(); }
+    active = true; returning = false;
+    document.documentElement.classList.add('hero-ava-on');
+    cursorEl.style.opacity = '1';
+    hdrAvatarImg.style.opacity = '0';    // only the photo lifts off; the ring stays
+    tx = x; ty = y; kick();
+  };
+  const flyHome = () => {
+    if (!active) return;
+    active = false; returning = true;
+    document.documentElement.classList.remove('hero-ava-on');   // round cursor comes back immediately
+    retStart = performance.now(); rfx = cx; rfy = cy; rfs = cs;
+    kick();
+  };
+
+  const overLine2 = (x, y) => { const r = line2.getBoundingClientRect(); return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; };
+
+  document.addEventListener('pointermove', (e) => {
+    if (e.pointerType === 'touch') return;
+    if (overLine2(e.clientX, e.clientY)) {
+      if (!active) flyOut(e.clientX, e.clientY); else { tx = e.clientX; ty = e.clientY; kick(); }
+      // which letter is under the cursor (+ feed the cursor position to the dots)
+      const hr = hero.getBoundingClientRect();
+      const lx = e.clientX - hr.left;
+      mouseHX = lx; mouseHY = e.clientY - hr.top;
+      let found = -1;
+      for (let k = 0; k < letters.length; k++) { if (lx >= letters[k].x0 && lx < letters[k].x1) { found = k; break; } }
+      // toggle on ENTER only: a touched letter turns purple and stays purple until touched again
+      if (found !== hoverLetter) {
+        if (found >= 0 && letterOn.length > found) letterOn[found] = letterOn[found] ? 0 : 1;
+        hoverLetter = found;
+      }
+    } else {
+      if (active) flyHome();
+      hoverLetter = -1; mouseHX = -9999; mouseHY = -9999;
+    }
+  });
+  window.addEventListener('blur', () => { if (active) flyHome(); hoverLetter = -1; mouseHX = -9999; mouseHY = -9999; });
+}
+
+// ---- Glimpse: 3D mouse parallax on the photos ----
+const glimpse = document.querySelector('[data-glimpse]');
+if (glimpse && !reduced) {
+  const depthFigs = Array.from(glimpse.querySelectorAll('[data-depth]'));
+  glimpse.addEventListener('pointermove', (e) => {
+    if (e.pointerType === 'touch') return;
+    const r = glimpse.getBoundingClientRect();
+    const mx = (e.clientX - r.left) / r.width - 0.5;
+    const my = (e.clientY - r.top) / r.height - 0.5;
+    depthFigs.forEach((fig) => {
+      const d = parseFloat(fig.dataset.depth) || 20;
+      const inner = fig.querySelector('img, svg');
+      if (inner) inner.style.transform =
+        `scale(1.12) translate(${(-mx * d).toFixed(1)}px, ${(-my * d).toFixed(1)}px) rotateX(${(-my * 5).toFixed(2)}deg) rotateY(${(mx * 5).toFixed(2)}deg)`;
+    });
+  });
+  glimpse.addEventListener('pointerleave', () => {
+    depthFigs.forEach((fig) => { const inner = fig.querySelector('img, svg'); if (inner) inner.style.transform = 'scale(1.12)'; });
+  });
+}
+
+// ---- Scroll reveal ----
+const revealEls = document.querySelectorAll('.reveal, .glimpse__anim');
+if (reduced || !('IntersectionObserver' in window)) {
+  revealEls.forEach((el) => el.classList.add('is-in'));
+} else {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add('is-in'); io.unobserve(entry.target); } });
+  }, { threshold: 0.15 });
+  revealEls.forEach((el) => io.observe(el));
+}
+
+// ---- (JS smooth wheel-scroll removed — reverted to native scrolling; it could stall) ----
+
+// ---- Custom round cursor (fine-pointer devices only) ----
+(function () {
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  const dot = document.createElement('div');
+  dot.className = 'cursor-dot';
+  dot.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(dot);
+  document.documentElement.classList.add('has-cursor');   // hide native cursor only once the dot exists
+
+  const interactive = 'a, button, [role="button"], input, textarea, label, summary, .tl-ucard, .case, .tl-scard';
+  let mx = innerWidth / 2, my = innerHeight / 2, cx = mx, cy = my;
+  let shown = false, inside = true, hover = false, down = false;
+  let cs = 1;   // smoothed scale — eased toward its target so grow/shrink is gentle, not a hard jump
+  const followEase = reduced ? 1 : 0.2;
+  const scaleEase = reduced ? 1 : 0.16;
+
+  addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; shown = true; }, { passive: true });
+  addEventListener('mouseover', (e) => { hover = !!(e.target.closest && e.target.closest(interactive)); }, { passive: true });
+  document.addEventListener('mouseleave', () => { inside = false; });
+  document.addEventListener('mouseenter', () => { inside = true; });
+  addEventListener('mousedown', () => { down = true; });
+  addEventListener('mouseup', () => { down = false; });
+
+  (function loop() {
+    cx += (mx - cx) * followEase;
+    cy += (my - cy) * followEase;
+    const heroActive = document.documentElement.classList.contains('hero-ava-on');   // only while actually over the name
+    dot.style.opacity = (shown && inside && !heroActive) ? '1' : '0';
+    dot.classList.toggle('is-hover', hover);
+    const targetS = (hover ? 1.7 : 1) * (down ? 0.82 : 1);
+    cs += (targetS - cs) * scaleEase;   // ease toward target → smooth grow & shrink
+    dot.style.transform = `translate3d(${(cx - 12.5).toFixed(2)}px, ${(cy - 12.5).toFixed(2)}px, 0) scale(${cs.toFixed(3)})`;
+    requestAnimationFrame(loop);
+  })();
+})();
+
+// ---- "Back to top" links actually scroll to the top (the #top anchor sits on the fixed header, so it alone won't) ----
+document.querySelectorAll('a[href="#top"]').forEach((a) => {
+  a.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+  });
+});
+
+// ---- "Let's work together" lands on the footer's top rule ----
+// Every Contact button — here and on the case studies (index.html#contact) — aims at the last
+// section on the page. The landing spot is the line the rings pile up on: the footer's top edge
+// sits exactly at the bottom of the screen, so the whole pile is in frame and the footer itself
+// stays below the fold.
+(function () {
+  const contact = document.querySelector('#contact');
+  const foot = document.querySelector('.foot');
+  if (!contact || !foot) return;
+
+  // scroll position that puts the footer's top rule on the bottom edge of the viewport
+  const footLine = () => {
+    const top = foot.getBoundingClientRect().top + window.scrollY - window.innerHeight;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    return Math.max(0, Math.min(Math.round(top), Math.round(max)));
+  };
+
+  // The page keeps growing for a moment after it opens — lazy photos decode, the wordmark canvas
+  // sizes itself once the display font is ready — and every one of those pushes the footer down.
+  // So the landing is HELD: re-aimed on each height change until the page is still. The first real
+  // scroll from the reader ends the hold, so nothing is ever pulled out from under them.
+  let release = null;
+  function hold() {
+    if (release) release();
+    let live = true;
+    const settle = () => {
+      if (!live) return;
+      const t = footLine();
+      if (Math.abs(window.scrollY - t) > 1) window.scrollTo(0, t);
+    };
+    // Height changes are the thing that matters, so watch for them rather than guessing a
+    // duration: a lazy photo can decode long after load on a slow connection, and every one of
+    // them pushes the footer down. The observer costs nothing while the page is still.
+    const ro = 'ResizeObserver' in window ? new ResizeObserver(settle) : null;
+    if (ro) ro.observe(document.body);
+    // A ticker as well as the observer: the growth and the correcting scroll can land on either
+    // side of a frame, and a tick that is already in the right place costs nothing.
+    const iv = setInterval(settle, 200);
+    // the known cause of the page growing after it opens: the wordmark canvas measures itself
+    // once the display font is ready, and that alone moves the footer down a couple of hundred px
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(settle).catch(() => {});
+    const end = () => { live = false; if (ro) ro.disconnect(); clearInterval(iv); release = null; };
+    setTimeout(end, 6000);
+    // Only a real scroll input ends the hold. Position alone can't be the test: the browser does
+    // its own jump to #contact after load, which lands at the page bottom — treating that as "the
+    // reader moved" left the landing exactly where it wasn't wanted. Pointer/mouse-down are not
+    // enders either: a stray tap or focus click would cut the hold before the page settles.
+    ['wheel', 'touchstart', 'keydown'].forEach((ev) => window.addEventListener(ev, end, { passive: true, once: true }));
+    release = end;
+    settle();
+  }
+
+  document.querySelectorAll('a[href="#contact"]').forEach((a) => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (history.replaceState) history.replaceState(null, '', '#contact');
+      const target = footLine();
+      window.scrollTo({ top: target, behavior: reduced ? 'auto' : 'smooth' });
+      // a smooth scroll asked for from a click is sometimes dropped — land it either way, then
+      // hold it (the hold starts late so it doesn't fight the glide)
+      setTimeout(() => { if (Math.abs(window.scrollY - target) > 40) window.scrollTo(0, footLine()); }, 420);
+      setTimeout(hold, 800);
+    });
+  });
+
+  // Arriving from another page. The hash is not always present the moment this runs — some
+  // browsers apply the fragment after the document is parsed — so this listens for it as well as
+  // reading it, and re-aims on load once the images have decoded and the page has stopped growing.
+  const arrive = () => { if (location.hash === '#contact') hold(); };
+  arrive();
+  window.addEventListener('hashchange', arrive);
+  window.addEventListener('load', arrive);
+})();
+
+// ---- Page-foot rings: 1350 lilac circles that pile up ON the footer's top rule ----
+// The canvas is absolutely positioned and painted BEHIND all content (z-index -1), so it adds
+// no height and changes no layout. Physics: gravity, wall/floor bounce, circle-to-circle
+// collision through a flat linked-list grid (a Map of string keys is far too slow at this count),
+// and a cursor that only moves a circle on ACTUAL contact — a swept segment test, so fast flicks
+// can't tunnel past. Nothing caps them upward: a hard enough hit throws them clean off screen.
+(function () {
+  const foot = document.querySelector('.foot');
+  if (!foot) return;
+
+  const canvas = document.createElement('canvas');
+  canvas.className = 'foot__dots';
+  canvas.setAttribute('aria-hidden', 'true');
+  foot.prepend(canvas);
+  const ctx = canvas.getContext('2d');
+
+  // A third of what it was on both sizes, and a third again on phones — the pile now stands
+  // ~50px over the footer rule instead of burying the links above it.
+  const PHONE = window.matchMedia('(max-width: 700px)').matches;
+  const COUNT = PHONE ? 150 : 450;
+  const N_24 = PHONE ? 5 : 15, N_16 = Math.round(COUNT / 3), N_12 = PHONE ? 6 : 17;
+  const N_FILLED = PHONE ? 11 : 34;
+  const G = 0.32, AIR = 0.994, REST = 0.28, FLOOR_FRICTION = 0.86;
+  const HUE = '119, 63, 156';
+  const CELL = 26;                       // >= the largest diameter, so 3x3 neighbours suffice
+  // A ring that has barely CHANGED POSITION for this many frames is parked: no gravity, no
+  // integration, no collision response. Without it every resting ring keeps taking a gravity
+  // step that its neighbours immediately undo — motionless on paper, shimmering on screen.
+  // The test has to be displacement, not velocity: a supported ring carries vy ≈ G forever.
+  // SLEEP_D has to tolerate the slow sink a position-based solver leaves in a stack (each
+  // resting ring gives back only half its overlap per frame); WAKE_D is real travel, the only
+  // thing allowed to wake a parked neighbour — otherwise that jitter cascades through the pile.
+  const SLEEP_AFTER = 16, SLEEP_D = 0.55, WAKE_D = 0.9;
+  const ITER = 3;                        // contact-solver sweeps per frame
+
+  let W = 0, H = 0, floorY = 0, dpr = 1, parts = [], raf = null, live = false, seeded = false;
+  let px0 = -9999, py0 = -9999, px1 = -9999, py1 = -9999, mvx = 0, mvy = 0;
+  let cols = 0, rows = 0, head = null, next = null, awake = 1;
+  const rnd = (a, b) => a + Math.random() * (b - a);
+
+  function layout() {
+    const r = foot.getBoundingClientRect();
+    W = Math.max(1, Math.round(r.width));
+    H = Math.max(1, Math.round(canvas.offsetHeight || r.height));
+    // they settle ON the footer's top rule, not down at the page edge
+    floorY = Math.max(20, H - Math.round(r.height));
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cols = Math.ceil(W / CELL) + 1; rows = Math.ceil(H / CELL) + 1;
+    head = new Int32Array(cols * rows); next = new Int32Array(COUNT);
+
+    if (!seeded && W > 1 && H > 1) {
+      seeded = true;
+      const radii = [];
+      for (let i = 0; i < N_24; i++) radii.push(12);          // 24px
+      for (let i = 0; i < N_16; i++) radii.push(8);           // 16px
+      for (let i = 0; i < N_12; i++) radii.push(6);           // 12px
+      while (radii.length < COUNT) radii.push(rnd(2, 4));     // the rest stay small (4–8px)
+      for (let i = radii.length - 1; i > 0; i--) {            // shuffle so sizes intermix
+        const j = (Math.random() * (i + 1)) | 0;
+        const t = radii[i]; radii[i] = radii[j]; radii[j] = t;
+      }
+      const filled = new Set();
+      while (filled.size < N_FILLED) filled.add((Math.random() * COUNT) | 0);
+      for (let i = 0; i < COUNT; i++) {
+        const rad = radii[i];
+        parts.push({
+          x: rnd(rad, W - rad),
+          y: rnd(Math.max(0, floorY - H * 0.42), floorY - rad),   // drop in from above the rule
+          vx: rnd(-0.6, 0.6), vy: rnd(-1, 1.5), r: rad, fill: filled.has(i), z: 0, d: 9, ox: 0, oy: 0, g: 0, gN: 0
+        });
+      }
+    }
+  }
+
+  window.addEventListener('mousemove', (e) => {
+    const r = canvas.getBoundingClientRect();
+    const nx = e.clientX - r.left, ny = e.clientY - r.top;
+    if (px1 > -9000) { mvx = nx - px1; mvy = ny - py1; }
+    px0 = px1; py0 = py1; px1 = nx; py1 = ny;
+    if (px0 < -9000) { px0 = px1; py0 = py1; }
+  }, { passive: true });
+
+  function step() {
+    const speed = Math.hypot(mvx, mvy);
+    const sdx = px1 - px0, sdy = py1 - py0, L2 = sdx * sdx + sdy * sdy;
+    for (let i = 0; i < parts.length; i++) {
+      const p = parts[i];
+      p.ox = p.x; p.oy = p.y;                             // where it stood when the frame began
+      if (px1 > -9000) {                                  // contact only — no force field
+        let t = L2 > 0 ? ((p.x - px0) * sdx + (p.y - py0) * sdy) / L2 : 0;
+        t = t < 0 ? 0 : t > 1 ? 1 : t;
+        const ox = p.x - (px0 + t * sdx), oy = p.y - (py0 + t * sdy);
+        const d = Math.hypot(ox, oy), reach = p.r + 1.5;
+        if (d < reach) {
+          const dd = d || 0.001, nx = ox / dd, ny = oy / dd;
+          const f = 1.1 + Math.min(34, speed) * 0.85;
+          p.vx += nx * f + mvx * 0.5;
+          p.vy += ny * f + mvy * 0.5;
+          p.x += nx * (reach - dd); p.y += ny * (reach - dd);
+          p.z = 0;                                        // touched → wide awake
+        }
+      }
+      if (p.z >= SLEEP_AFTER) continue;                   // parked: gravity can't nudge it either
+      // A ring standing on ground — the floor, or a ring that is itself standing on ground — gets
+      // only a trace of gravity. Position-only contact solving can't carry a full G through six
+      // layers of pile in one frame, so without this the stack sinks and springs back every frame,
+      // which is exactly the shimmer. The chain matters: "touching something" is NOT support, or a
+      // clump of rings still falling through the air would hold each other up in mid-flight.
+      p.vy += p.g ? G * 0.1 : G;
+      p.gN = 0;
+      p.vx *= AIR; p.vy *= AIR;
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < p.r)     { p.x = p.r;     p.vx = -p.vx * 0.5; }
+      if (p.x > W - p.r) { p.x = W - p.r; p.vx = -p.vx * 0.5; }
+      const fl = floorY - p.r;
+      if (p.y > fl) {
+        p.y = fl; p.vx *= FLOOR_FRICTION; p.gN = 1;                    // the floor is ground
+        // a bounce this small is invisible as motion but visible as flicker — kill it outright
+        p.vy = Math.abs(p.vy) < 1.1 ? 0 : -p.vy * REST;
+      }
+    }
+
+    head.fill(-1);                                        // flat grid: no per-ball string keys
+    for (let i = 0; i < parts.length; i++) {
+      const p = parts[i];
+      let cx = (p.x / CELL) | 0, cy = (p.y / CELL) | 0;
+      cx = cx < 0 ? 0 : cx >= cols ? cols - 1 : cx;
+      cy = cy < 0 ? 0 : cy >= rows ? rows - 1 : cy;
+      const c = cy * cols + cx;
+      next[i] = head[c]; head[c] = i;
+    }
+    // Solve the contacts more than once per frame. One Gauss-Seidel sweep can't converge a pile
+    // this deep — every ring has half a dozen neighbours, so a single pass leaves overlaps that
+    // gravity re-opens next frame, and the whole pile simmers instead of coming to rest.
+    for (let it = 0; it < ITER; it++) {
+      const first = it === 0;
+      for (let i = 0; i < parts.length; i++) {
+        const a = parts[i];
+        let cx = (a.x / CELL) | 0, cy = (a.y / CELL) | 0;
+        cx = cx < 0 ? 0 : cx >= cols ? cols - 1 : cx;
+        cy = cy < 0 ? 0 : cy >= rows ? rows - 1 : cy;
+        for (let ox = -1; ox <= 1; ox++) {
+          const gx = cx + ox; if (gx < 0 || gx >= cols) continue;
+          for (let oy = -1; oy <= 1; oy++) {
+            const gy = cy + oy; if (gy < 0 || gy >= rows) continue;
+            for (let j = head[gy * cols + gx]; j !== -1; j = next[j]) {
+              if (j <= i) continue;
+              const b = parts[j];
+              // two parked rings are already resting against each other — re-solving that contact
+              // every frame is what made the settled pile crawl and shimmer
+              if (a.z >= SLEEP_AFTER && b.z >= SLEEP_AFTER) continue;
+              const dx = b.x - a.x, dy = b.y - a.y, min = a.r + b.r;
+              const d2 = dx * dx + dy * dy;
+              if (d2 > 0.0001 && d2 < min * min) {
+                // only a ring that actually TRAVELLED last frame may wake a parked neighbour;
+                // resting contact must not keep resetting the counter, or the pile never settles.
+                if (a.d > WAKE_D) b.z = 0; else if (b.d > WAKE_D) a.z = 0;
+                const d = Math.sqrt(d2), nx = dx / d, ny = dy / d, push = (min - d) * 0.5;
+                // ground propagates upward one layer per frame: b holds a up only if b is itself held
+                if (ny > 0.5) { if (b.g) a.gN = 1; } else if (ny < -0.5) { if (a.g) b.gN = 1; }
+                a.x -= nx * push; a.y -= ny * push;
+                b.x += nx * push; b.y += ny * push;
+                if (!first) continue;                    // velocities are settled on the first sweep only
+                const rel = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
+                if (rel < 0) {
+                  const imp = rel * 0.5;                 // dead stop along the normal: no bounce to feed
+                  a.vx += nx * imp; a.vy += ny * imp;
+                  b.vx -= nx * imp; b.vy -= ny * imp;
+                  const tx = -ny, ty = nx;               // ...and a little friction across it
+                  const rt = ((b.vx - a.vx) * tx + (b.vy - a.vy) * ty) * 0.16;
+                  a.vx += tx * rt; a.vy += ty * rt;
+                  b.vx -= tx * rt; b.vy -= ty * rt;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    // settle pass — measured AFTER collisions, so a ring that gravity pushed down and its
+    // neighbour pushed straight back up counts as having gone nowhere, and can finally park.
+    awake = 0;
+    for (let i = 0; i < parts.length; i++) {
+      const p = parts[i];
+      p.d = Math.abs(p.x - p.ox) + Math.abs(p.y - p.oy);
+      p.g = p.gN;
+      // Only a ring standing on ground may settle. Below the threshold it is just jittering, so
+      // bleed its speed away hard — that is what lets the counter actually reach SLEEP_AFTER
+      // instead of hovering under it. Anything still in the air keeps falling, however slowly.
+      if (p.g && p.d < SLEEP_D) { if (p.z < SLEEP_AFTER) p.z++; p.vx *= 0.5; p.vy *= 0.5; } else p.z = 0;
+      if (p.z < SLEEP_AFTER) awake++; else { p.vx = 0; p.vy = 0; }
+    }
+    mvx *= 0.7; mvy *= 0.7;
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.lineWidth = 1.2;
+    ctx.strokeStyle = 'rgba(' + HUE + ', 0.5)';
+    ctx.fillStyle = 'rgba(' + HUE + ', 0.5)';
+    ctx.beginPath();                                   // one path for every ring, one stroke call
+    for (const p of parts) {
+      if (p.fill || p.y < -40) continue;
+      ctx.moveTo(p.x + p.r, p.y); ctx.arc(p.x, p.y, p.r, 0, 6.283);
+    }
+    ctx.stroke();
+    ctx.beginPath();                                   // ...and one for the solid ones
+    for (const p of parts) {
+      if (!p.fill || p.y < -40) continue;
+      ctx.moveTo(p.x + p.r, p.y); ctx.arc(p.x, p.y, p.r, 0, 6.283);
+    }
+    ctx.fill();
+  }
+
+  // Once every ring is parked the frame is final: stop drawing entirely (a settled pile that keeps
+  // re-rendering is both the flicker and a pointless battery drain). Any real input wakes it again.
+  function loop() {
+    step(); draw();
+    raf = (live && (awake > 0 || pointerLive)) ? requestAnimationFrame(loop) : null;
+    pointerLive = false;
+  }
+  let pointerLive = false;
+  const wake = () => { pointerLive = true; if (live && !raf) raf = requestAnimationFrame(loop); };
+
+  layout();
+  if (reduced) { draw(); return; }
+  window.addEventListener('resize', () => { layout(); if (!raf) draw(); wake(); });
+  window.addEventListener('mousemove', wake, { passive: true });
+
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        live = en.isIntersecting;
+        if (live && !raf) { layout(); raf = requestAnimationFrame(loop); }
+      });
+    }, { rootMargin: '250px' }).observe(foot);
+  } else { live = true; raf = requestAnimationFrame(loop); }
+})();

@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bianca — Case study · Yehuda Amitzur</title>
+  <meta name="description" content="Bianca — a restaurant management dashboard that gives managers real-time insight into profitability, performance and team activity. A UX/UI case study by Yehuda Amitzur." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <!-- favicon: the same ring as the site cursor — purple stroke, lighter purple fill -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css?v=18" />
+
+  <style>
+    /* =========================================================
+       Bianca — case study (page-scoped, reuses shared tokens)
+       Same engineering structure as Talmind. Purple stays the
+       structural brand; Bianca's own warm orange lives only in
+       the hero band + inside the product screenshots.
+       ========================================================= */
+    .bn { --bn-orange:  #d97816;   /* Bianca product brand */
+          --bn-orange-2:#e79038;
+          --bn-shadow:  0 30px 60px -34px rgba(40,37,30,0.4);
+          --bn-shadow-lift: 0 46px 84px -40px rgba(40,37,30,0.5);
+          --bn-mut: rgba(40,37,30,0.55);
+    }
+    .bn-wrap { width: 100%; max-width: 1180px; margin-inline: auto; padding-inline: var(--pad); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+    .bn-section { padding-block: clamp(2.75rem, 5.5vw, 4.75rem); scroll-margin-top: var(--hdr-h); }
+
+    .bn-mini { font-family: var(--f-body); font-size: .72rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--brand); }
+    .bn-eyebrow { display: inline-flex; align-items: center; gap: .6em; font-family: var(--f-body); font-size: .76rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--brand); }
+    .bn-eyebrow::before { content: ""; width: 26px; height: 1px; background: linear-gradient(90deg, var(--brand), transparent); }
+    .bn-h2 { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.9rem, 4.4vw, 3rem); line-height: 1.04; letter-spacing: -0.02em; max-width: 22ch; }
+
+    /* ---------- Hero (pinned VIDEO + gradient locked as ONE backdrop + fixed title + reduced dashboard) ---------- */
+    .bn-hero { position: relative; z-index: 1; overflow: visible; text-align: left;
+      padding-top: calc(var(--hdr-h) + clamp(2.25rem, 6vw, 5rem));
+      padding-bottom: clamp(1rem, 3vw, 2rem); }
+
+    /* restaurant video — PINNED to the viewport (only the video stays put) */
+    .bn-hero__bg { position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+      width: 100vw; height: clamp(600px, 56vw, 820px); z-index: 0; overflow: hidden; pointer-events: none; }
+    .bn-hero__video { width: 100%; height: 100%; object-fit: cover; object-position: center 42%; }
+
+    /* gradient veil — LOCKED onto the pinned video so the two never separate (no seam on scroll) */
+    .bn-hero__bg::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(243,178,112,0.80) 0%, rgba(255,255,255,0.67) 56.49%, #F0EFE9 100%),
+        linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 50.24%, #F0EFE9 100%); }
+
+    /* title — held in place from the first pixel (sticky at its own position) and dissolves almost instantly on scroll */
+    .bn-hero__head { position: sticky; top: calc(var(--hdr-h) + clamp(2.25rem, 6vw, 5rem)); z-index: 3; max-width: 66rem; will-change: opacity; }
+    .bn-hero__title { font-family: var(--f-display); font-weight: 500; color: var(--ink);
+      font-size: clamp(1.35rem, 2.35vw, 2.15rem); line-height: 1.3; letter-spacing: -0.018em; }
+    .bn-hero__title b { font-weight: 800; }
+    .bn-hero__title .hl { color: var(--brand); }
+
+    /* dashboard — reduced to the Figma proportion, dropped well below the title; scrolls over the pinned video */
+    .bn-tablet { position: relative; z-index: 2; width: min(782px, 100%);
+      margin: clamp(3.5rem, 9vw, 7rem) auto 0;
+      transform-style: preserve-3d; will-change: transform, opacity;
+      animation: bnTabletIn 1.15s cubic-bezier(.2,.7,.2,1) 3s both; }
+    .bn-tablet__img { display: block; width: 100%; height: auto; border-radius: clamp(12px, 1.5vw, 20px);
+      box-shadow: 0 44px 90px -46px rgba(40,37,30,0.55); }
+    @keyframes bnTabletIn {
+      from { opacity: 0; transform: translateY(72px) scale(1.1); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* sheet holding the rest of the page — scrolls up over the pinned video; its TOP edge fades in
+       from transparent so the meta frame blends onto the hero instead of cutting a hard seam */
+    .bn-cover { position: relative; z-index: 2;
+      background: linear-gradient(180deg, rgba(240,239,233,0) 0, var(--bg) clamp(200px, 26vh, 340px)); }
+
+    /* ---------- Wordmark + meta ---------- */
+    .bn-idsection { padding-top: clamp(1.25rem, 3vw, 2.25rem); padding-bottom: 0; }
+    .bn-wordmark { font-family: var(--f-display); font-weight: 800; letter-spacing: -0.02em;
+      font-size: clamp(3rem, 9vw, 6.6rem); line-height: .92; color: var(--ink); text-transform: uppercase; }
+    /* meta row — bottom hairline only (no top line, per brief) */
+    .bn-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1.25rem 2.5rem;
+      border-bottom: 1px solid var(--line); padding-block: clamp(1.15rem, 2.6vw, 1.7rem); margin-top: clamp(1rem, 2.4vw, 1.6rem); }
+    .bn-meta div { display: flex; flex-direction: column; gap: .28rem; }
+    .bn-meta dt { font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; color: var(--brand); font-weight: 600; }
+    .bn-meta dd { font-family: var(--f-display); font-weight: 500; font-size: .98rem; color: var(--ink); }
+
+    /* ---------- Problem / Solution ---------- */
+    .bn-blocklabel { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.15rem, 2vw, 1.5rem);
+      letter-spacing: -0.01em; color: var(--ink); }
+    .bn-problem p { color: var(--ink); font-family: var(--f-display); font-weight: 500;
+      font-size: clamp(1.18rem, 2vw, 1.6rem); line-height: 1.42; letter-spacing: -0.01em; margin-top: 1rem; max-width: 60rem; }
+    .bn-problem p b, .bn-note p b { color: var(--brand); font-weight: 600; }
+    .bn-solution { margin-top: clamp(2rem, 4vw, 3rem); }
+    .bn-bullets { margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem; }
+    .bn-bullets li { position: relative; padding-left: 1.85rem; color: var(--ink);
+      font-family: var(--f-display); font-weight: 500; font-size: clamp(1.08rem, 1.6vw, 1.38rem); line-height: 1.4; }
+    .bn-bullets li::before { content: ""; position: absolute; left: .35rem; top: .6em;
+      width: 9px; height: 9px; border-radius: 50%; background: var(--brand); }
+
+    /* ---------- Product flows — muted looping video in a glass frame, full-bleed orange wires ---------- */
+    /* no overflow clipping here: the video frame's orange glow must be able to bleed past the box.
+       the wire SVG is inset:0 inside this element, so nothing else escapes. */
+    .bn-flow { position: relative; padding-block: clamp(2rem, 5vw, 3.75rem); }
+    .bn-flow__wires { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+    .bn-flow__wires svg { width: 100%; height: 100%; display: block; }
+    .bn-wire { fill: none; vector-effect: non-scaling-stroke; stroke-linecap: round; }
+    .bn-wire--line { stroke: #e08a2b; stroke-width: 2.2; opacity: .8; }
+    .bn-wire--soft { stroke: #e6a869; stroke-width: 12; opacity: .16; }
+
+    /* glass frame — glass spec, but padding + radii matched to the "Inside the project" cards */
+    .bn-videoframe { position: relative; z-index: 1; width: 100%; margin-inline: auto;
+      padding: clamp(16px, 2.6vw, 40px);
+      border-radius: clamp(20px, 2.4vw, 34px);   /* same box as .bn-shot — the only other media frame here */
+      border: 1.055px solid rgba(255, 255, 255, 0.32);
+      background: linear-gradient(308deg, rgba(65, 65, 65, 0.02) -65.63%, rgba(167, 167, 167, 0.29) 147.78%);
+      box-shadow: 0 -4px 29.4px 10px rgba(217, 130, 43, 0.10);
+      -webkit-backdrop-filter: blur(13.72px); backdrop-filter: blur(13.72px); }
+    /* the inner radius matches .bn-shot > img exactly — at phone widths a flat 20px read far
+       rounder than every other screenshot on the page */
+    .bn-video { display: block; width: 100%; height: auto; aspect-ratio: 2580 / 1834;
+      object-fit: cover; border-radius: clamp(12px, 1.4vw, 18px); background: #eceae3; }
+
+    /* ---------- Cognitive-load note ---------- */
+    .bn-note p { color: var(--ink); font-family: var(--f-display); font-weight: 500;
+      font-size: clamp(1.15rem, 1.8vw, 1.5rem); line-height: 1.5; letter-spacing: -0.01em; max-width: 64rem; }
+
+    /* ---------- Inside the project — grey cards that stack & grow on scroll ---------- */
+    .bn-head__sub { color: var(--bn-mut); font-family: var(--f-display); font-weight: 500;
+      font-size: clamp(1.05rem, 1.6vw, 1.3rem); margin-top: .75rem; }
+    .bn-stack { margin-top: clamp(1.75rem, 3.5vw, 2.75rem); display: flex; flex-direction: column; gap: clamp(2rem, 4vw, 3.5rem); }
+    .bn-scard { position: sticky; top: calc(var(--hdr-h) + 14px); z-index: 1;
+      transform: scale(var(--s, 1)); transform-origin: center top; opacity: var(--o, 1); will-change: transform, opacity;
+      background: #eceae3; border-radius: clamp(24px, 3vw, 43px); padding: clamp(16px, 2.6vw, 40px);
+      display: flex; flex-direction: column; gap: 18px; overflow: clip;
+      /* the card hugs the screenshot (no big side gaps): its width tracks the height-capped image (≈1.41 ratio) */
+      width: 100%; max-width: min(100%, calc((100svh - 300px) * 1.41 + 5rem)); margin-inline: auto;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04), 0 4px 24px rgba(0,0,0,0.08); }
+    .bn-scard:nth-child(2) { z-index: 2; }
+    .bn-scard:last-child { position: relative; top: 0; z-index: 3; }
+    .bn-scard__fig { max-width: 100%; }
+    /* cap the screen height to the viewport so the caption below stays visible while the card is pinned;
+       the image keeps its intrinsic ratio (via width/height attrs) so it reserves space before it loads */
+    .bn-scard__fig img { display: block; border-radius: 20px; width: 100%; max-width: 100%; height: auto; max-height: calc(100svh - 300px); }
+    .bn-scard__cap { color: #28251e; font-family: var(--f-body); font-size: clamp(1rem, 1.25vw, 1.125rem); line-height: 1.6; max-width: 100%; text-align: left; }
+    .bn-scard__cap b { color: #18160f; font-weight: 600; }
+
+    /* ---------- New editorial sections (Research → Impact) — mini eyebrow + h2 + body ---------- */
+    .bn-body { color: rgba(40,37,30,0.88); font-family: var(--f-display); font-weight: 400;
+      font-size: clamp(1.06rem, 1.5vw, 1.32rem); line-height: 1.55; letter-spacing: -0.004em;
+      margin-top: 1.1rem; max-width: 64rem; }
+    .bn-body .hl, .bn-body b { color: var(--brand); font-weight: 600; }
+    .bn-section .bn-mini + .bn-h2 { margin-top: .85rem; }
+
+    /* Research — three serif stats, each under a thin brand rule.
+       They arrive one behind the other with the same long rise-and-fade the homepage project
+       tiles use (wtIn), rather than the whole row fading in as one block. */
+    .bn-stats { margin-top: clamp(2rem, 4.5vw, 3.25rem); display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.5rem, 4vw, 3rem); }
+    .bn-stats.reveal { opacity: 1; transform: none; transition: none; }   /* the children carry the entrance */
+    .bn-stats .bn-stat { opacity: 0; }
+    .bn-stats.is-in .bn-stat { animation: bnStatIn 1.5s cubic-bezier(.22,.61,.36,1) both; }
+    .bn-stats.is-in .bn-stat:nth-child(1) { animation-delay: .05s; }
+    .bn-stats.is-in .bn-stat:nth-child(2) { animation-delay: .18s; }
+    .bn-stats.is-in .bn-stat:nth-child(3) { animation-delay: .31s; }
+    @keyframes bnStatIn { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+    .bn-stat { border: 1.5px solid var(--brand); border-radius: clamp(14px, 1.8vw, 22px);
+      padding: clamp(1.4rem, 2.6vw, 2.1rem) clamp(1rem, 2vw, 1.5rem);
+      display: flex; flex-direction: column; align-items: center; text-align: center; gap: .35rem; }
+    .bn-stat__n { display: block; font-family: var(--f-serif); font-weight: 400; color: var(--brand);
+      font-size: clamp(3.4rem, 7vw, 5.4rem); line-height: .9; letter-spacing: -0.01em; }
+    .bn-stat span { display: block; margin-top: .2rem; color: var(--bn-mut); font-size: 1rem; line-height: 1.45; text-align: center; }
+
+    /* Key insight — large Instrument Serif line */
+    .bn-insight { font-family: var(--f-display); font-weight: 500; color: var(--ink);
+      font-size: clamp(1.5rem, 3vw, 2.15rem); line-height: 1.18; letter-spacing: -0.02em;
+      margin-top: 1.1rem; max-width: 34ch; }
+    .bn-insight .hl { color: var(--brand); }
+
+    /* Problem — two mirrored columns of bullets, closed by a serif line */
+    .bn-cols2 { margin-top: clamp(1.75rem, 3.5vw, 2.5rem); display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.5rem, 5vw, 4rem); }
+    .bn-collabel { display: block; font-family: var(--f-display); font-weight: 700; color: var(--brand);
+      font-size: clamp(1.1rem, 1.6vw, 1.3rem); margin-bottom: 1.1rem; }
+    .bn-plist { display: flex; flex-direction: column; gap: .95rem; }
+    .bn-plist li { position: relative; padding-left: 1.6rem; color: var(--ink); font-family: var(--f-display);
+      font-weight: 400; font-size: clamp(1rem, 1.35vw, 1.15rem); line-height: 1.5; }
+    .bn-plist li::before { content: ""; position: absolute; left: .3rem; top: .6em; width: 7px; height: 7px; border-radius: 50%; background: var(--brand); }
+    .bn-serifline { font-family: var(--f-serif); font-weight: 400; color: var(--ink);
+      font-size: clamp(1.4rem, 2.8vw, 2rem); line-height: 1.25; letter-spacing: -0.01em; margin-top: clamp(2rem, 4vw, 3rem); }
+
+    /* Open / exposed screenshot — grey device mat, soft shadow, flat in the flow
+       (replaces the old sticky-stacking "Inside the project" cards) */
+    .bn-shot { width: 100%; margin: 0; margin-top: clamp(1.6rem, 3.2vw, 2.4rem);
+      background: #e7e5de; border-radius: clamp(20px, 2.4vw, 34px); padding: clamp(16px, 2.6vw, 40px);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 10px 36px rgba(0,0,0,0.11); }
+    .bn-shot > img, .bn-shot > video { display: block; width: 100%; height: auto; border-radius: clamp(12px, 1.4vw, 18px); }
+
+    @media (max-width: 760px) {
+      .bn-stats, .bn-cols2 { grid-template-columns: 1fr; }
+      .bn-insight { max-width: none; }
+    }
+
+    /* ---------- CTA ---------- */
+    /* the extra bottom room keeps the footer's ring pile (~56px tall) clear of the CTA and its links */
+    .bn-cta { padding-top: clamp(3.25rem, 6.5vw, 5.5rem); padding-bottom: calc(clamp(3.25rem, 6.5vw, 5.5rem) + 84px);
+      border-top: 1px solid var(--line-soft); }
+    .bn-cta h2 { font-family: var(--f-display); font-weight: 700; font-size: clamp(2.2rem, 7vw, 4.5rem); letter-spacing: -0.03em; line-height: 1; max-width: 16ch; }
+    .bn-cta .pill { margin-top: 2.25rem; }
+    .bn-backall { display: inline-flex; align-items: center; gap: .5em; margin-top: 2.5rem; color: var(--bn-mut); font-family: var(--f-display); font-weight: 500; font-size: .95rem; transition: color .25s ease, gap .25s ease; }
+    .bn-backall:hover { color: var(--brand); gap: .8em; }
+
+    /* ---------- Right-side scroll progress rail ---------- */
+    .bn-rail { position: fixed; right: max(10px, calc((100vw - 1180px) / 2 - 50px)); top: 50%; transform: translateY(-50%); z-index: 55; height: min(52vh, 440px); display: flex; align-items: center;
+      opacity: 0; pointer-events: none; transition: opacity .4s ease; }
+    .bn-rail.is-on { opacity: 1; pointer-events: auto; }
+    .bn-rail__bar { position: relative; width: 2px; height: 100%; background: var(--line); border-radius: 2px; }
+    .bn-rail__fill { position: absolute; left: 0; top: 0; width: 2px; height: 0; background: var(--brand); border-radius: 2px; }
+    .bn-rail__dots { position: absolute; left: 50%; top: 0; height: 100%; width: 0; transform: translateX(-50%); display: block; }
+    .bn-rail__dot { position: absolute; left: 0; top: var(--pos, 0%); margin: -4.5px 0 0 -4.5px; width: 9px; height: 9px; border-radius: 50%; background: var(--bg); box-shadow: 0 0 0 2px var(--line); transition: transform .3s ease, box-shadow .3s ease, background .3s ease; }
+    .bn-rail__cap { top: 100%; }
+    .bn-rail__dot.is-done { background: var(--brand); box-shadow: 0 0 0 2px var(--brand); }
+    .bn-rail__dot.is-active { background: var(--brand); box-shadow: 0 0 0 4px var(--brand-soft); transform: scale(1.55); }
+
+    /* =========================================================
+       Header — frosted glass (page-scoped to .bn)
+       ========================================================= */
+    /* Header pill glass + shape are shared (styles.css) so every page matches;
+       here we only delay the entrance for the load sequence. */
+    .bn .hdr--float { animation: hdrIn 1.15s cubic-bezier(.2,.7,.2,1) 1.5s both; }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 1024px) { .bn-rail { display: none; } }
+    @media (max-width: 760px) {
+      .bn-meta { gap: 1rem 1.5rem; }
+      .bn-meta div { min-width: 40%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .bn-tablet { transform: none !important; animation: none !important; opacity: 1 !important; }
+      .bn-stats .bn-stat { opacity: 1; animation: none !important; }
+      /* fall back to a normal scrolling hero (no pinned video / sticky title) */
+      .bn-hero__bg { position: absolute; }
+      .bn-hero__head { position: static; }
+    }
+  </style>
+</head>
+<body class="bn">
+  <!-- phones: the side rail is hidden, so progress runs along the top edge instead -->
+  <div class="pgbar" aria-hidden="true"><span></span></div>
+  <a class="skip-link" href="#research">Skip to content</a>
+
+  <!-- ===== HEADER (floating frosted pill → collapses to a badge on scroll) ===== -->
+  <header class="hdr hdr--float" id="top">
+    <div class="hdr__pill">
+      <a class="hdr__logo" href="index.html" aria-label="Yehuda Amitzur — home">
+        <span class="hdr__avatar"><img class="hdr__avatar-img" src="profile.png" alt="Yehuda Amitzur" width="46" height="46" /></span>
+      </a>
+      <div class="hdr__expand">
+        <nav class="hdr__nav" aria-label="Primary">
+          <a href="index.html">Home</a>
+          <a href="index.html#work">Work</a>
+          <a href="cv-yehuda-amitzur.pdf" target="_blank" rel="noopener">CV</a>
+        </nav>
+        <a class="hdr__cta" href="index.html#contact">Contact</a>
+        <button class="hdr__menu" aria-label="Open menu" aria-expanded="false" aria-controls="hdr-drawer"><span></span><span></span></button>
+      </div>
+      <span class="hdr__status" aria-hidden="true"><span>Available for work</span><i class="hdr__dot"></i></span>
+    </div>
+
+    <!-- frosted-glass menu card (mobile + tablet) -->
+    <div class="hdr__drawer" id="hdr-drawer" hidden>
+      <div class="hdr__drawer-top">
+        <span class="hdr__drawer-ava"><img src="profile.png" alt="" width="46" height="46" /></span>
+        <button class="hdr__drawer-close" type="button" aria-label="Close menu"><span></span><span></span></button>
+      </div>
+      <a href="index.html">Home</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#work">Projects</a>
+      <a href="cv-yehuda-amitzur.pdf" target="_blank" rel="noopener">My cv</a>
+      <a class="hdr__drawer-contact" href="index.html#contact">Contact</a>
+    </div>
+  </header>
+
+  <!-- ===== RIGHT-SIDE SCROLL PROGRESS RAIL ===== -->
+  <nav class="bn-rail" aria-label="Section progress">
+    <span class="bn-rail__bar"><span class="bn-rail__fill"></span></span>
+    <span class="bn-rail__dots">
+      <a class="bn-rail__dot" href="#problem" aria-label="The problem"></a>
+      <a class="bn-rail__dot" href="#dashboard" aria-label="Solution — dashboard"></a>
+      <a class="bn-rail__dot" href="#operations" aria-label="Solution — operations"></a>
+      <a class="bn-rail__dot" href="#staff" aria-label="Solution — staff"></a>
+      <span class="bn-rail__dot bn-rail__cap" aria-hidden="true"></span>
+    </span>
+  </nav>
+
+  <main>
+    <!-- ===== HERO ===== -->
+    <h1 class="sr-only">Bianca — a restaurant management dashboard</h1>
+    <section class="bn-hero bn-wrap">
+      <div class="bn-hero__bg" aria-hidden="true">
+        <video class="bn-hero__video" autoplay muted loop playsinline preload="auto" poster="bianca-hero-poster.jpg">
+          <source src="restaurant-hero-video.mp4" type="video/mp4" />
+        </video>
+      </div>
+
+      <div class="bn-hero__head" data-hero-head>
+        <p class="bn-hero__title reveal"><b>48 managers</b> and <b>572 employees</b> reported the exact same problem — <span class="hl">and no one had solved it.</span></p>
+      </div>
+
+      <div class="bn-tablet" data-tablet>
+        <img class="bn-tablet__img" src="bianca-hero.jpg" width="1600" height="1400"
+             alt="The Bianca restaurant management dashboard" />
+      </div>
+    </section>
+
+    <!-- everything below the hero rides on an opaque sheet that scrolls up over the pinned video -->
+    <div class="bn-cover">
+    <!-- ===== WORDMARK + META ===== -->
+    <section class="bn-idsection bn-wrap">
+      <p class="bn-wordmark reveal" aria-hidden="true">Bianca</p>
+      <dl class="bn-meta reveal">
+        <div><dt>Platform</dt><dd>restaurant management app</dd></div>
+        <div><dt>Role</dt><dd>UX/UI · Branding</dd></div>
+        <div><dt>Timeline</dt><dd>6 weeks</dd></div>
+        <div><dt>Tools</dt><dd>Figma · Claude · AI</dd></div>
+      </dl>
+    </section>
+
+    <!-- ===== RESEARCH ===== -->
+    <section class="bn-section bn-wrap" id="research">
+      <h2 class="bn-h2 reveal">Two weeks. Two sides of the same system.</h2>
+      <p class="bn-body reveal">To understand why running a restaurant feels so chaotic, I ran a research sprint —
+        surveying managers and employees separately, then cross-referencing their frustrations. The scale of the
+        problem came through immediately.</p>
+      <div class="bn-stats reveal">
+        <!-- stat__val + data-count hands these to the shared count-up in script.js — the same
+             growth the homepage "3+ years / 10+ projects" figures use -->
+        <div class="bn-stat"><b class="bn-stat__n stat__val" data-count="48">48</b><span>Quantitative survey sent to restaurant managers</span></div>
+        <div class="bn-stat"><b class="bn-stat__n stat__val" data-count="3">3</b><span>In-depth interviews conducted with managers</span></div>
+        <div class="bn-stat"><b class="bn-stat__n stat__val" data-count="572">572</b><span>Separate quantitative survey across restaurant employees</span></div>
+      </div>
+    </section>
+
+    <!-- ===== THE KEY INSIGHT ===== -->
+    <section class="bn-section bn-wrap" id="insight">
+      <span class="bn-mini reveal">The key insight</span>
+      <p class="bn-insight reveal">The research revealed the real problem wasn't missing information — it was
+        <span class="hl">cognitive load:</span> in existing interfaces, urgent and trivial blend together.</p>
+    </section>
+
+    <!-- ===== THE PROBLEM — the same pain, two directions ===== -->
+    <section class="bn-section bn-wrap" id="problem">
+      <span class="bn-mini reveal">The problem</span>
+      <h2 class="bn-h2 reveal">The same pain, experienced from opposite directions</h2>
+      <div class="bn-cols2 reveal">
+        <div>
+          <span class="bn-collabel">Managers:</span>
+          <ul class="bn-plist">
+            <li>Hard to see who's working when</li>
+            <li>High employee turnover creates constant last-minute changes — sickness, sudden unavailability,
+              people quitting, exams — and each one demands immediate clarity that isn't there</li>
+            <li>No overall picture of the week — because everything runs in duplicate, split between a shared
+              WhatsApp group and separate personal messages</li>
+          </ul>
+        </div>
+        <div>
+          <span class="bn-collabel">Employees:</span>
+          <ul class="bn-plist">
+            <li>Unclear when I'm working</li>
+            <li>Changes arrive last-minute</li>
+            <li>No overall picture of the week</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SOLUTION — DASHBOARD (home screen -> alert note -> dashboard-in-motion flow) ===== -->
+    <section class="bn-section bn-wrap" id="dashboard">
+      <span class="bn-mini reveal">Solution — Dashboard</span>
+      <h2 class="bn-h2 reveal">A dashboard built for decisions, not just data display</h2>
+      <p class="bn-body reveal">I chose a central dashboard over separate reports because the research showed managers
+        need to <span class="hl">decide fast in the morning</span> — not analyze deeply. The dashboard is built around
+        action: what needs attention right now.</p>
+      <figure class="bn-shot reveal">
+        <img src="bianca-home.jpg" width="4320" height="3780" alt="The Bianca dashboard — the restaurant's whole day at a glance" loading="lazy" />
+      </figure>
+      <p class="bn-body reveal" style="margin-top: clamp(1.9rem, 3.6vw, 2.6rem);"><b>Separating critical from important.</b>
+        To reduce the cognitive load the research identified, I clearly separated Critical Alerts — shown first, at the
+        top — from Important and Informational Alerts shown below. Urgent things look urgent. Routine things don't compete.</p>
+    </section>
+
+    <!-- full-bleed: the wires must reach both screen edges, so this sits OUTSIDE .bn-wrap -->
+    <div class="bn-flow" aria-label="The Bianca dashboard in motion">
+        <div class="bn-flow__wires" aria-hidden="true">
+          <svg viewBox="0 0 1440 520" preserveAspectRatio="none">
+            <path class="bn-wire bn-wire--soft" d="M0,300 C 260,300 380,150 720,150 C 1060,150 1180,352 1440,352" />
+            <path class="bn-wire bn-wire--line" d="M0,300 C 260,300 380,150 720,150 C 1060,150 1180,352 1440,352" />
+            <path class="bn-wire bn-wire--soft" d="M0,344 C 260,344 380,198 720,198 C 1060,198 1180,398 1440,398" />
+            <path class="bn-wire bn-wire--line" d="M0,344 C 260,344 380,198 720,198 C 1060,198 1180,398 1440,398" />
+          </svg>
+        </div>
+      <div class="bn-wrap">
+        <figure class="bn-videoframe reveal">
+          <video class="bn-video" autoplay muted loop playsinline preload="metadata" poster="bianca-mockup-1.png">
+            <source src="bianca-flow-1.mp4" type="video/mp4" />
+          </video>
+        </figure>
+      </div>
+    </div>
+
+    <!-- ===== SOLUTION — OPERATIONS (alerts-in-motion flow -> operations screen) ===== -->
+    <section class="bn-section bn-wrap" id="operations">
+      <span class="bn-mini reveal">Solution — Operations</span>
+      <h2 class="bn-h2 reveal">Menu, inventory, and ordering — unified</h2>
+      <p class="bn-body reveal">Previously, managers had to jump between three disconnected sections to manage the
+        daily flow of ingredients and supplies. I unified <span class="hl">Menu management, Inventory, and Purchases</span>
+        into a single operational category — so a manager can move from "what do we have" to "what do we need to order"
+        in one place, without context-switching.</p>
+    </section>
+
+    <!-- full-bleed: the wires must reach both screen edges, so this sits OUTSIDE .bn-wrap -->
+    <div class="bn-flow" aria-label="Bianca alert separation in motion">
+        <div class="bn-flow__wires" aria-hidden="true">
+          <svg viewBox="0 0 1440 520" preserveAspectRatio="none">
+            <path class="bn-wire bn-wire--soft" d="M0,210 C 260,210 380,392 720,392 C 1060,392 1180,180 1440,180" />
+            <path class="bn-wire bn-wire--line" d="M0,210 C 260,210 380,392 720,392 C 1060,392 1180,180 1440,180" />
+            <path class="bn-wire bn-wire--soft" d="M0,254 C 260,254 380,436 720,436 C 1060,436 1180,224 1440,224" />
+            <path class="bn-wire bn-wire--line" d="M0,254 C 260,254 380,436 720,436 C 1060,436 1180,224 1440,224" />
+          </svg>
+        </div>
+      <div class="bn-wrap">
+        <figure class="bn-videoframe reveal">
+          <video class="bn-video" autoplay muted loop playsinline preload="metadata" poster="bianca-mockup-2.png">
+            <source src="bianca-flow-2.mp4" type="video/mp4" />
+          </video>
+        </figure>
+      </div>
+    </div>
+
+    <!-- ===== SOLUTION — STAFF MANAGEMENT (was "Inside the project"; now open & exposed) ===== -->
+    <section class="bn-section bn-wrap" id="staff">
+      <span class="bn-mini reveal">Solution — Staff management</span>
+      <h2 class="bn-h2 reveal">Built for high turnover</h2>
+      <p class="bn-body reveal">High employee turnover is one of the most consistent pain points managers reported.
+        I built a dedicated Staff section with <span class="hl">full transparency</span>: who's active, who isn't, and
+        how to quickly find and edit any record. An add-employee flow keeps onboarding fast even when someone joins
+        mid-week.</p>
+      <figure class="bn-shot reveal">
+        <img src="bianca-staff-1.jpg" width="2724" height="1937" alt="Bianca staff management — the employee directory with active, on-leave and inactive states" loading="lazy" />
+      </figure>
+      <p class="bn-body reveal">Scheduling was the other half of the shared problem — both managers and employees
+        reported not having a clear picture of the week. The weekly shift board shows the manager the whole week at a
+        glance, and shows the employee exactly when they're working — instead of information scattered between a
+        WhatsApp group and personal messages. If a shift is understaffed, the system flags it in red, so the manager
+        doesn't discover the problem at the last minute. If an employee ends a shift early, the system automatically
+        bumps them to the top of the list, in gray, with their available hours marked — so re-staffing happens
+        immediately, without manually searching for who's free.</p>
+      <figure class="bn-shot reveal">
+        <img src="bianca-staff-2.jpg" width="2722" height="1936" alt="Bianca staff management — the weekly scheduling board with understaffed shifts flagged in red" loading="lazy" />
+      </figure>
+    </section>
+
+    <!-- ===== IMPACT ===== -->
+    <section class="bn-section bn-wrap" id="impact">
+      <span class="bn-mini reveal">Impact</span>
+      <p class="bn-insight reveal" style="max-width: 34ch;">Bianca closed the gap between awareness and action —
+        <span class="hl">a system that tells you exactly what to do next.</span></p>
+      <p class="bn-body reveal">By separating urgency levels, unifying operations, and making scheduling visible, it
+        transformed a dashboard full of noise into a tool you can act on — without switching tabs, digging through
+        menus, or guessing who's available.</p>
+    </section>
+
+    <!-- ===== CTA ===== -->
+    <section class="bn-cta bn-wrap">
+      <h2 class="reveal">Liked this project?<br>Let's talk.</h2>
+      <div class="reveal"><a class="pill" href="index.html#contact"><span>Let's work together</span></a></div>
+      <div><a class="bn-backall" href="index.html#work"><span aria-hidden="true">←</span> Back to all work</a></div>
+    </section>
+    </div><!-- /.bn-cover -->
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot__inner">
+      <span>© 2026 Yehuda Amitzur — built with Claude</span>
+      <a href="#top">Back to top ↑</a>
+    </div>
+  </footer>
+
+  <script src="script.js?v=18"></script>
+  <script>
+    /* ---- Bianca case-study interactions (page-scoped) ---- */
+    (function () {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
+      const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+      // Wire the glass-menu close button to the shared hamburger toggle
+      const menuBtn = document.querySelector('.hdr__menu');
+      const closeBtn = document.querySelector('.bn-drawer__close');
+      if (menuBtn && closeBtn) {
+        closeBtn.addEventListener('click', () => { if (menuBtn.getAttribute('aria-expanded') === 'true') menuBtn.click(); });
+      }
+
+      // Right-side progress rail
+      const railEl = document.querySelector('.bn-rail');
+      const fill = document.querySelector('.bn-rail__fill');
+      const dots = Array.from(document.querySelectorAll('.bn-rail__dot')).filter((d) => !d.classList.contains('bn-rail__cap'));
+      const railCap = document.querySelector('.bn-rail__cap');
+      const targets = dots.map((d) => document.querySelector(d.getAttribute('href')));
+      const revealSec = document.querySelector('#problem');   // rail appears from The problem onward
+      const endSec = document.querySelector('#impact');       // ...and is gone by Impact
+      const pgbar = document.querySelector('.pgbar');
+      const pgfill = pgbar && pgbar.firstElementChild;
+      function railUpdate() {
+        // Progress starts at ZERO the moment the rail reveals — it must never appear already
+        // part-filled. Stops = [reveal point, ...section anchors, end of page], and dot i sits at
+        // ((i+1)/segments)*100, so nothing is lit at p=0 and the end cap closes it out at 100.
+        const doc = document.documentElement;
+        const maxScroll = Math.max(1, doc.scrollHeight - doc.clientHeight);
+        const y = doc.scrollTop, vh = window.innerHeight;
+        const reach = targets.map((t) => (t ? Math.max(0, t.getBoundingClientRect().top + window.scrollY - vh * 0.4) : 0));
+        let startY = revealSec ? revealSec.getBoundingClientRect().top + window.scrollY - vh * 0.6 : 0;
+        if (!(startY < reach[0])) startY = reach[0] - 1;
+        const stops = [startY].concat(reach, [maxScroll]);
+        const segs = stops.length - 1;
+        let seg = 0;
+        for (let i = 0; i < segs; i++) if (y >= stops[i]) seg = i;
+        const span = stops[seg + 1] - stops[seg];
+        const frac = span > 0 ? clamp((y - stops[seg]) / span, 0, 1) : 1;
+        const p = clamp(((seg + frac) / segs) * 100, 0, 100);
+        if (fill) fill.style.height = p + '%';
+        let idx = -1;
+        dots.forEach((d, i) => {
+          const pos = ((i + 1) / segs) * 100;
+          d.style.setProperty('--pos', pos + '%');
+          if (p + 0.001 >= pos) idx = i;
+        });
+        const started = revealSec ? revealSec.getBoundingClientRect().top < window.innerHeight * 0.6 : true;
+        const ended = endSec ? endSec.getBoundingClientRect().top < window.innerHeight * 0.9 : false;
+        if (railEl) railEl.classList.toggle('is-on', started && !ended);
+        // the phone bar rides the very same numbers: same start, same end, same fill
+        if (pgfill) { pgfill.style.width = p + '%'; pgbar.classList.toggle('is-on', started && !ended); }
+        dots.forEach((d, i) => { d.classList.toggle('is-active', i === idx); d.classList.toggle('is-done', i < idx); });
+        if (railCap) railCap.classList.toggle('is-done', p >= 99.5);   // the line lands on a dot, not a bare edge
+      }
+
+      // Hero title — dissolves as you scroll while the video band stays pinned
+      const heroHead = document.querySelector('[data-hero-head]');
+      function heroFade() {
+        if (!heroHead || reduce) return;
+        // dissolve almost immediately — done within ~90px of scroll
+        const o = clamp(1 - window.scrollY / 90, 0, 1);
+        heroHead.style.opacity = o.toFixed(3);
+        heroHead.style.pointerEvents = o < 0.05 ? 'none' : '';
+      }
+
+      // Subtle parallax on the two full-bleed dashboard showcases
+      const paras = Array.from(document.querySelectorAll('[data-parallax]'));
+      function paraUpdate() {
+        if (reduce) return;
+        const vh = window.innerHeight;
+        paras.forEach((el) => {
+          const r = el.getBoundingClientRect();
+          const c = (r.top + r.height / 2 - vh / 2) / vh;   // -0.5..0.5 around centre
+          el.style.transform = 'translate3d(0,' + (clamp(c, -1, 1) * -26).toFixed(1) + 'px,0)';
+        });
+      }
+
+      // Inside-the-product — grow & fade the stacking cards as they enter
+      const scards = Array.from(document.querySelectorAll('.bn-scard'));
+      function productUpdate() {
+        if (reduce || !scards.length) return;
+        const vh = window.innerHeight;
+        scards.forEach((c) => {
+          const r = c.getBoundingClientRect();
+          const enter = clamp((vh - r.top) / (vh * 0.82), 0, 1);
+          c.style.setProperty('--s', (0.92 + 0.08 * enter).toFixed(3));
+          c.style.setProperty('--o', clamp((vh - r.top) / (vh * 0.4), 0, 1).toFixed(3));
+        });
+      }
+
+      let ticking = false;
+      function onScroll() {
+        if (ticking) return; ticking = true;
+        requestAnimationFrame(() => { railUpdate(); paraUpdate(); productUpdate(); heroFade(); ticking = false; });
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+
+      // ---- Hero dashboard: cursor parallax — starts only after the timed load-in entrance ----
+      const tablet = document.querySelector('[data-tablet]');
+      if (tablet && !reduce && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        const hero = tablet.closest('.bn-hero');
+        let raf = null, tx = 0, ty = 0, cx = 0, cy = 0, ready = false;
+        // clear the CSS entrance animation once it's done — its fill state would otherwise
+        // override the inline transform we set for the cursor parallax
+        setTimeout(() => { tablet.style.animation = 'none'; ready = true; }, 4300);   // 3s delay + ~1.15s entrance (matches Talmind)
+        const apply = () => {
+          cx += (tx - cx) * 0.12; cy += (ty - cy) * 0.12;
+          tablet.style.transform = 'translate3d(' + cx.toFixed(1) + 'px,' + cy.toFixed(1) + 'px,0) rotateX(' + (-cy * 0.045).toFixed(2) + 'deg) rotateY(' + (cx * 0.045).toFixed(2) + 'deg)';
+          if (Math.hypot(tx - cx, ty - cy) > 0.3) raf = requestAnimationFrame(apply); else raf = null;
+        };
+        (hero || tablet).addEventListener('pointermove', (e) => {
+          if (!ready) return;
+          const r = (hero || tablet).getBoundingClientRect();
+          tx = ((e.clientX - r.left) / r.width - 0.5) * 38;
+          ty = ((e.clientY - r.top) / r.height - 0.5) * 24;
+          if (!raf) raf = requestAnimationFrame(apply);
+        });
+        (hero || tablet).addEventListener('pointerleave', () => { if (!ready) return; tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(apply); });
+      }
+
+      onScroll();
+      window.addEventListener('load', onScroll);
+    })();
+  </script>
+</body>
+</html>

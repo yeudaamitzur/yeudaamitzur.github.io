@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Talmind — Case study · Yehuda Amitzur</title>
+  <meta name="description" content="Talmind — a tablet app that brings authentic Talmud study into Korean classrooms, teaching the questioning, reasoning mind behind it. A UX/UI case study by Yehuda Amitzur." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <!-- favicon: the same ring as the site cursor — purple stroke, lighter purple fill -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css?v=18" />
+
+  <style>
+    /* =========================================================
+       Talmind — case study (page-scoped, reuses shared tokens)
+       Left-aligned editorial. Warm-neutral + brand purple.
+       Cards used sparingly: glassy, no stroke.
+       Shadows mirror the "Glimpse" photos: 0 30px 60px -34px rgba(40,37,30,.4)
+       ========================================================= */
+    .tl { --tl-shadow: 0 30px 60px -34px rgba(40,37,30,0.4);
+          --tl-shadow-lift: 0 46px 84px -40px rgba(40,37,30,0.5);
+          --tl-liked: linear-gradient(135deg, #efe8f6, #f6f2ec); /* the ToI card colour */
+          --tl-mut: rgba(40,37,30,0.55);
+    }
+    .tl-wrap { width: 100%; max-width: 1180px; margin-inline: auto; padding-inline: var(--pad); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+    .tl-section { padding-block: clamp(2.75rem, 5.5vw, 4.75rem); scroll-margin-top: var(--hdr-h); }
+
+    .tl-eyebrow {
+      display: inline-flex; align-items: center; gap: .6em;
+      font-family: var(--f-body); font-size: .76rem; font-weight: 600;
+      letter-spacing: .18em; text-transform: uppercase; color: var(--brand);
+    }
+    .tl-eyebrow::before { content: ""; width: 26px; height: 1px; background: linear-gradient(90deg, var(--brand), transparent); }
+    .tl-mini { font-family: var(--f-body); font-size: .72rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--brand); }
+
+    .tl-h2 { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.9rem, 4.4vw, 3rem); line-height: 1.04; letter-spacing: -0.02em; margin-top: 1rem; max-width: 20ch; }
+    .tl-lead { color: var(--tl-mut); font-size: clamp(1.06rem, 1.5vw, 1.3rem); line-height: 1.6; margin-top: 1.2rem; max-width: 46rem; }
+    .tl-lead strong { color: var(--ink); font-weight: 600; }
+
+    /* ---------- Hero (video backdrop + dissolving tablet) ---------- */
+    .tl-hero {
+      position: relative; z-index: 1; overflow: visible; text-align: center;
+      padding-top: calc(var(--hdr-h) + clamp(2.25rem, 6vw, 5rem));
+      padding-bottom: clamp(1rem, 3vw, 2rem);
+    }
+    .tl-hero > :not(.tl-hero__bg) { position: relative; z-index: 2; }   /* content above the video */
+
+    /* full-bleed video — PINNED to the viewport (only the video stays put) */
+    .tl-hero__bg { position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+      width: 100vw; height: clamp(600px, 57vw, 819px); z-index: 0; overflow: hidden; pointer-events: none; }
+
+    /* gradient veil — LOCKED onto the pinned video so the two never separate (no seam on scroll) */
+    .tl-hero__bg::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(173,179,197,0.92) 0%, rgba(255,255,255,0.67) 47.12%, #F0EFE9 100%),
+        linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 50.24%, #F0EFE9 100%); }
+
+    /* lead copy — held in place from the first pixel and dissolves almost instantly on scroll */
+    /* `.tl-hero > .tl-hero__head` beats the blanket `.tl-hero > :not(.tl-hero__bg)` rule above */
+    .tl-hero > .tl-hero__head { position: sticky; top: calc(var(--hdr-h) + clamp(2.25rem, 6vw, 5rem)); z-index: 3; will-change: opacity; }
+
+    /* sheet holding the rest of the page — scrolls up over the pinned video; its TOP edge fades in
+       from transparent so the meta frame blends onto the hero instead of cutting a hard seam */
+    .tl-cover { position: relative; z-index: 2;
+      background: linear-gradient(180deg, rgba(240,239,233,0) 0, var(--bg) clamp(200px, 26vh, 340px)); }
+    .tl-hero__video { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
+
+    .tl-hero__lead { margin: 0 auto; max-width: 68rem; color: #18160f;
+      font-family: var(--f-display); font-weight: 300; letter-spacing: -0.011em;
+      font-size: clamp(1.15rem, 1.75vw, 1.44rem); line-height: 1.45; }
+    .tl-hero__lead strong { font-weight: 700; font-size: 1.17em; }
+    .tl-hero__lead .hl { color: #773f9c; }
+    .tl-hero__src { display: inline-flex; align-items: center; gap: .35em; margin-top: 1rem;
+      color: var(--brand); font-weight: 600; font-size: .9rem; border-bottom: 1px solid transparent; transition: border-color .25s ease; }
+    .tl-hero__src:hover { border-color: var(--brand); }
+
+    /* floating hands-tablet — rises up & settles from a larger size ~3s after load, then drifts with the cursor */
+    .tl-tablet { position: relative; z-index: 2; width: min(1120px, 100%); margin: clamp(2rem, 5vw, 4.5rem) auto 0;
+      transform-style: preserve-3d; will-change: transform, opacity;
+      animation: tlTabletIn 1.15s cubic-bezier(.2,.7,.2,1) 3s both; }
+    .tl-tablet__img { display: block; width: 100%; height: auto; }
+    @keyframes tlTabletIn {
+      from { opacity: 0; transform: translateY(80px) scale(1.16); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    /* project wordmark — the crown of the hierarchy, deliberately unlike the thin section eyebrows */
+    .tl-hero__brand { align-self: flex-start; display: inline-flex; align-items: center; gap: .55em;
+      font-family: var(--f-display); font-weight: 700; font-size: .95rem; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--brand); background: var(--brand-soft); padding: .5em 1.05em; border-radius: 999px; }
+    .tl-hero__brand::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--brand); }
+    .tl-hero__title { font-family: var(--f-display); font-weight: 700; font-size: clamp(2rem, 4.6vw, 3.1rem); line-height: 1.03; letter-spacing: -0.025em; margin-top: 1rem; max-width: 28ch; }
+    .tl-hero__title em { font-family: var(--f-serif); font-style: italic; font-weight: 400; color: var(--brand); letter-spacing: 0; }
+    .tl-hero__sub { color: var(--ink); font-size: clamp(1.1rem, 1.7vw, 1.42rem); line-height: 1.5; margin-top: 1.4rem; max-width: 54rem; }
+    .tl-hero__sub b { color: var(--brand); font-weight: 600; }
+
+    /* floating product icons — drift up across the whole hero background, contained to the hero */
+    .tl-hero-float { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: clip; }
+    .tl-float { position: absolute; top: 0; width: 84px; opacity: 0; will-change: transform, opacity;
+      filter: drop-shadow(0 16px 22px rgba(40,37,30,0.14)); animation: tlFloatUp 16s ease-in-out infinite; }
+    .tl-float--1 { left: 7%;  width: 68px; animation-duration: 15s; animation-delay: -2s; }
+    .tl-float--2 { left: 24%; width: 92px; animation-duration: 20s; animation-delay: -11s; }
+    .tl-float--3 { left: 43%; width: 72px; animation-duration: 17s; animation-delay: -6s; }
+    .tl-float--4 { left: 60%; width: 98px; animation-duration: 22s; animation-delay: -15s; }
+    .tl-float--5 { left: 76%; width: 76px; animation-duration: 16s; animation-delay: -4s; }
+    .tl-float--6 { left: 90%; width: 86px; animation-duration: 19s; animation-delay: -9s; }
+    @keyframes tlFloatUp {
+      0%   { transform: translateY(46vh) rotate(-9deg); opacity: 0; }
+      15%  { opacity: .6; }
+      85%  { opacity: .6; }
+      100% { transform: translateY(-52vh) rotate(9deg); opacity: 0; }
+    }
+
+    /* meta row (Role / Timeline / Platform / Tools) — aligned inside the grid, not edge-to-edge */
+    .tl-metabar { margin-top: clamp(1.5rem, 3.5vw, 2.75rem); }
+    .tl-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1.25rem 2.5rem; border-bottom: 1px solid var(--line); padding-block: clamp(1.15rem, 2.6vw, 1.7rem); }
+    .tl-meta div { display: flex; flex-direction: column; gap: .25rem; }
+    .tl-meta dt { font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; color: var(--brand); font-weight: 600; }
+    .tl-meta dd { font-family: var(--f-display); font-weight: 500; font-size: .98rem; color: var(--ink); }
+
+    /* hero media — starts around the upper third of the viewport */
+    .tl-hero-media { padding-bottom: clamp(1rem, 3vw, 2.5rem); }
+    .tl-hero-media__fig { position: relative; border-radius: clamp(20px, 3vw, 30px); overflow: hidden; box-shadow: var(--tl-shadow); background: var(--bg-deep); }
+    .tl-hero-media__fig img { width: 100%; height: clamp(400px, 76vh, 860px); object-fit: cover; object-position: center 32%; will-change: transform; }
+
+    /* ---------- About + Goal ---------- */
+    .tl-about__grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.5rem, 5vw, 4rem); }
+    .tl-about__grid p { color: var(--ink); font-size: clamp(1.15rem, 1.9vw, 1.6rem); line-height: 1.4; margin-top: .9rem; font-family: var(--f-display); font-weight: 500; letter-spacing: -0.01em; }
+    .tl-about__grid p b { color: var(--brand); }
+
+    /* ---------- Journey — header + horizontal facts pinned together, grid-aligned ---------- */
+    .tl-journey { position: relative; }
+    .tl-journey__sticky { position: sticky; top: 0; height: 100vh; overflow: hidden;
+      display: flex; flex-direction: column; justify-content: center; gap: clamp(1.5rem, 3vw, 2.5rem); }
+    .tl-journey__lead { align-self: stretch; }
+    .tl-journey__track { display: flex; align-items: stretch; gap: clamp(1.25rem, 3vw, 2.5rem); width: max-content; will-change: transform;
+      padding-left: max(var(--pad), calc((100vw - 1180px) / 2 + var(--pad)));   /* card 01 lines up with the header */
+      padding-right: clamp(70px, 12vw, 150px); }
+    .tl-panel { flex: 0 0 auto; width: min(80vw, 500px); display: flex; flex-direction: column; justify-content: center; }
+    /* fade the cards out on the right so they never slide under / clash with the progress rail */
+    .tl-journey__sticky::after { content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: clamp(60px, 12vw, 150px);
+      background: linear-gradient(90deg, rgba(240,239,233,0), var(--bg) 78%); pointer-events: none; z-index: 3; }
+
+    .tl-fact { position: relative; border-radius: 26px; padding: clamp(1.75rem, 3vw, 2.6rem); background: rgba(255,255,255,0.55); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: var(--tl-shadow); }
+    .tl-fact__n { font-family: var(--f-serif); font-style: italic; font-size: 3.2rem; line-height: 1; color: var(--brand); opacity: .9; }
+    .tl-fact h3 { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.35rem, 2.4vw, 1.85rem); line-height: 1.12; letter-spacing: -0.01em; margin-top: 1rem; }
+    .tl-fact p { color: var(--tl-mut); font-size: 1.06rem; line-height: 1.55; margin-top: .8rem; }
+
+    /* ---------- Liked-colour quote band (chavruta / Times of Israel) ---------- */
+    .tl-quote-fig { background: var(--tl-liked); border-radius: 26px; padding: clamp(1.75rem, 4vw, 3rem); box-shadow: var(--tl-shadow); max-width: 60rem; margin-inline: auto; }
+    .tl-quote-fig p { font-family: var(--f-display); font-weight: 500; color: var(--ink); font-size: clamp(1.15rem, 2vw, 1.55rem); line-height: 1.45; letter-spacing: -0.01em; }
+    .tl-quote-fig q { quotes: "“" "”"; }
+    .tl-quote-fig strong { color: var(--brand); font-weight: 700; }
+    .tl-quote-src { display: inline-flex; align-items: center; gap: .4em; margin-top: 1.25rem; color: var(--brand); font-weight: 600; font-size: .92rem; border-bottom: 1px solid transparent; transition: border-color .25s ease; }
+    .tl-quote-src:hover { border-color: var(--brand); }
+
+    /* ---------- What is Gemara — dry vs alive diptych ---------- */
+    .tl-diptych { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: clamp(1rem, 2.5vw, 2rem); margin-top: clamp(2rem, 4vw, 3rem); }
+    .tl-side { border-radius: 24px; padding: clamp(1.5rem, 3vw, 2.4rem); }
+    .tl-side h3 { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.3rem, 2.4vw, 1.9rem); line-height: 1.1; margin-top: .8rem; letter-spacing: -0.01em; }
+    .tl-side--dry { background: var(--surface-2); filter: saturate(.7); }
+    .tl-side--dry h3, .tl-side--dry .tl-mini { color: var(--ink-faint); }
+    .tl-side--alive { background: linear-gradient(155deg, rgba(119,63,156,0.14), rgba(119,63,156,0.03)); box-shadow: var(--tl-shadow); }
+    .tl-side--alive h3 { color: var(--brand); }
+    .tl-chips { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: 1.25rem; }
+    .tl-chips span { font-family: var(--f-display); font-weight: 600; font-size: .92rem; padding: .5em 1em; border-radius: 999px; }
+    .tl-side--dry .tl-chips span { background: transparent; color: var(--ink-faint); box-shadow: inset 0 0 0 1px var(--line); }
+    .tl-side--alive .tl-chips span { background: var(--brand-soft); color: var(--brand); }
+    .tl-side--alive .tl-chips span:nth-child(4) { background: var(--brand); color: #fff; }
+    .tl-dip-arrow { display: flex; align-items: center; justify-content: center; color: var(--brand); }
+    .tl-dip-arrow svg { width: 30px; height: 30px; }
+
+    /* ---------- Users & problems ---------- */
+    .tl-users { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1rem, 2.5vw, 1.5rem); margin-top: clamp(2rem, 4vw, 3rem); }
+    .tl-ucard { position: relative; border-radius: 24px; padding: clamp(1.6rem, 2.6vw, 2.1rem); background: rgba(255,255,255,0.5); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: var(--tl-shadow); transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s ease; }
+    .tl-ucard:hover { transform: translateY(-6px); box-shadow: var(--tl-shadow-lift); }
+    .tl-ucard__who { font-family: var(--f-display); font-weight: 700; color: var(--brand); font-size: 1.02rem; }
+    .tl-ucard h3 { font-family: var(--f-display); font-weight: 600; font-size: 1.25rem; margin-top: .55rem; letter-spacing: -0.01em; }
+    .tl-ucard p { color: var(--tl-mut); font-size: 1rem; line-height: 1.55; margin-top: .6rem; }
+
+    /* ---------- Solution ---------- */
+    .tl-solution { margin-top: clamp(2rem, 4vw, 3rem); display: flex; flex-direction: column; }
+    .tl-srow { display: grid; grid-template-columns: auto 1fr; gap: clamp(1.25rem, 3vw, 2.5rem); align-items: start; padding-block: clamp(1.5rem, 3vw, 2.25rem); border-top: 1px solid var(--line-soft); }
+    .tl-srow:last-child { border-bottom: 1px solid var(--line-soft); }
+    .tl-srow__n { font-family: var(--f-serif); font-style: italic; font-size: clamp(2.4rem, 5vw, 3.6rem); line-height: .9; color: var(--brand); }
+    .tl-srow h3 { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.3rem, 2.4vw, 1.8rem); line-height: 1.1; letter-spacing: -0.01em; }
+    .tl-srow p { color: var(--tl-mut); font-size: 1.08rem; line-height: 1.6; margin-top: .7rem; max-width: 44rem; }
+    .tl-srow p strong { color: var(--ink); font-weight: 600; }
+    .tl-subskills { display: inline-flex; flex-wrap: wrap; gap: .5rem; vertical-align: middle; margin-left: .5rem; }
+    .tl-subskills span { font-family: var(--f-display); font-weight: 600; font-size: .9rem; color: var(--brand); background: var(--brand-soft); padding: .4em .9em; border-radius: 999px; }
+
+    /* ---------- Success metrics ---------- */
+    .tl-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1rem, 2.5vw, 1.5rem); margin-top: clamp(2rem, 4vw, 3rem); }
+    .tl-metric { background: var(--tl-liked); border-radius: 24px; padding: clamp(1.6rem, 3vw, 2.3rem); box-shadow: var(--tl-shadow); }
+    .tl-metric b { display: block; font-family: var(--f-display); font-weight: 800; font-size: clamp(3rem, 7vw, 5rem); line-height: .9; color: var(--brand); letter-spacing: -0.03em; }
+    .tl-metric span { display: block; color: var(--tl-mut); margin-top: .7rem; font-size: 1.02rem; line-height: 1.4; }
+
+    /* ---------- Card base (shared by the flat "Before" card) ---------- */
+    .tl-scard { position: sticky; top: calc(var(--hdr-h) + 14px); z-index: 1;
+      transform: scale(var(--s, 1)); transform-origin: center top; opacity: var(--o, 1); will-change: transform, opacity;
+      background: #d5d5d5; border-radius: clamp(24px, 3vw, 43px); padding: clamp(16px, 2.6vw, 40px);
+      display: flex; flex-direction: column; gap: 18px; overflow: clip;
+      /* the card hugs the screenshot (no big side gaps): its width tracks the height-capped image (16:10 ratio) */
+      width: 100%; max-width: min(100%, calc((100svh - 300px) * 1.6 + 5rem)); margin-inline: auto;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04), 0 4px 24px rgba(0,0,0,0.08); }
+    .tl-scard__fig { max-width: 100%; }
+    /* cap the screen height to the viewport so the caption below stays visible while the card is pinned;
+       the image keeps its intrinsic ratio (via width/height attrs) so it reserves space before it loads */
+    .tl-scard__fig img { display: block; border-radius: 20px; width: 100%; max-width: 100%; height: auto; max-height: calc(100svh - 300px); }
+    .tl-scard__cap { color: #28251e; font-family: var(--f-body); font-size: clamp(1rem, 1.25vw, 1.125rem); line-height: 1.6; max-width: 100%; text-align: left; }
+    .tl-scard__cap b { color: #18160f; font-weight: 600; }
+
+    /* ---------- Inside the project — ONE grey frame; 4 screens present themselves on scroll ---------- */
+    .tl-frameshow { --mat: clamp(10px, 1.4vw, 20px); margin-top: clamp(1.75rem, 3.5vw, 2.75rem); position: relative; }
+    .tl-frameshow__pin { position: sticky; top: calc(var(--hdr-h) + 1.1rem);
+      min-height: calc(100svh - var(--hdr-h) - 2.2rem);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(14px, 2vw, 22px); }
+
+    /* dots hang in the left gutter; the frame itself stays page-centred */
+    .tl-stagewrap { position: relative; width: max-content; max-width: 100%; margin-inline: auto; }
+    .tl-dots { position: absolute; right: 100%; top: 0; height: 100%; margin-right: clamp(12px, 1.4vw, 22px);
+      display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+    .tl-dots__d { width: 11px; height: 11px; border-radius: 50%; border: 0; padding: 0; cursor: pointer;
+      background: var(--line); transition: background .3s ease, transform .3s ease, box-shadow .3s ease; }
+    .tl-dots__d:hover { background: var(--brand-soft); }
+    .tl-dots__d.is-active { background: var(--brand); transform: scale(1.4); box-shadow: 0 0 0 4px var(--brand-soft); }
+    .tl-dots__d:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+
+    /* grey mat; the stage inside it is EXACTLY 16:10, so 16:10 screens are never cropped */
+    .tl-frame { position: relative; width: min(94vw, calc((100svh - 300px) * 1.6));
+      background: #d5d5d5; border-radius: clamp(20px, 2.4vw, 34px); padding: var(--mat);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 10px 36px rgba(0,0,0,0.11); }
+    .tl-frame__stage { position: relative; aspect-ratio: 16 / 10; border-radius: 18px; overflow: clip; background: #d0ccc3; }
+
+    /* screens stack; the incoming one slides up from below (clipped by the stage) while the old one fades in place */
+    .tl-frame__screen { position: absolute; inset: 0; opacity: 0; z-index: 1; transition: opacity .45s ease; will-change: opacity, transform; }
+    .tl-frame__screen.is-active { opacity: 1; z-index: 2; }
+    .tl-frame__screen.is-entering { z-index: 3; animation: tlSlideUp .72s .16s cubic-bezier(.2,.72,.2,1) both; }
+    @keyframes tlSlideUp { from { transform: translateY(58%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .tl-frame__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    /* darkening scrim — fades in when the screen's content lifts to the front */
+    .tl-frame__scrim { position: absolute; inset: 0; z-index: 2; opacity: 0; pointer-events: none;
+      background: radial-gradient(125% 120% at 50% 42%, rgba(14,10,34,0.22), rgba(8,6,22,0.55));
+      transition: opacity .8s ease; }
+    .tl-screen--home.is-lift .tl-frame__scrim,
+    .tl-frame__screen.is-emph .tl-frame__scrim { opacity: 1; }
+
+    /* SCREEN 1 — liftable "prepare" component + badges + progress overlaid on their baked-in twins */
+    .tl-comp { position: absolute; z-index: 3; left: var(--comp-l); top: var(--comp-t); width: var(--comp-w);
+      transform-origin: 50% 44%; transform: translateY(0) scale(1); will-change: transform;
+      transition: transform .9s cubic-bezier(.2,.72,.2,1), filter .9s ease; filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+    .tl-comp__img { display: block; width: 100%; height: auto; }
+    .tl-screen--home.is-lift .tl-comp { transform: translateY(-1.6%) scale(1.055);
+      filter: drop-shadow(0 30px 48px rgba(18,12,48,0.45)); }
+    .tl-comp__badge, .tl-comp__prog { position: absolute; left: var(--x); top: var(--y); width: var(--w); height: auto;
+      pointer-events: none; filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+    .tl-comp__badge { transform: translate(-50%, -50%) scale(1); transform-origin: center;
+      transition: transform .6s cubic-bezier(.34,1.56,.64,1), filter .6s ease; transition-delay: calc(var(--i,0) * 90ms); }
+    .tl-comp.is-badges .tl-comp__badge { transform: translate(-50%,-50%) scale(2.15);
+      filter: drop-shadow(0 7px 13px rgba(26,18,58,0.34)); }
+    .tl-comp__prog { transform-origin: 50% 50%; transform: translateY(0) scale(1);
+      transition: transform .7s cubic-bezier(.2,.72,.2,1), filter .7s ease; }
+    .tl-comp.is-prog .tl-comp__prog { transform: translateY(-18%) scale(1.66);
+      filter: drop-shadow(0 18px 30px rgba(26,18,58,0.5)); }
+
+    /* SCREENS 2–4 — generic "lift to the front" overlays (panels, cards) */
+    .tl-lift { position: absolute; z-index: 3; left: var(--x); top: var(--y); width: var(--w); height: auto;
+      transform-origin: var(--o, 50% 50%); transform: translateY(0) scale(1); will-change: transform;
+      transition: transform .8s cubic-bezier(.2,.72,.2,1), filter .8s ease; filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+    .tl-lift > img { display: block; width: 100%; height: auto; }
+    .tl-frame__screen.is-emph .tl-lift { transform: translateY(-2.4%) scale(var(--emph, 1.07));
+      filter: drop-shadow(0 26px 44px rgba(18,12,48,0.42)); }
+    /* screen-2 monster rides the panel lift, then waves hello once it's at the front */
+    .tl-monster { position: absolute; left: var(--mx); top: var(--my); width: var(--mw); }
+    .tl-monster > img { display: block; width: 100%; height: auto; transform-origin: 62% 88%; }
+    .tl-screen--quiz.is-emph .tl-monster > img { animation: tlWave 1.6s .4s ease-in-out both; }
+    @keyframes tlWave { 0%{transform:rotate(0) scale(1)} 16%{transform:rotate(-12deg) scale(1.07)} 32%{transform:rotate(10deg) scale(1.09)}
+      48%{transform:rotate(-9deg) scale(1.08)} 64%{transform:rotate(6deg) scale(1.05)} 82%{transform:rotate(-3deg) scale(1.03)} 100%{transform:rotate(0) scale(1)} }
+
+    /* caption under the frame — persistent bold label + typed suffix; brand-purple caret */
+    .tl-frame__cap { width: min(94vw, calc((100svh - 300px) * 1.6)); margin: 0; min-height: 4.9em;
+      color: #28251e; font-family: var(--f-body); font-size: clamp(1rem, 1.25vw, 1.125rem); line-height: 1.6; text-align: left; }
+    .tl-frame__cap b { color: #18160f; font-weight: 600; }
+    .tl-frame__cap .tl-caret { background: var(--brand); }
+
+    /* mobile / tablet — SAME pinned experience; dots drop to a row under the frame, nothing overflows the grid */
+    @media (max-width: 760px) {
+      .tl-frame { width: min(92vw, calc((100svh - 210px) * 1.6)); }
+      .tl-frame__cap { width: min(92vw, calc((100svh - 210px) * 1.6)); min-height: 6em; font-size: 0.95rem; }
+      .tl-stagewrap { display: flex; flex-direction: column; align-items: center; }
+      .tl-frame { order: 1; }
+      .tl-dots { order: 2; position: static; height: auto; margin: 10px 0 0; flex-direction: row; justify-content: center; }
+      /* the frame parks at exactly the height the "Before" card parks at — a little above centre —
+         and the pin box stops being a full screen tall, which is what left a dead gap between
+         this section and the one before it, and between the heading and the frame. */
+      .tl-frameshow__pin { top: calc(var(--hdr-h) + 2.75rem); min-height: 0; justify-content: flex-start; }
+      /* the hero tablet is the first thing you see — let it use the full width of the phone
+         instead of sitting inside the text gutter. EXACTLY 100vw: a single pixel wider and the
+         document scrolls sideways under your finger, which drags the whole page off-centre. */
+      .tl-tablet { width: 100vw; margin-inline: calc(50% - 50vw); }
+    }
+
+    /* reduced motion — un-pin, show the seated composed home + its first line; hide the rest */
+    @media (prefers-reduced-motion: reduce) {
+      .tl-frameshow.is-static .tl-frameshow__pin { position: static; min-height: 0; }
+      .tl-frameshow.is-static .tl-frame__screen { transition: none; animation: none; }
+      .tl-frameshow.is-static .tl-frame__screen:not(.tl-screen--home) { display: none; }
+      .tl-frameshow.is-static .tl-dots { display: none; }
+    }
+
+    /* ---------- Scrolly "Before" card — the home screen pins, gets lassoed in pencil, then states its verdict ---------- */
+    /* the section is tall (JS sets its height) so the card stays pinned while the mark-up + caption play out */
+    /* margin-top matches the heading→content gap used elsewhere (e.g. .tl-frameshow) */
+    .tl-scrolly { position: relative; margin-top: clamp(1.75rem, 3.5vw, 2.75rem); }
+    .tl-scrolly__pin { position: sticky; top: calc(var(--hdr-h) + 2.75rem);
+      min-height: calc(100svh - var(--hdr-h) - 4.5rem); display: flex; align-items: flex-start; justify-content: center; }
+
+    /* the flat before card — no grey frame: reset the inherited card box (no bg, padding, clip or big radius),
+       leaving just the image (with its own shadow + modest radius) and the caption below it */
+    .tl-scard--before-flat { position: static; top: auto; transform: none; opacity: 1; z-index: auto; gap: 0; align-self: flex-start;
+      background: none; padding: 0; box-shadow: none; border-radius: 0; overflow: visible;
+      /* the whole card tracks the (smaller) image width, so the caption lines up under it.
+         Its section now carries .tl-wrap, so 100% here IS the grid — the frame can't spill past it. */
+      width: 100%; max-width: min(100%, calc((100svh - 300px) * 1.6 * 0.72)); margin-inline: auto; }
+    .tl-scard--before-flat .tl-scard__fig { position: relative; max-width: 100%; }
+    /* radius matches the page's screenshot images (.tl-scard__fig img = 20px); shadow no longer clipped */
+    .tl-scard--before-flat .tl-scard__fig img { border-radius: 20px; box-shadow: 0 18px 40px -12px rgba(40,37,30,0.28); }
+
+    /* pencil mark-up layer — red, drawn on by scroll via stroke-dashoffset */
+    .tl-pencil { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; overflow: visible; pointer-events: none; }
+    .tl-pencil path { fill: none; stroke: #CB1F1F; stroke-width: 5.5; stroke-linecap: round; stroke-linejoin: round;
+      filter: drop-shadow(0 1px 1.5px rgba(150,18,18,0.28));
+      stroke-dasharray: var(--len, 3000); stroke-dashoffset: var(--len, 3000); opacity: 0; }
+
+    /* the verdict — its wrapper grows from 0 → full, expanding the grey frame downward */
+    .tl-scard--before-flat .tl-scard__reveal { overflow: hidden; max-height: 0; opacity: 0; will-change: max-height, opacity; }
+    .tl-scard--before-flat .tl-scard__reveal .tl-scard__cap { padding-top: clamp(16px, 2.6vw, 28px); margin: 0; min-height: 1.6em; }
+    /* the typed critique + a blinking pencil-red caret while it writes */
+    .tl-scard__type { color: #28251e; }
+    .tl-caret { display: inline-block; width: 2px; height: 1.05em; margin-left: 1px; transform: translateY(0.16em);
+      background: #CB1F1F; opacity: 0; }
+    .tl-caret.is-on { opacity: 1; animation: tlCaret 1s steps(1,end) infinite; }
+    @keyframes tlCaret { 50% { opacity: 0; } }
+
+    /* phones: the pin box shrinks to the card, so the section doesn't trail a screen of dead
+       space before "Inside the project" (must sit after the .tl-scrolly rules above to win) */
+    @media (max-width: 760px) { .tl-scrolly__pin { min-height: 0; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .tl-pencil path[data-mark="top"], .tl-pencil path[data-mark="bottom"] { stroke-dashoffset: 0; opacity: 1; }
+      .tl-scard--before-flat .tl-scard__reveal { max-height: none; opacity: 1; }
+      .tl-scrolly__pin { position: static; min-height: 0; }
+      .tl-caret { display: none; }
+    }
+
+    /* ---------- CTA (left-aligned) ---------- */
+    /* the extra bottom room keeps the footer's ring pile (~56px tall) clear of the CTA and its links */
+    .tl-cta { padding-top: clamp(3.25rem, 6.5vw, 5.5rem); padding-bottom: calc(clamp(3.25rem, 6.5vw, 5.5rem) + 84px);
+      border-top: 1px solid var(--line-soft); }
+    .tl-cta h2 { font-family: var(--f-display); font-weight: 700; font-size: clamp(2.2rem, 7vw, 4.5rem); letter-spacing: -0.03em; line-height: 1; max-width: 16ch; }
+    .tl-cta .pill { margin-top: 2.25rem; }
+    .tl-backall { display: inline-flex; align-items: center; gap: .5em; margin-top: 2.5rem; color: var(--tl-mut); font-family: var(--f-display); font-weight: 500; font-size: .95rem; transition: color .25s ease, gap .25s ease; }
+    .tl-backall:hover { color: var(--brand); gap: .8em; }
+
+    /* ---------- Right-side scroll progress rail ---------- */
+    .tl-rail { position: fixed; right: max(10px, calc((100vw - 1180px) / 2 - 50px)); top: 50%; transform: translateY(-50%); z-index: 55; height: min(60vh, 500px); display: flex; align-items: center;
+      opacity: 0; pointer-events: none; transition: opacity .4s ease; }
+    .tl-rail.is-on { opacity: 1; pointer-events: auto; }
+    .tl-rail__bar { position: relative; width: 2px; height: 100%; background: var(--line); border-radius: 2px; }
+    .tl-rail__fill { position: absolute; left: 0; top: 0; width: 2px; height: 0; background: var(--brand); border-radius: 2px; }
+    .tl-rail__dots { position: absolute; left: 50%; top: 0; height: 100%; width: 0; transform: translateX(-50%); display: block; }
+    .tl-rail__dot { position: absolute; left: 0; top: var(--pos, 0%); margin: -4.5px 0 0 -4.5px; width: 9px; height: 9px; border-radius: 50%; background: var(--bg); box-shadow: 0 0 0 2px var(--line); transition: transform .3s ease, box-shadow .3s ease, background .3s ease; }
+    .tl-rail__cap { top: 100%; }
+    .tl-rail__dot.is-done { background: var(--brand); box-shadow: 0 0 0 2px var(--brand); }
+    .tl-rail__dot.is-active { background: var(--brand); box-shadow: 0 0 0 4px var(--brand-soft); transform: scale(1.55); }
+
+    /* Header pill is shared in styles.css; here we only delay its entrance for the load sequence */
+    .tl .hdr--float { animation: hdrIn 1.15s cubic-bezier(.2,.7,.2,1) 1.5s both; }
+
+    /* ---------- TALMIND wordmark + meta ---------- */
+    .tl-idsection { padding-top: clamp(1rem, 3vw, 2rem); padding-bottom: 0; }
+    .tl-wordmark { font-family: var(--f-display); font-weight: 800; letter-spacing: -0.02em;
+      font-size: clamp(3rem, 9vw, 6.6rem); line-height: .92; color: var(--ink); text-transform: uppercase; }
+
+    /* ---------- Two-screen showcase — slide in from the sides, purple thread draws L→R ---------- */
+    .tl-duo { position: relative; overflow: hidden; padding-block: clamp(1.5rem, 4vw, 3.25rem); }
+    .tl-duo__stage { position: relative; width: 100%; max-width: 1240px; margin-inline: auto; aspect-ratio: 1440 / 470; }
+    .tl-duo__thread { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; overflow: visible; }
+    .tl-duo__thread path { fill: none; stroke: var(--brand); stroke-width: 3.4; stroke-linecap: round;
+      filter: drop-shadow(0 6px 14px rgba(119,63,156,0.35)); }
+    .tl-duo__screen { position: absolute; top: 50%; width: 49%; z-index: 2; height: auto;
+      will-change: transform; }
+    .tl-duo__screen--left  { left: -1%;  transform: translate(var(--dx, -150%), -50%); }
+    .tl-duo__screen--right { right: -1%; transform: translate(var(--dx, 150%),  -50%); z-index: 3; }
+
+    /* ---------- Single quiz screen — rotates up from below in 3D ---------- */
+    .tl-solo { perspective: 1500px; overflow: hidden; padding-block: clamp(1.5rem, 4vw, 3rem); }
+    .tl-solo__screen { display: block; width: min(780px, 84%); height: auto; margin-inline: auto;
+      transform-origin: 50% 100%; transform: var(--t3d, rotateX(42deg) translateY(150px)); opacity: var(--o3d, 0);
+      will-change: transform, opacity; }
+
+    /* ---------- Journey — numbered list (matches Figma) ---------- */
+    .tl-facts { margin-top: clamp(2rem, 4.5vw, 3.25rem); display: flex; flex-direction: column; gap: clamp(1.4rem, 3vw, 2.1rem); }
+    .tl-factrow { display: grid; grid-template-columns: auto 1fr; gap: clamp(1rem, 2.4vw, 1.75rem); align-items: start; }
+    .tl-factrow__n { font-family: var(--f-serif); font-style: italic; font-size: clamp(2.2rem, 3.6vw, 2.9rem); line-height: .85; color: var(--brand); }
+    .tl-factrow p { color: var(--tl-mut); font-size: clamp(1rem, 1.25vw, 1.12rem); line-height: 1.6; max-width: 62rem; }
+
+    /* ---------- Two-column blocks (Problem/Solution · Challenge/Success) ---------- */
+    .tl-cols { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 6vw, 5rem); }
+    .tl-col > .tl-h2 { margin-top: 0; }
+    .tl-block { margin-top: clamp(1.35rem, 2.6vw, 1.9rem); }
+    .tl-block__label { display: block; font-family: var(--f-display); font-weight: 700; font-size: 1.04rem; letter-spacing: -0.01em; }
+    .tl-col--problem .tl-block__label { color: var(--brand); }
+    .tl-col--solution .tl-block__label { color: var(--ink); }
+    .tl-block p { color: var(--tl-mut); font-size: 1.02rem; line-height: 1.55; margin-top: .45rem; max-width: 34rem; }
+
+    .tl-h2--brand { color: var(--brand); }
+    .tl-challenge__q { font-size: clamp(1.1rem, 1.6vw, 1.32rem); color: var(--ink); font-weight: 500; margin-top: 1.1rem; }
+    .tl-challenge__sub { font-family: var(--f-display); font-weight: 700; margin-top: 1.5rem; }
+    .tl-challenge__body { color: var(--tl-mut); line-height: 1.55; margin-top: .45rem; max-width: 33rem; }
+    .tl-success__list { margin-top: 1.3rem; display: flex; flex-direction: column; gap: 1.1rem; }
+    .tl-success__list li { position: relative; padding-left: 1.5rem; color: var(--ink); font-size: clamp(1rem, 1.3vw, 1.1rem); line-height: 1.4; }
+    .tl-success__list li::before { content: ""; position: absolute; left: .25rem; top: .55em; width: 6px; height: 6px; border-radius: 50%; background: var(--tl-mut); }
+    .tl-success__list b { font-family: var(--f-display); font-weight: 800; color: var(--ink); margin-right: .35rem; }
+
+    /* ---------- Journey eyebrow — research-source continuation (matches the eyebrow, muted colour) ---------- */
+    .tl-eyebrow__gem { color: rgba(24, 22, 15, 0.55); }
+
+    /* inline "Source ↗" link that closes each journey fact */
+    .tl-factrow__src { display: inline-flex; align-items: baseline; gap: .12em; margin-left: .5em; white-space: nowrap;
+      color: var(--brand); font-family: var(--f-body); font-weight: 600; font-size: .9em;
+      border-bottom: 1px solid transparent; transition: border-color .25s ease; }
+    .tl-factrow__src:hover { border-color: var(--brand); }
+    .tl-factrow__src span { font-size: .85em; }
+
+    /* ---------- Sketch — single composed collage (stays whole at every width) ---------- */
+    .tl-sketch__stage { margin: clamp(2rem, 4.5vw, 3.5rem) auto 0; }
+    .tl-sketch__stage img { display: block; width: 100%; height: auto; }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 1024px) { .tl-rail { display: none; } }
+    @media (max-width: 900px) {
+      .tl-journey__sticky { position: static; height: auto; overflow: visible; display: block; }
+      .tl-journey__sticky::after { display: none; }
+      .tl-journey__lead { padding-bottom: clamp(1rem, 3vw, 1.75rem); }
+      .tl-journey__track { width: auto; max-width: 1180px; margin-inline: auto; flex-direction: column; transform: none !important; padding: 0 var(--pad); gap: clamp(1rem, 3vw, 1.5rem); }
+      .tl-panel { width: 100%; }
+      .tl-journey { padding-block: clamp(2.75rem, 5.5vw, 4.75rem); }
+    }
+    @media (max-width: 760px) {
+      .tl-about__grid { grid-template-columns: 1fr; }
+      .tl-diptych { grid-template-columns: 1fr; }
+      .tl-dip-arrow { transform: rotate(90deg); }
+      .tl-users, .tl-metrics { grid-template-columns: 1fr; }
+      .tl-srow { grid-template-columns: 1fr; gap: .5rem; }
+      .tl-cols { grid-template-columns: 1fr; gap: clamp(2rem, 8vw, 3rem); }
+    }
+    /* two-screen showcase stacks on small screens */
+    @media (max-width: 720px) {
+      .tl-duo__stage { aspect-ratio: auto; display: flex; flex-direction: column; align-items: center; gap: 1.25rem; }
+      .tl-duo__thread { display: none; }
+      .tl-duo__screen { position: static; width: min(420px, 86%); }
+      .tl-duo__screen--left  { transform: translateX(var(--dx, -60%)); }
+      .tl-duo__screen--right { transform: translateX(var(--dx, 60%)); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .tl-tablet { transform: none !important; animation: none !important; opacity: 1 !important; }
+      /* fall back to a normal scrolling hero (no pinned video / sticky lead) */
+      .tl-hero__bg { position: absolute; }
+      .tl-hero__head { position: static; }
+      .tl-tablet__img { opacity: 1 !important; }
+      .tl-duo__screen { transform: translate(0, -50%) !important; }
+      .tl-duo__thread path { stroke-dashoffset: 0 !important; }
+      .tl-solo__screen { transform: none !important; opacity: 1 !important; }
+    }
+  </style>
+</head>
+<body class="tl">
+  <!-- phones: the side rail is hidden, so progress runs along the top edge instead -->
+  <div class="pgbar" aria-hidden="true"><span></span></div>
+  <a class="skip-link" href="#about">Skip to content</a>
+
+  <!-- ===== HEADER (floating pill → collapses to a status badge on scroll) ===== -->
+  <header class="hdr hdr--float" id="top">
+    <div class="hdr__pill">
+      <a class="hdr__logo" href="index.html" aria-label="Yehuda Amitzur — home">
+        <span class="hdr__avatar"><img class="hdr__avatar-img" src="profile.png" alt="Yehuda Amitzur" width="46" height="46" /></span>
+      </a>
+      <div class="hdr__expand">
+        <nav class="hdr__nav" aria-label="Primary">
+          <a href="index.html">Home</a>
+          <a href="index.html#work">Work</a>
+          <a href="cv-yehuda-amitzur.pdf" target="_blank" rel="noopener">CV</a>
+        </nav>
+        <a class="hdr__cta" href="index.html#contact">Contact</a>
+        <button class="hdr__menu" aria-label="Open menu" aria-expanded="false" aria-controls="hdr-drawer"><span></span><span></span></button>
+      </div>
+      <span class="hdr__status" aria-hidden="true"><span>Available for work</span><i class="hdr__dot"></i></span>
+    </div>
+    <div class="hdr__drawer" id="hdr-drawer" hidden>
+      <div class="hdr__drawer-top">
+        <span class="hdr__drawer-ava"><img src="profile.png" alt="" width="46" height="46" /></span>
+        <button class="hdr__drawer-close" type="button" aria-label="Close menu"><span></span><span></span></button>
+      </div>
+      <a href="index.html">Home</a>
+      <a href="index.html#work">Projects</a>
+      <a href="cv-yehuda-amitzur.pdf" target="_blank" rel="noopener">My cv</a>
+      <a class="hdr__drawer-contact" href="index.html#contact">Contact</a>
+    </div>
+  </header>
+
+  <!-- ===== RIGHT-SIDE SCROLL PROGRESS RAIL ===== -->
+  <nav class="tl-rail" aria-label="Section progress">
+    <span class="tl-rail__bar"><span class="tl-rail__fill"></span></span>
+    <span class="tl-rail__dots">
+      <a class="tl-rail__dot" href="#journey" aria-label="The journey"></a>
+      <a class="tl-rail__dot" href="#gemara" aria-label="What is Talmud"></a>
+      <a class="tl-rail__dot" href="#problem" aria-label="Problem & solution"></a>
+      <a class="tl-rail__dot" href="#challenge" aria-label="Challenge & success"></a>
+      <a class="tl-rail__dot" href="#product" aria-label="Inside the project"></a>
+      <span class="tl-rail__dot tl-rail__cap" aria-hidden="true"></span>
+    </span>
+  </nav>
+
+  <main>
+    <!-- ===== HERO (video backdrop + dissolving tablet) ===== -->
+    <h1 class="sr-only">Talmind — bringing authentic Talmud study to Korean classrooms</h1>
+    <section class="tl-hero tl-wrap">
+      <div class="tl-hero__bg" aria-hidden="true">
+        <video class="tl-hero__video" autoplay muted loop playsinline preload="auto" poster="talmind-hero-poster.jpg">
+          <source src="talmind-hero-video.mp4" type="video/mp4" />
+        </video>
+      </div>
+
+      <div class="tl-hero__head" data-hero-head>
+        <p class="tl-hero__lead reveal"><strong>The Koreans believe that studying the Talmud is the main reason for the
+          success and wisdom of the Jews</strong> — as is evident from the fact that they account for
+          <span class="hl">25% of Nobel Prize winners,</span> despite making up only
+          <span class="hl">0.2% of the world's population.</span></p>
+        <a class="tl-hero__src reveal" href="https://www.timesofisrael.com/talmud-inspired-learning-craze-sweeps-south-korea/" target="_blank" rel="noopener">Source: The Times of Israel <span aria-hidden="true">↗</span></a>
+      </div>
+
+      <div class="tl-tablet" data-tablet>
+        <img class="tl-tablet__img" src="talmind-tablet-only.png" width="4476" height="1933"
+             alt="Tablet running the Talmind home screen" />
+      </div>
+    </section>
+
+    <!-- everything below the hero rides on an opaque sheet that scrolls up over the pinned video -->
+    <div class="tl-cover">
+    <!-- ===== WORDMARK + META ===== -->
+    <section class="tl-idsection tl-wrap">
+      <p class="tl-wordmark reveal" aria-hidden="true">Talmind</p>
+      <dl class="tl-meta reveal">
+        <div><dt>Platform</dt><dd>Classroom tablet app</dd></div>
+        <div><dt>Role</dt><dd>UX/UI · Branding</dd></div>
+        <div><dt>Timeline</dt><dd>One month, end to end</dd></div>
+        <div><dt>Tools</dt><dd>Figma · Claude · AI</dd></div>
+      </dl>
+    </section>
+
+    <!-- ===== ABOUT + GOAL ===== -->
+    <section class="tl-section tl-wrap" id="about">
+      <div class="tl-about__grid">
+        <div class="reveal">
+          <span class="tl-mini">Overview</span>
+          <p>Talmind is a tablet app designed to bring <b>authentic Talmud study</b> to elementary, middle, and
+            high&nbsp;school classrooms in Korea.</p>
+        </div>
+        <div class="reveal">
+          <span class="tl-mini">Main goal</span>
+          <p>To help Korean students <b>acquire and embrace</b> Jewish intellectual wisdom.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TWO-SCREEN SHOWCASE (slide in from the sides + purple thread draws L→R) ===== -->
+    <section class="tl-duo" data-duo aria-label="Two Talmind screens connected by the learning path">
+      <div class="tl-duo__stage">
+        <img class="tl-duo__screen tl-duo__screen--left" src="talmind-screen-lessons.png" width="1500" height="1033"
+             alt="Talmind lesson dashboard on a tablet" loading="lazy" />
+        <img class="tl-duo__screen tl-duo__screen--right" src="talmind-screen-game.png" width="1500" height="1033"
+             alt="Talmind drag-and-match game on a tablet" loading="lazy" />
+      </div>
+    </section>
+
+    <!-- ===== THE JOURNEY — numbered list ===== -->
+    <section class="tl-section tl-wrap" id="journey">
+      <span class="tl-eyebrow reveal">The journey to defining the problem - <span class="tl-eyebrow__gem">Gemini Deep Research</span></span>
+      <h2 class="tl-h2 reveal">What began as mere curiosity turned out to be surprising</h2>
+      <ol class="tl-facts reveal">
+        <li class="tl-factrow"><span class="tl-factrow__n">1</span>
+          <p>The Korean population, approximately 50 million people, owns almost every household a "book called
+            the Talmud." The Ministry of Education has even recommended including Talmudic stories in children's
+            studies to develop thinking and intellectual skills.<a class="tl-factrow__src" href="https://aish.com/south_koreans_learning_talmud/" target="_blank" rel="noopener">Source<span aria-hidden="true">↗</span></a></p></li>
+        <li class="tl-factrow"><span class="tl-factrow__n">2</span>
+          <p>In most families, the book called the "Korean Gemara" is a 40-page collection of Talmudic stories,
+            based on the work of Rabbi Marvin Tokayer from the 1970s, similar to moral tales of the sages or
+            Stories of the Sages.<a class="tl-factrow__src" href="https://aish.com/south_koreans_learning_talmud/" target="_blank" rel="noopener">Source<span aria-hidden="true">↗</span></a></p></li>
+        <li class="tl-factrow"><span class="tl-factrow__n">3</span>
+          <p>There are private educational institutions known as "Chavruta Academies." The academies were founded
+            by Dr. Park Ki-Ryong from KHU University, in collaboration with associations for Jewish leadership and
+            innovative education.<a class="tl-factrow__src" href="https://www.jpost.com/diaspora/talmud-inspired-learning-craze-sweeps-south-korea-577402" target="_blank" rel="noopener">Source<span aria-hidden="true">↗</span></a></p></li>
+      </ol>
+    </section>
+
+    <!-- ===== WHAT IS TALMUD (dry vs alive) ===== -->
+    <section class="tl-section tl-wrap" id="gemara">
+      <h2 class="tl-h2 reveal">What Is Talmud?</h2>
+      <div class="tl-diptych">
+        <div class="tl-side tl-side--dry reveal">
+          <span class="tl-mini">Starts with a dry and boring part</span>
+          <h3>Rules &amp; quotations</h3>
+          <div class="tl-chips"><span>Definitions</span><span>Citations</span><span>Precedents</span><span>Rulings</span></div>
+        </div>
+        <div class="tl-dip-arrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+        </div>
+        <div class="tl-side tl-side--alive reveal">
+          <span class="tl-mini">And continues to the part that comes to life</span>
+          <h3>Questions &amp; creative reasoning</h3>
+          <div class="tl-chips"><span>Questions</span><span>Debate</span><span>Analysis</span><span>Creative solutions</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== THE PROBLEM / THE SOLUTION (two columns) ===== -->
+    <section class="tl-section tl-wrap" id="problem">
+      <div class="tl-cols">
+        <div class="tl-col tl-col--problem reveal">
+          <h2 class="tl-h2">The Problem</h2>
+          <div class="tl-block"><span class="tl-block__label">Teachers</span>
+            <p>Knowledge gaps and limited cultural context lead to an approach that overlooks fundamental
+              principles, making it difficult to apply effective teaching methodologies.</p></div>
+          <div class="tl-block"><span class="tl-block__label">Students</span>
+            <p>Hesitate to ask questions in front of their peers due to cultural norms, causing them to miss
+              opportunities for deeper learning.</p></div>
+          <div class="tl-block"><span class="tl-block__label">Parents</span>
+            <p>Struggle to determine whether their children truly understand the material, develop critical
+              thinking, and actively ask questions.</p></div>
+        </div>
+        <div class="tl-col tl-col--solution reveal">
+          <h2 class="tl-h2">The Solution</h2>
+          <div class="tl-block"><span class="tl-block__label">Teachers</span>
+            <p>A proper connection to authentic Talmudic topics, with a clear two-stage learning path: first
+              embedding the dry fundamentals clearly, then moving to the more interesting and deeper material.</p></div>
+          <div class="tl-block"><span class="tl-block__label">Students</span>
+            <p>A critical pedagogy that actively encourages asking questions, with ongoing feedback on progress.</p></div>
+          <div class="tl-block"><span class="tl-block__label">Parents</span>
+            <p>Clear tracking of three parameters measuring their children's skill improvement.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SINGLE QUIZ SCREEN (rotates up from below in 3D) ===== -->
+    <section class="tl-solo tl-wrap" data-solo aria-label="Talmind quiz screen">
+      <img class="tl-solo__screen" src="talmind-screen-quiz.png" width="1500" height="1033"
+           alt="Talmind daily-quiz screen on a tablet" loading="lazy" />
+    </section>
+
+    <!-- ===== THE CHALLENGE (two challenge → solution pairs) ===== -->
+    <section class="tl-section tl-wrap" id="challenge">
+      <h2 class="tl-h2 reveal">The Challenge</h2>
+      <div class="tl-cols" style="margin-top: clamp(1.35rem, 2.6vw, 1.9rem);">
+        <div class="tl-col reveal">
+          <p class="tl-challenge__q">How do I teach students the dry and boring parts?!</p>
+          <p class="tl-challenge__sub">The proposed solution:</p>
+          <p class="tl-challenge__body">By bringing it to life through a playful experience and allowing them to
+            be active partners in the learning process.</p>
+        </div>
+        <div class="tl-col reveal">
+          <p class="tl-challenge__q">How can the same game structure work for both Grades 4–6 and Grades 7–12?</p>
+          <p class="tl-challenge__sub">The proposed solution:</p>
+          <p class="tl-challenge__body">I trained an AI agent to analyze any Talmudic passage and automatically adapt
+            its content to each grade level, allowing the game structure to remain unchanged.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SKETCH (scattered paper collage) ===== -->
+    <section class="tl-section tl-wrap" id="sketch">
+      <span class="tl-eyebrow reveal">From paper to product</span>
+      <h2 class="tl-h2 reveal">Sketch</h2>
+      <p class="tl-lead reveal">Before a single pixel — the three-step flow, the daily quiz, and the drag-and-match
+        game, first worked out by hand.</p>
+      <div class="tl-sketch__stage reveal">
+        <img src="sketches-all.png" width="2640" height="1338"
+          alt="Hand sketches of the Talmind flow, the daily quiz screen, and the drag-and-match game board" loading="lazy" />
+      </div>
+    </section>
+
+    <!-- ===== WHAT IS SUCCESS ===== -->
+    <section class="tl-section tl-wrap" id="success">
+      <h2 class="tl-h2 tl-h2--brand reveal">What is success?</h2>
+      <ul class="tl-success__list reveal">
+        <li><b>7</b> good questions asked in one lesson</li>
+        <li><b>4</b> correct answers found in one lesson</li>
+        <li><b>1</b> creative solution reached in one lesson</li>
+      </ul>
+    </section>
+
+    <!-- ===== BEFORE (scrolly mark-up of the broken flow) ===== -->
+    <section class="tl-section" id="before">
+      <div class="tl-wrap">
+        <h2 class="tl-h2 reveal">Before</h2>
+      </div>
+      <div class="tl-wrap tl-scrolly" data-scrolly>
+        <div class="tl-scrolly__pin">
+          <article class="tl-scard tl-scard--before-flat">
+            <div class="tl-scard__fig">
+              <img src="talmind-home-before.jpg" width="2526" height="1579" alt="Talmind home screen — before redesign" loading="lazy" />
+              <svg class="tl-pencil" viewBox="0 0 1600 1000" fill="none" aria-hidden="true">
+                <path class="tl-pencil__p" data-mark="top" d="M 506.4 144.0 L 851.2 144.0 A 24.0 24.0 0 0 1 875.2 168.0 L 875.2 456.0 A 24.0 24.0 0 0 1 851.2 480.0 L 161.6 480.0 A 24.0 24.0 0 0 1 137.6 456.0 L 137.6 168.0 A 24.0 24.0 0 0 1 161.6 144.0 L 506.4 144.0" />
+                <path class="tl-pencil__p" data-mark="bottom" d="M 688.8 485.0 L 1214.0 485.0 A 26.0 26.0 0 0 1 1240.0 511.0 L 1240.0 943.0 A 26.0 26.0 0 0 1 1214.0 969.0 L 163.6 969.0 A 26.0 26.0 0 0 1 137.6 943.0 L 137.6 511.0 A 26.0 26.0 0 0 1 163.6 485.0 L 688.8 485.0" />
+                <path class="tl-pencil__p" data-mark="quiz" d="M 992.8 137.0 L 1095.0 137.0 A 26.0 26.0 0 0 1 1121.0 163.0 L 1121.0 445.0 A 26.0 26.0 0 0 1 1095.0 471.0 L 890.6 471.0 A 26.0 26.0 0 0 1 864.6 445.0 L 864.6 163.0 A 26.0 26.0 0 0 1 890.6 137.0 L 992.8 137.0" />
+                <path class="tl-pencil__p" data-mark="prog" d="M 680.0 873.0 L 1186.4 873.0 A 36.0 36.0 0 0 1 1222.4 909.0 L 1222.4 915.0 A 36.0 36.0 0 0 1 1186.4 951.0 L 173.6 951.0 A 36.0 36.0 0 0 1 137.6 909.0 L 137.6 909.0 A 36.0 36.0 0 0 1 173.6 873.0 L 680.0 873.0" />
+              </svg>
+            </div>
+            <div class="tl-scard__reveal" data-reveal>
+              <p class="tl-scard__cap"><b>Home.</b> <span class="tl-scard__type" data-suffix></span><span class="tl-caret" data-caret aria-hidden="true"></span></p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== INSIDE THE PROJECT (stacking screens) ===== -->
+    <section class="tl-section" id="product">
+      <div class="tl-wrap">
+        <h2 class="tl-h2 reveal">Inside the project</h2>
+      </div>
+      <div class="tl-wrap tl-frameshow" data-frameshow>
+        <div class="tl-frameshow__pin">
+          <div class="tl-stagewrap">
+            <nav class="tl-dots" data-dots aria-label="Jump between screens">
+              <button class="tl-dots__d is-active" type="button" data-goto="0" aria-label="Screen 1 — Home"></button>
+              <button class="tl-dots__d" type="button" data-goto="1" aria-label="Screen 2 — Quiz"></button>
+              <button class="tl-dots__d" type="button" data-goto="2" aria-label="Screen 3 — Game"></button>
+              <button class="tl-dots__d" type="button" data-goto="3" aria-label="Screen 4 — Lesson"></button>
+            </nav>
+            <div class="tl-frame">
+              <div class="tl-frame__stage">
+                <!-- SCREEN 1 — HOME: empty dashboard + the liftable "prepare" component -->
+                <div class="tl-frame__screen tl-screen--home is-active" data-screen="home">
+                  <img class="tl-frame__bg" src="talmind-home-empty.jpg" width="2400" height="1500" alt="Talmind home dashboard" loading="lazy" />
+                  <div class="tl-frame__scrim" aria-hidden="true"></div>
+                  <div class="tl-comp" data-comp style="--comp-l:10.2%;--comp-t:14.2%;--comp-w:87.6%;">
+                    <img class="tl-comp__img" src="talmind-steps.png" width="3432" height="1258" alt="Prepare for today's lesson — video, quiz and game steps" />
+                    <img class="tl-comp__badge" data-badge src="talmind-badge-done.png"     alt="" aria-hidden="true" style="--x:29.20%;--y:31.92%;--w:2.46%;--i:0" />
+                    <img class="tl-comp__badge" data-badge src="talmind-badge-progress.png" alt="" aria-hidden="true" style="--x:59.97%;--y:31.92%;--w:2.46%;--i:1" />
+                    <img class="tl-comp__badge" data-badge src="talmind-badge-locked.png"   alt="" aria-hidden="true" style="--x:90.73%;--y:31.92%;--w:2.46%;--i:2" />
+                    <img class="tl-comp__prog"  data-prog  src="talmind-progressbar.png"     alt="" aria-hidden="true" width="768" height="96" style="--x:38.7%;--y:71.4%;--w:22.4%" />
+                  </div>
+                </div>
+                <!-- SCREEN 2 — QUIZ: empty quiz + the points panel (with a waving monster) lifting to the front -->
+                <div class="tl-frame__screen tl-screen--quiz" data-screen="quiz">
+                  <img class="tl-frame__bg" src="talmind-quiz-empty.jpg" width="2400" height="1500" alt="Talmind daily quiz screen" loading="lazy" />
+                  <div class="tl-frame__scrim" aria-hidden="true"></div>
+                  <div class="tl-lift tl-qpanel" data-lift style="--x:75.8%;--y:15.5%;--w:22.4%;--emph:1.09;--o:70% 60%">
+                    <img src="talmind-quiz-points.png" width="384" height="760" alt="" aria-hidden="true" />
+                    <span class="tl-monster" style="--mx:25%;--my:59%;--mw:58%"><img src="talmind-monster.png" width="400" height="400" alt="" aria-hidden="true" /></span>
+                  </div>
+                </div>
+                <!-- SCREEN 3 — GAME: empty board + a drag card and a category box lifting to the front -->
+                <div class="tl-frame__screen tl-screen--game" data-screen="game">
+                  <img class="tl-frame__bg" src="talmind-game-empty.jpg" width="2400" height="1500" alt="Talmind drag-and-match game board" loading="lazy" />
+                  <div class="tl-frame__scrim" aria-hidden="true"></div>
+                  <img class="tl-lift" data-lift src="talmind-drag-card.png" width="428" height="248" alt="" aria-hidden="true" style="--x:12.2%;--y:34.6%;--w:14.4%;--emph:1.12" />
+                  <img class="tl-lift" data-lift src="talmind-category-box.png" width="412" height="254" alt="" aria-hidden="true" style="--x:59%;--y:79%;--w:13.2%;--emph:1.12" />
+                </div>
+                <!-- SCREEN 4 — LESSON: the 3 skill cards on the right lift to the front -->
+                <div class="tl-frame__screen tl-screen--lesson" data-screen="lesson">
+                  <img class="tl-frame__bg" src="talmind-lesson.jpg" width="1280" height="800" alt="Talmind lesson screen" loading="lazy" />
+                  <div class="tl-frame__scrim" aria-hidden="true"></div>
+                  <img class="tl-lift" data-lift src="talmind-skill-questioning.png" width="506" height="320" alt="" aria-hidden="true" style="--x:77.75%;--y:15.45%;--w:19.7%;--emph:1.1" />
+                  <img class="tl-lift" data-lift src="talmind-skill-solve.png"       width="506" height="320" alt="" aria-hidden="true" style="--x:77.75%;--y:39.45%;--w:19.7%;--emph:1.1" />
+                  <img class="tl-lift" data-lift src="talmind-skill-creativity.png"  width="506" height="320" alt="" aria-hidden="true" style="--x:77.75%;--y:63.25%;--w:19.7%;--emph:1.1" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="tl-frame__cap" data-fs-cap><b data-fs-label>Home.</b> <span class="tl-scard__type" data-fs-type></span><span class="tl-caret" data-fs-caret aria-hidden="true"></span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CTA ===== -->
+    <section class="tl-cta tl-wrap">
+      <h2 class="reveal">Liked this project?</h2>
+      <div class="reveal"><a class="pill" href="index.html#contact"><span>Let's work together</span></a></div>
+      <div><a class="tl-backall" href="index.html#work"><span aria-hidden="true">←</span> Back to all work</a></div>
+    </section>
+    </div><!-- /.tl-cover -->
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot__inner">
+      <span>© 2026 Yehuda Amitzur — built with Claude</span>
+      <a href="#top">Back to top ↑</a>
+    </div>
+  </footer>
+
+  <script src="script.js?v=18"></script>
+  <script>
+    /* ---- Talmind case-study interactions (page-scoped) ---- */
+    (function () {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
+      const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+      // Right-side progress rail
+      const railEl = document.querySelector('.tl-rail');
+      const duoSec = document.querySelector('[data-duo]');
+      const ctaSec = document.querySelector('.tl-cta');   // rail clears out before the closing CTA
+      const fill = document.querySelector('.tl-rail__fill');
+      const dots = Array.from(document.querySelectorAll('.tl-rail__dot')).filter((d) => !d.classList.contains('tl-rail__cap'));
+      const railCap = document.querySelector('.tl-rail__cap');
+      const targets = dots.map((d) => document.querySelector(d.getAttribute('href')));
+      const pgbar = document.querySelector('.pgbar');
+      const pgfill = pgbar && pgbar.firstElementChild;
+      function railUpdate() {
+        // Progress starts at ZERO the moment the rail reveals — it must never appear already
+        // part-filled. Stops = [reveal point, ...section anchors, end of page], and dot i sits at
+        // ((i+1)/segments)*100, so nothing is lit at p=0 and the end cap closes it out at 100.
+        const doc = document.documentElement;
+        const maxScroll = Math.max(1, doc.scrollHeight - doc.clientHeight);
+        const y = doc.scrollTop, vh = window.innerHeight;
+        const reach = targets.map((t) => (t ? Math.max(0, t.getBoundingClientRect().top + window.scrollY - vh * 0.4) : 0));
+        let startY = duoSec ? duoSec.getBoundingClientRect().bottom + window.scrollY - vh * 0.35 : 0;
+        if (!(startY < reach[0])) startY = reach[0] - 1;
+        const stops = [startY].concat(reach, [maxScroll]);
+        const segs = stops.length - 1;
+        let seg = 0;
+        for (let i = 0; i < segs; i++) if (y >= stops[i]) seg = i;
+        const span = stops[seg + 1] - stops[seg];
+        const frac = span > 0 ? clamp((y - stops[seg]) / span, 0, 1) : 1;
+        const p = clamp(((seg + frac) / segs) * 100, 0, 100);
+        if (fill) fill.style.height = p + '%';
+        let idx = -1;
+        dots.forEach((d, i) => {
+          const pos = ((i + 1) / segs) * 100;
+          d.style.setProperty('--pos', pos + '%');
+          if (p + 0.001 >= pos) idx = i;
+        });
+        const started = duoSec ? duoSec.getBoundingClientRect().bottom < window.innerHeight * 0.35 : true;
+        const ended = ctaSec ? ctaSec.getBoundingClientRect().top < window.innerHeight * 0.9 : false;
+        if (railEl) railEl.classList.toggle('is-on', started && !ended);
+        // the phone bar rides the very same numbers: same start, same end, same fill
+        if (pgfill) { pgfill.style.width = p + '%'; pgbar.classList.toggle('is-on', started && !ended); }
+        dots.forEach((d, i) => { d.classList.toggle('is-active', i === idx); d.classList.toggle('is-done', i < idx); });
+        if (railCap) railCap.classList.toggle('is-done', p >= 99.5);   // the line lands on a dot, not a bare edge
+      }
+
+      // Hero lead — dissolves as you scroll while the video band stays pinned
+      const heroHead = document.querySelector('[data-hero-head]');
+      function heroFade() {
+        if (!heroHead || reduce) return;
+        // dissolve almost immediately — done within ~90px of scroll
+        const o = clamp(1 - window.scrollY / 90, 0, 1);
+        heroHead.style.opacity = o.toFixed(3);
+        heroHead.style.pointerEvents = o < 0.05 ? 'none' : '';
+      }
+
+      // Journey — vertical scroll drives horizontal movement (pinned)
+      const journey = document.querySelector('.tl-journey');
+      const track = document.querySelector('.tl-journey__track');
+      let jmax = 0;
+      function journeyLayout() {
+        if (!journey || !track) return;
+        if (window.innerWidth <= 900 || reduce) { journey.style.height = ''; track.style.transform = ''; jmax = 0; return; }
+        jmax = Math.max(0, track.scrollWidth - window.innerWidth + Math.round(window.innerWidth * 0.08));
+        journey.style.height = (window.innerHeight + jmax) + 'px';
+      }
+      function journeyUpdate() {
+        if (!jmax) return;
+        const rect = journey.getBoundingClientRect();
+        const total = journey.offsetHeight - window.innerHeight;
+        const p = clamp(-rect.top / (total || 1), 0, 1);
+        track.style.transform = 'translate3d(' + (-jmax * p).toFixed(1) + 'px,0,0)';
+      }
+
+
+      // Two-screen showcase — vertical scroll slides the tablets in and draws the thread L→R
+      const duo = document.querySelector('[data-duo]');
+      const duoLeft = duo && duo.querySelector('.tl-duo__screen--left');
+      const duoRight = duo && duo.querySelector('.tl-duo__screen--right');
+      const thread = duo && duo.querySelector('.tl-duo__thread path');
+      let threadLen = 0;
+      if (thread) { threadLen = thread.getTotalLength(); thread.style.strokeDasharray = threadLen; thread.style.strokeDashoffset = threadLen; }
+      function duoUpdate() {
+        if (!duo || reduce) return;
+        const r = duo.getBoundingClientRect(), vh = window.innerHeight;
+        // 0 while the section is a screen below the fold → 1 once it's settled near centre
+        const p = clamp((vh * 0.92 - r.top) / (vh * 0.62), 0, 1);
+        const e = easeOutCubic(p);
+        const off = (1 - e) * 150;
+        if (duoLeft) duoLeft.style.setProperty('--dx', (-off) + '%');
+        if (duoRight) duoRight.style.setProperty('--dx', off + '%');
+        if (thread) thread.style.strokeDashoffset = (threadLen * (1 - e)).toFixed(1);
+      }
+
+      // Single quiz screen — rotates up from below in 3D as it enters
+      const solo = document.querySelector('[data-solo]');
+      const soloImg = solo && solo.querySelector('.tl-solo__screen');
+      function soloUpdate() {
+        if (!soloImg || reduce) return;
+        const r = solo.getBoundingClientRect(), vh = window.innerHeight;
+        const p = clamp((vh * 0.9 - r.top) / (vh * 0.6), 0, 1);
+        const e = easeOutCubic(p), k = 1 - e;
+        soloImg.style.setProperty('--t3d', 'rotateX(' + (k * 46).toFixed(1) + 'deg) translateY(' + (k * 150).toFixed(0) + 'px) rotateZ(' + (k * -5).toFixed(1) + 'deg) scale(' + (0.92 + 0.08 * e).toFixed(3) + ')');
+        soloImg.style.setProperty('--o3d', clamp(p * 1.6, 0, 1).toFixed(3));
+      }
+
+      // ===== Inside the project — ONE grey frame; 4 screens present themselves on scroll =====
+      //  A flat list of 10 "states" (screen × act) is driven by scroll. Moving between states self-plays an
+      //  erase→type caption (with bold runs) and flips CSS state; crossing a screen boundary slides the new
+      //  screen up into the frame while the old one fades. Dots jump between screens; a hard fling releases
+      //  the pin so an impatient reader lands straight at the section's exit. Reduced-motion → static home.
+      const fshow    = document.querySelector('[data-frameshow]');
+      const fsScreens = fshow ? Array.from(fshow.querySelectorAll('.tl-frame__screen')) : [];
+      const fsComp   = fshow && fshow.querySelector('[data-comp]');
+      const fsLabel  = fshow && fshow.querySelector('[data-fs-label]');
+      const fsType   = fshow && fshow.querySelector('[data-fs-type]');
+      const fsCaretEl= fshow && fshow.querySelector('[data-fs-caret]');
+      const fsDots   = fshow ? Array.from(fshow.querySelectorAll('.tl-dots__d')) : [];
+      const T = (t) => ({ t }), B = (t) => ({ t, b: 1 });   // plain / bold caption run
+      const LABELS = ['Home.', 'The quiz.', 'The game.', 'The lesson.'];
+      const STATES = [
+        { s: 0, fx: 'rest',   seg: [] },
+        { s: 0, fx: 'lift',   seg: [T('Includes 3 main steps. '), B('Learning video → Quiz practice → Game practice.')] },
+        { s: 0, fx: 'badges', seg: [T('Status icons clearly indicate completed steps and the user’s current progress. '), B('To maintain focus and build anticipation —'), T(' access to the next step is locked until the current one is completed.')] },
+        { s: 0, fx: 'prog',   seg: [T('Progress within each stage — to increase motivation.')] },
+        { s: 1, fx: 'rest',   seg: [T('Includes 8 questions about the material taught in the video.')] },
+        { s: 1, fx: 'emph',   seg: [T('To increase engagement, a points system and an immersive character animation were added to create a more rewarding and enjoyable experience.')] },
+        { s: 2, fx: 'rest',   seg: [] },
+        { s: 2, fx: 'emph',   seg: [T('Dragging concepts into the correct category ensures that the rules stick — and varies from 4th grade to 12th grade.')] },
+        { s: 3, fx: 'rest',   seg: [T('Lessons are organized by topic, while an AI assistant clearly highlights what’s left to complete — to make it easier for the student and keep them focused.')] },
+        { s: 3, fx: 'emph',   seg: [T('These 3 skills accompany the student in every lesson '), B('to encourage and adopt Talmudic thinking.')] },
+      ];
+      const SCREEN_FIRST = [0, 4, 6, 8];               // first state index of each screen
+      const segLen = (seg) => seg.reduce((n, r) => n + r.t.length, 0);
+      const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      function renderSeg(seg, n) {                       // build the revealed caption HTML (keeps bold runs intact)
+        let out = '', c = 0;
+        for (const r of seg) { if (c >= n) break; const k = Math.min(r.t.length, n - c); const p = esc(r.t.slice(0, k)); out += r.b ? '<b>' + p + '</b>' : p; c += k; }
+        fsType.innerHTML = out;
+      }
+      const fsStatic = () => reduce;                    // mobile + tablet now get the full experience
+
+      let fsCur = 0;                                    // currently displayed screen (for slide detection)
+      function fsSlide(scr) { fsScreens.forEach((sc) => sc.classList.remove('is-entering')); const el = fsScreens[scr]; if (el) { void el.offsetWidth; el.classList.add('is-entering'); } }
+      function applyState(i) {
+        const st = STATES[i];
+        fsScreens.forEach((sc, idx) => sc.classList.toggle('is-active', idx === st.s));
+        fsScreens[0].classList.toggle('is-lift', st.s === 0 && st.fx !== 'rest');
+        if (fsComp) { fsComp.classList.toggle('is-badges', st.s === 0 && st.fx === 'badges'); fsComp.classList.toggle('is-prog', st.s === 0 && st.fx === 'prog'); }
+        fsScreens.forEach((sc, idx) => { if (idx >= 1) sc.classList.toggle('is-emph', idx === st.s && st.fx === 'emph'); });
+        if (fsLabel) fsLabel.textContent = LABELS[st.s];
+        fsDots.forEach((d, idx) => d.classList.toggle('is-active', idx === st.s));
+        if (st.s !== fsCur) { fsSlide(st.s); fsCur = st.s; }
+      }
+
+      let fsDisp = 0, fsWant = 0, fsAnim = null, fsRAF = null, fsLock = 0;
+      const fsCaret = (on) => fsCaretEl && fsCaretEl.classList.toggle('is-on', on);
+      function fsBegin(to) { fsAnim = { to, t0: performance.now(), from: STATES[fsDisp].seg, fromN: segLen(STATES[fsDisp].seg), toSeg: STATES[to].seg, toN: segLen(STATES[to].seg), phase: 'erase' }; fsCaret(true); }
+      function fsStep(now) {
+        const a = fsAnim, ERASE = 7, TYPE = 16;
+        if (a.phase === 'erase') {
+          const shown = Math.max(0, a.fromN - Math.floor((now - a.t0) / ERASE));
+          renderSeg(a.from, shown);
+          if (shown <= 0) { applyState(a.to); a.phase = 'type'; a.t0 = now; }        // flip visuals/slide, then type
+        } else {
+          const shown = Math.floor((now - a.t0) / TYPE);
+          renderSeg(a.toSeg, Math.min(shown, a.toN));
+          if (shown >= a.toN) { renderSeg(a.toSeg, a.toN); fsDisp = a.to; fsAnim = null; fsCaret(false); }
+        }
+      }
+      function fsLoop(now) {
+        fsRAF = null;
+        if (!fshow || fsStatic()) return;
+        if (!fsAnim && fsDisp !== fsWant) fsBegin(fsDisp < fsWant ? fsDisp + 1 : fsDisp - 1);
+        if (fsAnim) fsStep(now);
+        if (fsAnim || fsDisp !== fsWant) fsRAF = requestAnimationFrame(fsLoop);
+      }
+      const fsEngine = () => { if (!fsRAF) fsRAF = requestAnimationFrame(fsLoop); };
+
+      function fsLayout() {
+        if (!fshow) return;
+        if (fsStatic()) { fshow.classList.add('is-static'); fshow.style.height = ''; }
+        else { fshow.classList.remove('is-static'); fshow.style.height = Math.round(window.innerHeight * 6.4) + 'px'; }   // 1 pin + 5.4 of scroll room for 10 states
+      }
+      function fsUpdate() {
+        if (!fshow) return;
+        if (fsStatic()) {   // reduced motion: seated home + its first line, no engine
+          if (fsRAF) { cancelAnimationFrame(fsRAF); fsRAF = null; } fsAnim = null; fsDisp = 0; fsCur = 0;
+          applyState(0); renderSeg(STATES[1].seg, STATES[1].seg ? segLen(STATES[1].seg) : 0); fsCaret(false); return;
+        }
+        if (performance.now() < fsLock) return;   // ignore while a dot-jump settles
+        const r = fshow.getBoundingClientRect();
+        const total = fshow.offsetHeight - window.innerHeight;
+        const p = clamp(-r.top / (total || 1), 0, 1);
+        const k = clamp((p - 0.03) / 0.90, 0, 1);
+        fsWant = Math.min(STATES.length - 1, Math.floor(k * STATES.length));
+        fsEngine();
+      }
+      // dots — jump straight to a screen (snap the engine, then align the scroll)
+      function fsGoto(scr) {
+        if (!fshow || fsStatic()) return;
+        const idx = SCREEN_FIRST[scr];
+        if (fsRAF) { cancelAnimationFrame(fsRAF); fsRAF = null; } fsAnim = null;
+        applyState(idx); fsDisp = fsWant = idx; fsCaret(false); renderSeg(STATES[idx].seg, segLen(STATES[idx].seg));
+        const total = fshow.offsetHeight - window.innerHeight;
+        const topAbs = fshow.getBoundingClientRect().top + window.scrollY;
+        const p = 0.03 + ((idx + 0.5) / STATES.length) * 0.90;
+        // the frame is pinned, so jumping the scroll position keeps it visually put — only the screen slides.
+        fsLock = performance.now() + 260;   // swallow the single-frame scroll spike
+        window.scrollTo(0, Math.round(topAbs + p * total));
+      }
+      fsDots.forEach((d, scr) => d.addEventListener('click', () => fsGoto(scr)));
+
+      // ---- Leaving a pinned section ----
+      // Two quick swipes the same way skip the whole section, landing at its near edge. On pointer
+      // devices a sustained hard fling does the same thing.
+      let fsRelease = 0;
+      const fsRect = () => fshow.getBoundingClientRect();
+      function fsSnapTo(idx) {                   // put the show straight on a state, no typing run
+        if (fsRAF) { cancelAnimationFrame(fsRAF); fsRAF = null; }
+        fsAnim = null;
+        applyState(idx); fsDisp = fsWant = idx; fsCaret(false);
+        renderSeg(STATES[idx].seg, segLen(STATES[idx].seg));
+      }
+      function sectionExit(sec, dir) {
+        const vh = window.innerHeight, topAbs = sec.getBoundingClientRect().top + window.scrollY;
+        fsRelease = performance.now() + 1400;    // don't grab the next swipe while the page glides out
+        const from = window.scrollY;
+        const target = Math.max(0, Math.round(dir > 0 ? topAbs + sec.offsetHeight - vh + 4 : topAbs - vh + 4));
+        // skipping means skipping: the show jumps to the far state instead of playing its way there
+        if (sec === fshow) fsSnapTo(dir > 0 ? STATES.length - 1 : 0);
+        window.scrollTo({ top: target, behavior: reduce ? 'auto' : 'smooth' });
+        // a smooth scroll asked for at the tail of a gesture is sometimes dropped; if nothing has
+        // moved shortly after, land it outright. Getting out must never depend on the animation.
+        setTimeout(() => {
+          if (Math.abs(window.scrollY - from) < 8 && Math.abs(window.scrollY - target) > 40) window.scrollTo(0, target);
+        }, 420);
+      }
+      const fsExit = (dir) => sectionExit(fshow, dir);
+
+      // fast-scroll escape (pointer devices) — a *sustained* hard fling inside the section jumps to its
+      // near exit edge. Requires three consecutive fast frames, so a single big jump (Page Down, anchor
+      // jump) never triggers it — only real momentum.
+      let fsLastY = window.scrollY, fsLastT = performance.now(), fsFling = 0, fsFastN = 0;
+      function fsFlingCheck() {
+        if (!fshow || fsStatic() || performance.now() < fsLock) { fsLastY = window.scrollY; fsLastT = performance.now(); fsFastN = 0; return; }
+        const now = performance.now(), y = window.scrollY, dt = Math.max(1, now - fsLastT);
+        const v = (y - fsLastY) / dt * 1000; fsLastY = y; fsLastT = now;
+        const r = fsRect(), vh = window.innerHeight;
+        const inside = r.top < vh * 0.6 && r.bottom > vh * 0.4;
+        const nearExit = (v > 0 && r.bottom < vh * 1.15) || (v < 0 && r.top > -vh * 0.15);
+        fsFastN = (inside && Math.abs(v) > 5000) ? fsFastN + 1 : 0;   // only a clearly-abnormal fling, not a brisk read-scroll
+        if (inside && !nearExit && fsFastN >= 3 && now - fsFling > 900) {
+          fsFastN = 0; fsFling = now;
+          fsExit(v > 0 ? 1 : -1);
+        }
+      }
+
+      // ---- Touch: one swipe = exactly one act ----
+      // A single flick on a phone travels far enough to cross two state bands, so acts were being
+      // skipped. While the frame covers the screen the swipe is taken over: the page is held still and
+      // each gesture jumps the scroll by exactly one band — invisible, because the frame is pinned.
+      const fsTouch = !window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+      const fsBandTop = (i) => {
+        const total = fshow.offsetHeight - window.innerHeight;
+        return Math.round(fsRect().top + window.scrollY + (0.03 + ((i + 0.5) / STATES.length) * 0.90) * total);
+      };
+      const covers = (el) => { const r = el.getBoundingClientRect(); return r.top <= 0 && r.bottom >= window.innerHeight; };
+
+      // The rule, used by BOTH pinned sections: while the section covers the screen the page is
+      // held still and one finger swipe — long or short — advances exactly one step. Two quick
+      // swipes the same way skip the whole section instead. Pushing past either end also leaves.
+      //   step()   -> the step the reader is on now
+      //   stopY(i) -> the absolute scroll position that step i lives at
+      function oneSwipeOneStep(sec, step, stopY, last, land) {
+        let sy = 0, moved = 0, armed = false, lastEnd = 0, lastDir = 0;
+        sec.addEventListener('touchstart', (e) => {
+          if (reduce || e.touches.length !== 1) { armed = false; return; }
+          armed = covers(sec) && performance.now() > fsRelease;
+          sy = e.touches[0].clientY; moved = 0;
+        }, { passive: true });
+        sec.addEventListener('touchmove', (e) => {
+          if (!armed || e.touches.length !== 1) return;
+          moved = sy - e.touches[0].clientY;
+          if (e.cancelable) e.preventDefault();   // hold the page still; the swipe drives the story
+        }, { passive: false });
+        sec.addEventListener('touchend', () => {
+          if (!armed) return;
+          armed = false;
+          if (Math.abs(moved) < 18) return;                    // a tap, or an accidental nudge
+          const dir = moved > 0 ? 1 : -1, now = performance.now();
+          const secondInARow = now - lastEnd < 700 && lastDir === dir;
+          lastEnd = now; lastDir = dir;
+          if (secondInARow) { sectionExit(sec, dir); return; }
+          const to = step() + dir;
+          if (to < 0 || to > last) { sectionExit(sec, dir); return; }
+          fsLock = performance.now() + 240;      // the jump below is bookkeeping, not a reader scrolling
+          window.scrollTo(0, stopY(to));
+          if (land) land(to);
+        }, { passive: true });
+        sec.addEventListener('touchcancel', () => { armed = false; }, { passive: true });
+      }
+
+      if (fshow && fsTouch) {
+        oneSwipeOneStep(fshow, () => fsWant, fsBandTop, STATES.length - 1,
+          (to) => { fsWant = to; fsEngine(); });
+      }
+
+      // Scrolly "Before" card — a pinned, three-act mark-up of the home screen:
+      //  Act 1 (scrubbed by scroll): red pencil lassos the broken flow, then the verdict grows the grey frame.
+      //  Acts 2 & 3 (scroll TRIGGERS, then they self-play): the pencil jumps to the next component while the
+      //  critique erases back to "Home." and the new line types itself out — no need to keep scrolling.
+      const scrolly = document.querySelector('[data-scrolly]');
+      const marks = {};
+      if (scrolly) scrolly.querySelectorAll('.tl-pencil__p').forEach((p) => { marks[p.dataset.mark] = p; });
+      const reveal   = scrolly && scrolly.querySelector('[data-reveal]');
+      const suffixEl = scrolly && scrolly.querySelector('[data-suffix]');
+      const caretEl  = scrolly && scrolly.querySelector('[data-caret]');
+      const ACTS = {
+        1: { marks: ['top', 'bottom'], text: 'The flow was incorrect — students should prepare for the lesson before entering it.' },
+        2: { marks: ['quiz'],          text: 'The weekly quiz lacked motivation and clear incentives for participation.' },
+        3: { marks: ['prog'],          text: 'The progress bar tracked completion, but never showed students what they were working toward.' },
+      };
+      const T1 = 0.40, T2 = 0.70, TRIGGER_ACT1 = 0.08;   // scroll fractions that start acts 1, 2 and 3
+      if (reduce && suffixEl) suffixEl.textContent = ACTS[1].text;
+
+      const setMark = (name, shown, drawn) => {
+        const p = marks[name]; if (!p) return;
+        const L = p.getTotalLength();
+        p.style.strokeDashoffset = (L * (1 - clamp(drawn, 0, 1))).toFixed(1);
+        p.style.opacity = shown.toFixed(3);
+      };
+      const showActMarks = (act, drawn) => Object.keys(marks).forEach((n) =>
+        ACTS[act].marks.includes(n) ? setMark(n, 1, drawn) : setMark(n, 0, 0));
+
+      function scrollyLayout() {
+        if (!scrolly) return;
+        Object.values(marks).forEach((p) => p.style.setProperty('--len', p.getTotalLength()));
+        // scroll room so the card stays pinned through all three acts (mobile + tablet get it too; only reduced-motion is static)
+        if (reduce) { scrolly.style.height = ''; }
+        else { scrolly.style.height = (window.innerHeight + Math.round(window.innerHeight * 2.7)) + 'px'; }
+      }
+
+      // ---- self-playing engine (all three acts) ----
+      let displayAct = 0, wantAct = 0, anim = null, engineOwns = false, engineRAF = null;
+      const caret = (on) => caretEl && caretEl.classList.toggle('is-on', on);
+      function startTransition(to) {
+        const fromText = displayAct === 0 ? '' : ACTS[displayAct].text;
+        anim = { to, t0: performance.now(), fromText, toText: ACTS[to].text, phase: displayAct === 0 ? 'draw' : 'erase' };
+        caret(true);
+      }
+      function engineFrame(now) {
+        if (!anim) return;
+        const a = anim, ERASE = 11, TYPE = 24, DRAW = 620;
+        if (a.phase === 'erase') {
+          const shown = Math.max(0, a.fromText.length - Math.floor((now - a.t0) / ERASE));
+          suffixEl.textContent = a.fromText.slice(0, shown);
+          const k = clamp(1 - shown / Math.max(1, a.fromText.length), 0, 1);   // fade old marks out as words vanish
+          ACTS[displayAct].marks.forEach((n) => setMark(n, 1 - k, 1));
+          if (shown <= 0) { ACTS[displayAct].marks.forEach((n) => setMark(n, 0, 0)); a.phase = 'draw'; a.t0 = now; }
+        } else if (a.phase === 'draw') {
+          const k = clamp((now - a.t0) / DRAW, 0, 1);
+          ACTS[a.to].marks.forEach((n) => setMark(n, 1, easeOutCubic(k)));
+          if (k >= 1) { a.phase = 'type'; a.t0 = now; }
+        } else {
+          const shown = Math.floor((now - a.t0) / TYPE);
+          suffixEl.textContent = a.toText.slice(0, Math.min(shown, a.toText.length));
+          if (shown >= a.toText.length) { suffixEl.textContent = a.toText; displayAct = a.to; anim = null; caret(false); }
+        }
+        reveal.style.maxHeight = (reveal.scrollHeight + 4) + 'px';
+      }
+      function engineLoop(now) {
+        engineRAF = null;
+        if (reduce || !scrolly) return;
+        if (!anim && displayAct !== wantAct) startTransition(displayAct < wantAct ? displayAct + 1 : displayAct - 1);
+        if (anim) engineFrame(now);
+        if (anim || displayAct !== wantAct) engineRAF = requestAnimationFrame(engineLoop);
+      }
+      const requestEngine = () => { if (!engineRAF) engineRAF = requestAnimationFrame(engineLoop); };
+
+      function scrollyUpdate() {
+        if (!scrolly || reduce) return;
+        const r = scrolly.getBoundingClientRect();
+        const total = scrolly.offsetHeight - window.innerHeight;
+        const p = clamp(-r.top / (total || 1), 0, 1);
+        const draw = (a, b) => easeOutCubic(clamp((p - a) / (b - a), 0, 1));
+
+        if (p < TRIGGER_ACT1) {                  // ---- Clean state: wait for scroll ----
+          engineOwns = false; wantAct = 0; displayAct = 0;
+          if (anim) { anim = null; caret(false); }
+          setMark('top', 0, 0); setMark('bottom', 0, 0); setMark('quiz', 0, 0); setMark('prog', 0, 0);
+          suffixEl.textContent = '';
+          reveal.style.maxHeight = '1px'; reveal.style.opacity = 0;
+        } else if (p < T1) {                     // ---- Act 1: self-playing ----
+          if (!engineOwns) { engineOwns = true; reveal.style.opacity = 1; reveal.style.maxHeight = (reveal.scrollHeight + 4) + 'px'; }
+          wantAct = 1;
+          requestEngine();
+        } else {                                  // ---- Acts 2 & 3: scroll picks the act, engine plays it ----
+          wantAct = p < T2 ? 2 : 3;
+          requestEngine();
+        }
+      }
+
+      // "Before" runs on the same rule. Its four steps are: clean, then each of the three acts —
+      // SC_AT are the progress thresholds the acts begin at, SC_STOPS where a step comes to rest.
+      const SC_AT = [0, TRIGGER_ACT1, T1, T2], SC_STOPS = [0.015, 0.24, 0.55, 0.85];
+      const scStep = () => {
+        const total = scrolly.offsetHeight - window.innerHeight;
+        const p = clamp(-scrolly.getBoundingClientRect().top / (total || 1), 0, 1);
+        let i = 0; while (i < SC_AT.length - 1 && p >= SC_AT[i + 1]) i++;
+        return i;
+      };
+      const scStopY = (i) => {
+        const total = scrolly.offsetHeight - window.innerHeight;
+        return Math.round(scrolly.getBoundingClientRect().top + window.scrollY + SC_STOPS[i] * total);
+      };
+      if (scrolly && fsTouch) oneSwipeOneStep(scrolly, scStep, scStopY, SC_STOPS.length - 1);
+
+      let ticking = false;
+      function onScroll() {
+        if (ticking) return; ticking = true;
+        requestAnimationFrame(() => { railUpdate(); journeyUpdate(); duoUpdate(); soloUpdate(); fsUpdate(); fsFlingCheck(); scrollyUpdate(); heroFade(); ticking = false; });
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', () => { journeyLayout(); scrollyLayout(); fsLayout(); onScroll(); });
+
+      // Count-up metrics
+      const nums = Array.from(document.querySelectorAll('[data-count]'));
+      if ('IntersectionObserver' in window && !reduce) {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((e) => {
+            if (!e.isIntersecting) return;
+            const el = e.target, to = +el.dataset.count; let t0 = null; const dur = 950;
+            (function step(ts) { if (!t0) t0 = ts; const k = clamp((ts - t0) / dur, 0, 1);
+              el.textContent = Math.round(k * to); if (k < 1) requestAnimationFrame(step); else el.textContent = to; })(performance.now());
+            io.unobserve(el);
+          });
+        }, { threshold: 0.6 });
+        nums.forEach((n) => io.observe(n));
+      } else { nums.forEach((n) => (n.textContent = n.dataset.count)); }
+
+      // ---- Hero tablet: cursor parallax — starts only after the timed load-in entrance ----
+      const tablet = document.querySelector('[data-tablet]');
+      if (tablet && !reduce && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        const hero = tablet.closest('.tl-hero');
+        let raf = null, tx = 0, ty = 0, cx = 0, cy = 0, ready = false;
+        // clear the CSS entrance animation — its fill state would override the inline cursor-parallax transform
+        setTimeout(() => { tablet.style.animation = 'none'; ready = true; }, 4300);   // wait out the 3s delay + ~1.15s entrance
+        const apply = () => {
+          cx += (tx - cx) * 0.12; cy += (ty - cy) * 0.12;
+          tablet.style.transform = 'translate3d(' + cx.toFixed(1) + 'px,' + cy.toFixed(1) + 'px,0) rotateX(' + (-cy * 0.05).toFixed(2) + 'deg) rotateY(' + (cx * 0.05).toFixed(2) + 'deg)';
+          if (Math.hypot(tx - cx, ty - cy) > 0.3) raf = requestAnimationFrame(apply); else raf = null;
+        };
+        (hero || tablet).addEventListener('pointermove', (e) => {
+          if (!ready) return;
+          const r = (hero || tablet).getBoundingClientRect();
+          tx = ((e.clientX - r.left) / r.width - 0.5) * 40;
+          ty = ((e.clientY - r.top) / r.height - 0.5) * 26;
+          if (!raf) raf = requestAnimationFrame(apply);
+        });
+        (hero || tablet).addEventListener('pointerleave', () => { if (!ready) return; tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(apply); });
+      }
+
+      journeyLayout(); scrollyLayout(); fsLayout(); onScroll();
+      window.addEventListener('load', () => { journeyLayout(); scrollyLayout(); fsLayout(); onScroll(); });
+      window.addEventListener('resize', () => {
+        if (thread) { threadLen = thread.getTotalLength(); thread.style.strokeDasharray = threadLen; }
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# Assets that no page references any more — kept on disk, left out of the published site
+ds-hero-video.mp4
+ds-hero-poster.jpg
+talmind-home.jpg
+talmind-classroom.jpg
+talmind-game.jpg
+talmind-quiz.jpg
+talmind-tablet-hands.png
+talmind-components.jpg
+talmind-primitives.jpg
+talmind-icons.jpg
+bianca-cover.jpg
+bianca-operations.jpg
+ds-banner.jpg
+ds-cover.jpg
+
+# the CV is served as cv-yehuda-amitzur.pdf; this is the same file under its original name
+CV - Yehuda Amitzur מעודכן.pdf

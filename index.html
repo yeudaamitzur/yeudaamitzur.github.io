@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yehuda Amitzur — UX Designer</title>
+  <meta name="description" content="Yehuda Amitzur — a UX/UI designer specializing in B2B systems, complex workflows, and conversion-driven experiences." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- Hanken Grotesk as a variable range so the hero line can sit at 250 (lighter than the 300 static) -->
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200..800&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- favicon: the same ring as the site cursor — purple stroke, lighter purple fill -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css?v=18" />
+</head>
+<body>
+  <a class="skip-link" href="#work">Skip to work</a>
+
+  <!-- ===== HEADER (floating pill → collapses to a status badge on scroll) ===== -->
+  <header class="hdr hdr--float" id="top">
+    <div class="hdr__pill">
+      <a class="hdr__logo" href="#top" aria-label="Yehuda Amitzur — home">
+        <span class="hdr__avatar"><img class="hdr__avatar-img" src="profile.png" alt="Yehuda Amitzur" width="46" height="46" /></span>
+      </a>
+      <div class="hdr__expand">
+        <nav class="hdr__nav" aria-label="Primary">
+          <a href="#work">Work</a>
+          <a href="#about">About</a>
+          <a href="cv-yehuda-amitzur.pdf" target="_blank" rel="noopener">CV</a>
+        </nav>
+        <a class="hdr__cta" href="#contact">Contact</a>
+        <button class="hdr__menu" aria-label="Open menu" aria-expanded="false" aria-controls="hdr-drawer"><span></span><span></span></button>
+      </div>
+      <span class="hdr__status" aria-hidden="true"><span>Available for work</span><i class="hdr__dot"></i></span>
+    </div>
+    <div class="hdr__drawer" id="hdr-drawer" hidden>
+      <div class="hdr__drawer-top">
+        <span class="hdr__drawer-ava"><img src="profile.png" alt="" width="46" height="46" /></span>
+        <button class="hdr__drawer-close" type="button" aria-label="Close menu"><span></span><span></span></button>
+      </div>
+      <a href="#top">Home</a>
+      <a href="#work">Projects</a>
+      <a href="#about">About</a>
+      <a href="cv-yehuda-amitzur.pdf" target="_blank" rel="noopener">My cv</a>
+      <a class="hdr__drawer-contact" href="#contact">Contact</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+      <div class="hero__glow" aria-hidden="true"></div>
+      <div class="hero__orb hero__orb--a" aria-hidden="true"></div>
+      <div class="hero__orb hero__orb--b" aria-hidden="true"></div>
+      <canvas class="hero__dots" data-dots="UX/UI Designer" aria-hidden="true"></canvas>
+      <figure class="hero__cursor" aria-hidden="true">
+        <img src="profile.png" alt="" width="120" height="120" />
+      </figure>
+      <div class="hero__stage">
+        <span class="hero__line hero__line--1"><span class="hero__rev">Hey, I'm Yehuda Amitzur</span></span>
+        <div class="hero__line hero__line--2" role="img" aria-label="UX/UI Designer"></div>
+      </div>
+
+      <!-- ===== SELECTED WORK — tiles live in the first screen (no scrolling needed) ===== -->
+      <nav class="hero-work" id="work" aria-label="Selected work">
+        <a class="wtile wtile--talmind" href="talmind.html">
+          <span class="wtile__frame">
+            <img class="wtile__img" src="tile-talmind.jpg" width="1200" height="750"
+                 alt="Talmind — the learning dashboard" fetchpriority="high" />
+          </span>
+          <span class="wtile__name">Talmind</span>
+          <span class="wtile__desc">A tablet learning app for Korean classrooms</span>
+        </a>
+        <a class="wtile wtile--bianca" href="bianca.html">
+          <span class="wtile__frame">
+            <img class="wtile__img" src="tile-bianca.jpg" width="1200" height="750"
+                 alt="Bianca — the restaurant management dashboard" fetchpriority="high" />
+          </span>
+          <span class="wtile__name">Bianca</span>
+          <span class="wtile__desc">A restaurant management dashboard</span>
+        </a>
+        <a class="wtile wtile--ds" href="design-system.html">
+          <span class="wtile__frame">
+            <img class="wtile__img" src="tile-ds.jpg" width="1200" height="750"
+                 alt="Design System — colours, typography and components" fetchpriority="high" />
+          </span>
+          <span class="wtile__name">Design System</span>
+          <span class="wtile__desc">Tokens, components and a developer handoff</span>
+        </a>
+      </nav>
+    </section>
+
+    <!-- The previous work concept (sticky-stacking case cards) that used to sit here has moved
+         into the hero as .hero-work tiles. The old markup is preserved in
+         work-cards-concept.html.bak, and the whole original page in index-cards-backup.html;
+         its CSS (.work / .cases / .case*) is still present in styles.css. -->
+
+    <!-- ===== EXPERIENCE (title + bio) ===== -->
+    <section class="section experience" id="experience">
+      <div class="wrap experience__grid">
+        <h2 class="experience__title">Experience</h2>
+        <div class="experience__body">
+          <p>Hi, I'm a UX/UI Designer with several years of experience specializing in B2B systems,
+            complex workflows, and conversion-driven experiences. With a background in visual
+            communication, I combine strong visual foundations with strategic UX thinking to create
+            scalable, intuitive, and impactful digital products.</p>
+          <p>I have experience leading end-to-end design processes — from research and information
+            architecture to high-fidelity UI and design systems — with a strong focus on usability,
+            clarity, and CRO.</p>
+          <p>My journey into tech was built through resilience, self-learning, and curiosity after
+            transitioning from a strict Haredi background into the creative and technological world.
+            I work with tools such as Figma, Claude, Midjourney, Gemini, and AI-driven workflows, and
+            I'm always eager to learn, grow, and collaborate on meaningful products.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== STATS ===== -->
+    <section class="section stats-sec">
+      <div class="wrap">
+        <ul class="stats" aria-label="At a glance">
+          <li class="stat"><span class="stat__num"><span class="stat__val" data-count="3">3</span><span class="stat__plus">+</span></span><span class="stat__label">Years of experience</span></li>
+          <li class="stat"><span class="stat__num"><span class="stat__val" data-count="10">10</span><span class="stat__plus">+</span></span><span class="stat__label">Projects</span></li>
+          <li class="stat"><span class="stat__num"><span class="stat__val" data-count="4">4</span></span><span class="stat__label">Design systems</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===== GLIMPSE / ABOUT ===== -->
+    <section class="section glimpse" id="about">
+      <div class="wrap glimpse__wrap" data-glimpse>
+        <h2 class="glimpse__title glimpse__anim">A Glimpse of Me and My World</h2>
+
+        <div class="glimpse__body">
+          <div class="glimpse__left">
+            <div class="glimpse__text glimpse__anim">
+              <p>When I'm not designing, I'm usually at a piano somewhere, chasing a melody until it
+                finally sits right.</p>
+              <p>The rest of the time I'm buried in some new tool or idea — taking things apart to see
+                how they work. Music keeps me patient; curiosity keeps me building.</p>
+            </div>
+            <figure class="glimpse__photo glimpse__photo--portrait glimpse__anim" data-depth="18">
+              <img src="glimpse-work.jpg" alt="Yehuda working on a laptop" loading="lazy" style="object-position: center 30%;" />
+            </figure>
+          </div>
+          <div class="glimpse__right">
+            <figure class="glimpse__photo glimpse__photo--tall glimpse__anim" data-depth="30">
+              <img src="glimpse-piano.jpg" alt="Yehuda playing the piano" loading="lazy" style="object-position: center 45%;" />
+            </figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CONTACT ===== -->
+    <section class="section contact" id="contact">
+      <div class="wrap">
+        <a class="contact__headline" href="mailto:yeudaamizur@gmail.com">
+          <span>Let's work</span>
+          <span class="contact__accent">together</span>
+        </a>
+        <!-- every way to reach him reads the same: one row of quiet links, no button competing
+             with the headline it sits under -->
+        <ul class="socials">
+          <li><a href="tel:+972533867295">Phone <span aria-hidden="true">↗</span></a></li>
+          <li><a href="mailto:yeudaamizur@gmail.com">Email <span aria-hidden="true">↗</span></a></li>
+          <li><a href="https://www.linkedin.com/in/yehuda-amizur/" target="_blank" rel="noopener">LinkedIn <span aria-hidden="true">↗</span></a></li>
+          <li><a href="https://www.behance.net/69c44b8d?undefined=1" target="_blank" rel="noopener">Behance <span aria-hidden="true">↗</span></a></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot__inner">
+      <span>© 2026 Yehuda Amitzur — built with Claude</span>
+      <a href="#top">Back to top ↑</a>
+    </div>
+  </footer>
+
+  <script src="script.js?v=18"></script>
+</body>
+</html>
