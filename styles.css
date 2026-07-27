@@ -234,12 +234,22 @@ ul, ol { list-style: none; padding: 0; }
   transition: max-width .55s cubic-bezier(.2,.7,.2,1), opacity .35s ease .05s, padding .5s cubic-bezier(.2,.7,.2,1); }
 .hdr__dot { width: 11px; height: 11px; border-radius: 50%; background: #2fbf5b; box-shadow: 0 0 0 4px rgba(47,191,91,0.18); }
 .hdr--float.is-scrolled .hdr__expand { max-width: 0; opacity: 0; padding-inline: 0; }
-.hdr--float.is-scrolled .hdr__status { max-width: 260px; opacity: 1; padding: 0 0 0 12px; }
+/* The dot's 4px glow ring is drawn OUTSIDE its box, and the dot is the last thing in a box that
+   has overflow:hidden (which is what lets the label collapse to width 0). With no right padding
+   the ring's outer edge was landing exactly on the clip line and getting shaved flat on one side.
+   5px of right padding opens the clip box; the matching negative margin hands the space straight
+   back, so the ring now draws into the pill's own 20px of padding and the pill's width is
+   unchanged — same trick as .hdr__expand above. */
+.hdr--float.is-scrolled .hdr__status { max-width: 260px; opacity: 1; padding: 0 6px 0 12px; margin-right: -6px; }
 /* ---- Mobile + tablet: the floating pill expands into ONE connected menu card ---- */
 @media (max-width: 1024px) {
   .hdr--float .hdr__nav, .hdr--float .hdr__cta { display: none; }
   .hdr--float .hdr__expand, .hdr--float.is-scrolled .hdr__expand { max-width: none; opacity: 1; padding: 5px .3rem 5px .55rem; }
-  .hdr--float .hdr__status, .hdr--float.is-scrolled .hdr__status { max-width: 0; opacity: 0; padding: 0; }
+  .hdr--float .hdr__status, .hdr--float.is-scrolled .hdr__status { max-width: 0; opacity: 0; padding: 0; margin-right: 0; }
+  /* Nothing inside the pill changes on scroll at this width — the nav and the status are both
+     out — so the pill must not change either. Without this it inherited the desktop scrolled
+     padding (10px → 20px on the right) and quietly grew 10px sideways as you scrolled. */
+  .hdr--float .hdr__pill, .hdr--float.is-scrolled .hdr__pill { padding: 8px 10px; }
   .hdr--float .hdr__menu { display: flex; width: 40px; height: 40px; }
 
   /* when the menu is open, the pill gives way so the card reads as the bar expanded (one unit) */
