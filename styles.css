@@ -448,7 +448,9 @@ ul, ol { list-style: none; padding: 0; }
 /* per-project tint + shadow hue, taken from each case study's own palette */
 .wtile--talmind { --wt-tint: linear-gradient(155deg, #D9DFF1, #F2F4FE); --wt-sh1: rgba(74,86,150,.16);  --wt-sh2: rgba(74,86,150,.42); }
 .wtile--bianca  { --wt-tint: linear-gradient(155deg, #F3E4D1, #F8F3EC); --wt-sh1: rgba(178,110,38,.16); --wt-sh2: rgba(178,110,38,.40); }
-.wtile--ds      { --wt-tint: linear-gradient(155deg, #E4D6F2, #F6F2FB); --wt-sh1: rgba(126,72,175,.16); --wt-sh2: rgba(126,72,175,.40); }
+/* Design System sits at hue 100 — the green of its own hero artwork. Same saturation and
+   lightness as the lilac it replaced, so it reads as one of the family, just a different hue. */
+.wtile--ds      { --wt-tint: linear-gradient(155deg, #DFF2D6, #F5FBF2); --wt-sh1: rgba(106,175,72,.16); --wt-sh2: rgba(106,175,72,.40); }
 
 /* short viewports: keep the row inside the first screen */
 @media (max-height: 760px) and (min-width: 701px) { .hero-work { max-width: 810px; } }
