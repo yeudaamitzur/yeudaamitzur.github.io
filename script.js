@@ -373,14 +373,14 @@ if (!reduced) {
 
 // ---- Only the header PHOTO flies to the cursor; per-letter glow; Instagram-style return ----
 if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
-  const SIZE = 80, HOME_S = 46 / 80, RET = 760, FLY = 300;   // FLY = the header→cursor hand-off
+  const SIZE = 80, HOME_S = 46 / 80, RET = 760, FLY = RET;   // out and back take exactly as long
   let tx = 0, ty = 0, cx = 0, cy = 0, cs = HOME_S;
   let active = false, returning = false, raf = null, homeX = 0, homeY = 0;
   let retStart = 0, rfx = 0, rfy = 0, rfs = HOME_S;
   // The photo flies from the header to the cursor — that hand-off is the effect and stays eased.
   // But once it has ARRIVED it becomes the cursor, and a thing that IS the cursor may not trail it.
   // From that moment it is locked to the pointer and drawn from the pointermove event itself.
-  let locked = false, flyStart = 0;
+  let locked = false, flyStart = 0, ffx = 0, ffy = 0, ffs = HOME_S;   // where the flight launched from
 
   const render = () => {
     cursorEl.style.transform = `translate(${(cx - SIZE / 2).toFixed(1)}px, ${(cy - SIZE / 2).toFixed(1)}px) scale(${cs.toFixed(3)})`;
@@ -399,17 +399,27 @@ if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
       if (t >= 1) { returning = false; cursorEl.style.opacity = '0'; hdrAvatarImg.style.opacity = ''; raf = null; return; }
       raf = requestAnimationFrame(loop); return;
     }
-    if (locked) { cx = tx; cy = ty; } else {
-      // The hand-off is time-boxed, NOT distance-based. Keyed off distance it would never finish
-      // while the pointer keeps moving — the gap never closes — and the photo would trail forever,
-      // which is the lag being reported. The follow strength ramps 0.26 → 1 across the flight, so
-      // it arrives exactly on the pointer rather than snapping the last few pixels.
-      const k = clamp((performance.now() - flyStart) / FLY, 0, 1);
-      const a = 0.26 + 0.74 * k * k;
-      cx += (tx - cx) * a; cy += (ty - cy) * a;
-      if (k >= 1) { cx = tx; cy = ty; locked = true; }
+    if (locked) { cx = tx; cy = ty; cs = ts(); } else if (active) {
+      // The flight OUT is the mirror image of the flight home: same clock, same easeInOutCubic,
+      // the same rounded hop and the same damped settle. It used to be a 300ms follow-ease that
+      // ramped 0.26 → 1, which arrived correctly but felt like a snatch; this reads as the photo
+      // being lifted out of the header and carried across.
+      // The hand-off is still time-boxed, NOT distance-based — keyed off distance it could never
+      // finish while the pointer kept moving, and the photo would trail forever. The eased
+      // progress runs between the LAUNCH point and wherever the pointer is NOW, so it still lands
+      // exactly on the pointer at t = 1; from there it locks and pointermove draws it.
+      const t = clamp((performance.now() - flyStart) / FLY, 0, 1);
+      const e = easeInOutCubic(t);
+      cx = ffx + (tx - ffx) * e;
+      const baseY = ffy + (ty - ffy) * e;
+      const arc = -Math.sin(t * Math.PI) * 60;                  // soft rounded hop over the top
+      const bounce = Math.sin(t * Math.PI * 3) * (1 - t) * 12;  // two gentle, damped bounces
+      cy = baseY + arc + bounce;
+      cs = ffs + (1 - ffs) * e;
+      if (t >= 1) { cx = tx; cy = ty; cs = 1; locked = true; }
+    } else {
+      cx += (tx - cx) * 0.26; cy += (ty - cy) * 0.26; cs += (ts() - cs) * 0.26;
     }
-    cs += (ts() - cs) * 0.26;
     render();
     // Once it is locked AND done growing there is nothing left to animate: the loop stands down and
     // pointermove draws it, so there is no rAF hop between the mouse and the photo.
@@ -426,6 +436,8 @@ if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
     homeX = r.left + r.width / 2; homeY = r.top + r.height / 2;
     if (!active && !returning) { cx = homeX; cy = homeY; cs = HOME_S; render(); }
     active = true; returning = false; locked = false; flyStart = performance.now();   // flies across first
+    // launch from wherever it actually is — the header, or mid-flight home if you came straight back
+    ffx = cx; ffy = cy; ffs = cs;
     document.documentElement.classList.add('hero-ava-on');
     cursorEl.style.opacity = '1';
     hdrAvatarImg.style.opacity = '0';    // only the photo lifts off; the ring stays
