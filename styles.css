@@ -232,15 +232,37 @@ ul, ol { list-style: none; padding: 0; }
   max-width: 0; opacity: 0; padding: 0;
   font-family: var(--f-display); font-weight: 500; font-size: 1rem; color: var(--ink);
   transition: max-width .55s cubic-bezier(.2,.7,.2,1), opacity .35s ease .05s, padding .5s cubic-bezier(.2,.7,.2,1); }
-.hdr__dot { width: 11px; height: 11px; border-radius: 50%; background: #2fbf5b; box-shadow: 0 0 0 4px rgba(47,191,91,0.18); }
+.hdr__dot { position: relative; width: 11px; height: 11px; border-radius: 50%; background: #2fbf5b;
+  box-shadow: 0 0 0 4px rgba(47,191,91,0.18); animation: dot-breathe 2.4s ease-in-out infinite; }
+/* Live-broadcast pulse: a ring the same size as the dot rides out from underneath it and fades,
+   the way a "we're on air" indicator does. It's a pseudo-element rather than an animated
+   box-shadow so it can't reflow anything, and it sits behind the dot (z-index -1) so the dot
+   itself stays a crisp solid green. .hdr__status opens 12px of clip room for it below. */
+.hdr__dot::after { content: ""; position: absolute; inset: 0; border-radius: 50%; z-index: -1;
+  background: #2fbf5b; animation: dot-pulse 2.4s cubic-bezier(.2,.6,.35,1) infinite; }
+@keyframes dot-pulse {
+  0%   { transform: scale(1);   opacity: .55; }
+  70%  { transform: scale(2.2); opacity: 0; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+@keyframes dot-breathe {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(47,191,91,0.18); }
+  50%      { box-shadow: 0 0 0 4px rgba(47,191,91,0.30); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hdr__dot { animation: none; }
+  .hdr__dot::after { animation: none; opacity: 0; }
+}
 .hdr--float.is-scrolled .hdr__expand { max-width: 0; opacity: 0; padding-inline: 0; }
 /* The dot's 4px glow ring is drawn OUTSIDE its box, and the dot is the last thing in a box that
    has overflow:hidden (which is what lets the label collapse to width 0). With no right padding
    the ring's outer edge was landing exactly on the clip line and getting shaved flat on one side.
-   5px of right padding opens the clip box; the matching negative margin hands the space straight
+   Padding opens the clip box; the matching negative margin hands the space straight
    back, so the ring now draws into the pill's own 20px of padding and the pill's width is
-   unchanged — same trick as .hdr__expand above. */
-.hdr--float.is-scrolled .hdr__status { max-width: 260px; opacity: 1; padding: 0 6px 0 12px; margin-right: -6px; }
+   unchanged — same trick as .hdr__expand above. The pulse ring reaches ~8px past the dot on every
+   side, so the padding is now 12px (right) and 7px (top/bottom) with matching negative margins:
+   the clip box opens far enough for the ring to finish, and the pill's own box is untouched. */
+.hdr--float.is-scrolled .hdr__status { max-width: 260px; opacity: 1; padding: 7px 12px 7px 12px; margin: -7px -12px -7px 0; }
 /* ---- Mobile + tablet: the floating pill expands into ONE connected menu card ---- */
 @media (max-width: 1024px) {
   .hdr--float .hdr__nav, .hdr--float .hdr__cta { display: none; }
