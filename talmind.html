@@ -29,7 +29,12 @@
              inside it. The flat "Before" shot is sized to --stagew so both sections show the
              product at exactly the same scale. */
           --mat: clamp(10px, 1.4vw, 20px);
-          --fw: min(94vw, 1108px, calc((100svh - 300px) * 1.6));
+          /* the last term keeps the card inside its text column AND leaves a 48px strip on each
+             side for the dot rail. Without it, anywhere under ~1030px the card came out wider
+             than the column and the track's overflow:clip quietly shaved its right edge off,
+             while the dots had no gutter left to sit in. */
+          --fw: min(94vw, 1108px, calc((100svh - 300px) * 1.6),
+                    calc(min(100vw, 1180px) - var(--pad) * 2 - 96px));
           --stagew: calc(var(--fw) - var(--mat) * 2);
     }
     .tl-wrap { width: 100%; max-width: 1180px; margin-inline: auto; padding-inline: var(--pad); }
@@ -232,7 +237,13 @@
     /* dots hang in the left gutter (desktop) or in a row under the views (mobile) */
     .tl-fsstage { position: relative; width: max-content; max-width: 100%; margin-inline: auto; }
     .tl-fsview { display: flex; flex-direction: column; align-items: center; gap: clamp(14px, 2vw, 22px); }
-    .tl-dots { position: absolute; right: 100%; top: 0; height: 100%; margin-right: clamp(12px, 1.4vw, 22px); z-index: 4;
+    /* The rail centres on the FRAME, not on the whole view. Given 100% it measured the view —
+       frame + gap + caption — so its middle sat ~40px below the middle of the screen it belongs
+       to, which is what read as "a bit low". This is the frame's exact height: the 16:10 stage
+       plus its mat, top and bottom. */
+    .tl-dots { position: absolute; right: 100%; top: 0;
+      height: calc(var(--stagew) * 0.625 + var(--mat) * 2);
+      margin-right: clamp(16px, 2.4vw, 36px); z-index: 4;
       display: flex; flex-direction: column; justify-content: center; gap: 14px; }
     .tl-dots__d { width: 11px; height: 11px; border-radius: 50%; border: 0; padding: 0; cursor: pointer;
       background: var(--line); transition: background .3s ease, transform .3s ease, box-shadow .3s ease; }
