@@ -135,8 +135,6 @@ let dots = [], letters = [], letterHot = [], letterOn = [], letterLift = [], cw 
 let textRight = 0, textMidY = 0, textH = 0, entryStart = 0, hoverLetter = -1, entryDone = false;
 let inkSprite = null, purpleSprite = null, spriteSize = 0;
 let mouseHX = -9999, mouseHY = -9999;   // cursor in hero coords (for the letter "push")
-// Exact ink mask for hit-testing (see letterAt) — 1 byte per pixel across the text band only
-let hitMask = null, hitY0 = 0, hitY1 = 0, hitR = 3;
 
 // Pre-render the dot + glowing-dot once, then blit with drawImage (fast, no per-frame blur)
 function makeSprites() {
@@ -154,26 +152,6 @@ function makeSprites() {
   const pc = purpleSprite.getContext('2d'); pc.scale(S, S);
   pc.fillStyle = '#B575DF';
   pc.beginPath(); pc.arc(spriteSize / 2, spriteSize / 2, dotR, 0, 6.283); pc.fill();
-}
-
-// Which letter, if any, the pointer is physically touching. Walks only the (2·hitR+1)² pixels
-// around the pointer and stops at the first inked one — no layout reads, cheap enough for a
-// pointermove. Returns -1 anywhere there is no ink, including inside a letter's counters.
-function letterAt(lx, ly) {
-  if (!hitMask || !letters.length) return -1;
-  const x0 = Math.max(0, Math.round(lx) - hitR), x1 = Math.min(cw - 1, Math.round(lx) + hitR);
-  const y0 = Math.max(hitY0, Math.round(ly) - hitR), y1 = Math.min(hitY1 - 1, Math.round(ly) + hitR);
-  const r2 = hitR * hitR;
-  for (let y = y0; y <= y1; y++) {
-    const row = (y - hitY0) * cw, dy = y - ly;
-    for (let x = x0; x <= x1; x++) {
-      const dx = x - lx;
-      if (dx * dx + dy * dy > r2 || !hitMask[row + x]) continue;
-      for (let k = 0; k < letters.length; k++) if (x >= letters[k].x0 && x < letters[k].x1) return k;
-      return -1;
-    }
-  }
-  return -1;
 }
 
 function buildDots() {
@@ -248,21 +226,6 @@ function buildDots() {
   letters.forEach((L, i) => { const s = sums[i]; if (s) { L.cx = s.x / s.n; L.cy = s.y / s.n; } });
   dots.forEach((d) => { if (d.li >= 0) { const L = letters[d.li]; let vx = d.hx - L.cx, vy = d.hy - L.cy; const m = Math.hypot(vx, vy) || 1; d.lx = vx / m; d.ly = vy / m; } });
 
-  // ---- the hit mask: exactly the pixels the letters are actually drawn on ----
-  // Hovering used to be tested on the letter's x-range alone, which makes each letter a full-height
-  // column across the whole line box — so a letter answered the cursor while it was still well
-  // above or below the type, or out in the gap beside it. That is the "it reacts when I only get
-  // near it" being reported. This is the same alpha channel the dots themselves were placed from,
-  // kept for the band the type occupies, so a letter can only respond to a pointer that is ON it.
-  hitY0 = Math.max(0, Math.round(textMidY - textH));
-  hitY1 = Math.min(ch, Math.round(textMidY + textH));
-  hitMask = new Uint8Array(cw * Math.max(0, hitY1 - hitY0));
-  for (let y = hitY0; y < hitY1; y++) {
-    const row = (y - hitY0) * cw;
-    for (let x = 0; x < cw; x++) if (data[(y * cw + x) * 4 + 3] > 130) hitMask[row + x] = 1;
-  }
-  hitR = Math.max(2, stepPx);   // tolerance = the gap between dots, so any dot you touch counts
-
   makeSprites();
   // Only the FIRST build plays the fly-in. A later rebuild (a real width change) re-seats the
   // dots already assembled, so scrolling never replays the assembly animation.
@@ -309,12 +272,8 @@ function drawDots() {
   }
   for (const d of hotDots) {
     let x = d._x, y = d._y;
-    // The cursor nudges the dots it is actually on top of. This reach was 90px, which is wider
-    // than most of the letters — dots shifted while the pointer was nowhere near them, and that
-    // wide invisible circle is what made the whole thing feel like it answered from a distance.
-    const dx = x - mouseHX, dy = y - mouseHY, dd = Math.hypot(dx, dy) || 1;
-    const PUSH_R = 44;
-    if (dd < PUSH_R) { const push = (1 - dd / PUSH_R) * 20 * d._lift; x += dx / dd * push; y += dy / dd * push; }
+    const dx = x - mouseHX, dy = y - mouseHY, dd = Math.hypot(dx, dy) || 1;   // cursor pushes the dots outward
+    if (dd < 90) { const push = (1 - dd / 90) * 24 * d._lift; x += dx / dd * push; y += dy / dd * push; }
     ctx.globalAlpha = d._fade;          ctx.drawImage(inkSprite,    x - half, y - half, spriteSize, spriteSize);   // crisp base
     ctx.globalAlpha = d._hot * d._fade; ctx.drawImage(purpleSprite, x - half, y - half, spriteSize, spriteSize);   // crisp purple — no blur/halo
   }
@@ -518,7 +477,8 @@ if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
       const hr = heroRect();
       const lx = e.clientX - hr.left;
       mouseHX = lx; mouseHY = e.clientY - hr.top;
-      const found = letterAt(lx, mouseHY);   // touching the ink itself, not just its column
+      let found = -1;
+      for (let k = 0; k < letters.length; k++) { if (lx >= letters[k].x0 && lx < letters[k].x1) { found = k; break; } }
       // toggle on ENTER only: a touched letter turns purple and stays purple until touched again
       if (found !== hoverLetter) {
         if (found >= 0 && letterOn.length > found) letterOn[found] = letterOn[found] ? 0 : 1;
