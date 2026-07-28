@@ -241,14 +241,18 @@
        frame + gap + caption — so its middle sat ~40px below the middle of the screen it belongs
        to, which is what read as "a bit low". This is the frame's exact height: the 16:10 stage
        plus its mat, top and bottom. */
-    .tl-dots { position: absolute; right: 100%; top: 0;
+    /* --dot drives the circle, the space between circles and the active ring together, so the three
+       can never drift apart: the gap is one and a half circles, and the whole rail is three times
+       the size on desktop, where it is a landmark rather than a footnote. */
+    .tl-dots { --dot: 11px; position: absolute; right: 100%; top: 0;
       height: calc(var(--stagew) * 0.625 + var(--mat) * 2);
       margin-right: clamp(16px, 2.4vw, 36px); z-index: 4;
-      display: flex; flex-direction: column; justify-content: center; gap: 14px; }
-    .tl-dots__d { width: 11px; height: 11px; border-radius: 50%; border: 0; padding: 0; cursor: pointer;
+      display: flex; flex-direction: column; justify-content: center; gap: calc(var(--dot) * 1.5); }
+    .tl-dots__d { width: var(--dot); height: var(--dot); border-radius: 50%; border: 0; padding: 0; cursor: pointer;
       background: var(--line); transition: background .3s ease, transform .3s ease, box-shadow .3s ease; }
     .tl-dots__d:hover { background: var(--brand-soft); }
-    .tl-dots__d.is-active { background: var(--brand); transform: scale(1.4); box-shadow: 0 0 0 4px var(--brand-soft); }
+    .tl-dots__d.is-active { background: var(--brand); transform: scale(1.4);
+      box-shadow: 0 0 0 calc(var(--dot) * 0.36) var(--brand-soft); }
     .tl-dots__d:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
 
     /* grey mat; the stage inside it is EXACTLY 16:10, so 16:10 screens are never cropped */
@@ -318,12 +322,18 @@
     /* ---- desktop: the four views share one cell; the ones still to come wait below the clip ---- */
     @media (min-width: 761px) {
       .tl-fsviews { display: grid; grid-template-areas: "v"; overflow: clip; overflow-clip-margin: 56px; }
+      /* three times the size out here — see the --dot note above */
+      .tl-dots { --dot: 33px; }
       /* The page-coloured backing is what lets a view hide the one it rose in front of. It is
          EXACTLY the frame's box (same left, same width, same top) plus the caption underneath, so
          it has to carry the frame's radius too — a square backing painted its own corners over the
          card behind it, and the rising card arrived with square shoulders sitting outside its
-         rounded ones. That is the "extra rectangular surface" that squared the corners off. */
-      .tl-fsview { grid-area: v; background: var(--bg); border-radius: clamp(20px, 2.4vw, 34px);
+         rounded ones. That is the "extra rectangular surface" that squared the corners off.
+         TOP corners only, though. The bottom of the backing sits under the caption, and rounding
+         it there cut two notches out of the cover through which the SECOND LINE of a passed view's
+         caption showed — text from a screen you are no longer on, peeking out below the one you are. */
+      .tl-fsview { grid-area: v; background: var(--bg);
+        border-radius: clamp(20px, 2.4vw, 34px) clamp(20px, 2.4vw, 34px) 0 0;
         will-change: transform, opacity;
         /* Opacity snaps solid at the START of a rise. It used to cross-fade over .42s of a .82s
            trip, so for half the journey you were reading the outgoing screen straight through the
@@ -361,7 +371,18 @@
          into an ellipse. A phone stage never needs more than 18px to swallow the baked corner. */
       .tl-frame__stage { border-radius: 18px; }
       /* the dots are a fixed landmark — they sit under the track and never move with the caption */
-      .tl-dots { order: 2; position: static; height: auto; margin: 16px 0 0; flex-direction: row; justify-content: center; }
+      /* The bottom margin is NOT decoration — it is clearance for the footer's ring pile. Those
+         rings are seeded across a band 0.42 × their 150vh canvas deep (so 63vh), measured up from
+         the footer's top rule, and on a tall phone the top of that band lands ON the dot row: until
+         they drop, the dots sit behind a scatter of lilac circles. Pushing the CTA — and with it the
+         footer, and with it the whole band — down by the shortfall is the only lever there is: the
+         canvas lives in .foot at z-index 3 and the dots are sealed inside .tl-cover at 2, so no
+         z-index can lift them over it. The dot row sits 471px above the footer rule on its own, so
+         the shortfall is 63vh − 471 + 40px of air; `vh` is the same unit the canvas is sized in, so
+         the two track each other on any device. Zero on short phones, which already clear it, and
+         capped so a very tall one never opens a hole. Nothing else on the page moves. */
+      .tl-dots { order: 2; position: static; height: auto; flex-direction: row; justify-content: center;
+        margin: 16px 0 clamp(0px, calc(63vh - 431px), 150px); }
       /* the section starts further down, so it is clearly its own thing and not the tail of "Before" */
       #product { padding-top: clamp(3.5rem, 10vw, 5rem); }
       /* the hero tablet is the first thing you see — let it use the full width of the phone
