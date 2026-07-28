@@ -6,6 +6,28 @@
   <title>Yehuda Amitzur — UX/UI Designer</title>
   <meta name="description" content="Yehuda Amitzur — a UX/UI designer specializing in B2B systems, complex workflows, and conversion-driven experiences." />
 
+  <!-- Link previews — Mail, iMessage, Slack, WhatsApp, LinkedIn. With no og:image at all, every
+       client picks whatever picture it happens to find first in the page, which is why sharing the
+       site showed a lone Talmind screenshot. og-cover.jpg IS the homepage: the real hero rendered
+       headless at 1600×840 and halved to the 1200×630 every platform expects. To regenerate it,
+       screenshot index.html at that size with the entrance animations forced to their end state
+       (`*{animation-delay:0s;animation-duration:.001s}` + `.reveal{opacity:1;transform:none}`),
+       then bump the ?v below — the URL is the only thing a scraper's cache looks at. -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Yehuda Amitzur" />
+  <meta property="og:url" content="https://yeudaamitzur.github.io/" />
+  <meta property="og:title" content="Yehuda Amitzur — UX/UI Designer" />
+  <meta property="og:description" content="A UX/UI designer specializing in B2B systems, complex workflows, and conversion-driven experiences." />
+  <meta property="og:image" content="https://yeudaamitzur.github.io/og-cover.jpg?v=1" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Hey, I'm Yehuda Amitzur — UX/UI Designer, with the Talmind, Bianca and Design System case studies" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Yehuda Amitzur — UX/UI Designer" />
+  <meta name="twitter:description" content="A UX/UI designer specializing in B2B systems, complex workflows, and conversion-driven experiences." />
+  <meta name="twitter:image" content="https://yeudaamitzur.github.io/og-cover.jpg?v=1" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <!-- Hanken Grotesk as a variable range so the hero line can sit at 250 (lighter than the 300 static) -->

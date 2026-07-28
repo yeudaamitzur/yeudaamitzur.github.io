@@ -6,6 +6,23 @@
   <title>Talmind — Case study · Yehuda Amitzur</title>
   <meta name="description" content="Talmind — a tablet app that brings authentic Talmud study into Korean classrooms, teaching the questioning, reasoning mind behind it. A UX/UI case study by Yehuda Amitzur." />
 
+
+  <!-- Link previews — see the long note in index.html. The card image is this study's own tile. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Yehuda Amitzur" />
+  <meta property="og:url" content="https://yeudaamitzur.github.io/talmind.html" />
+  <meta property="og:title" content="Talmind — Case study · Yehuda Amitzur" />
+  <meta property="og:description" content="Talmind — a tablet app that brings authentic Talmud study into Korean classrooms, teaching the questioning, reasoning mind behind it. A UX/UI case study by Yehuda Amitzur." />
+  <meta property="og:image" content="https://yeudaamitzur.github.io/tile-talmind.jpg?v=1" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="750" />
+  <meta property="og:image:alt" content="The Talmind learning dashboard" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Talmind — Case study · Yehuda Amitzur" />
+  <meta name="twitter:description" content="Talmind — a tablet app that brings authentic Talmud study into Korean classrooms, teaching the questioning, reasoning mind behind it. A UX/UI case study by Yehuda Amitzur." />
+  <meta name="twitter:image" content="https://yeudaamitzur.github.io/tile-talmind.jpg?v=1" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -322,8 +339,10 @@
     /* ---- desktop: the four views share one cell; the ones still to come wait below the clip ---- */
     @media (min-width: 761px) {
       .tl-fsviews { display: grid; grid-template-areas: "v"; overflow: clip; overflow-clip-margin: 56px; }
-      /* three times the size out here — see the --dot note above */
-      .tl-dots { --dot: 33px; }
+      /* Out here they are twice the phone's size — 33px was a third too big, and the rail sat too
+         close to the card. The gap and the ring follow --dot on their own (see the note above),
+         so only these two numbers ever change. */
+      .tl-dots { --dot: 22px; margin-right: clamp(30px, 4.6vw, 64px); }
       /* The page-coloured backing is what lets a view hide the one it rose in front of. It is
          EXACTLY the frame's box (same left, same width, same top) plus the caption underneath, so
          it has to carry the frame's radius too — a square backing painted its own corners over the
