@@ -318,16 +318,27 @@
     /* ---- desktop: the four views share one cell; the ones still to come wait below the clip ---- */
     @media (min-width: 761px) {
       .tl-fsviews { display: grid; grid-template-areas: "v"; overflow: clip; overflow-clip-margin: 56px; }
-      /* the page-coloured backing is what lets a view hide the one it rose in front of */
-      .tl-fsview { grid-area: v; background: var(--bg); will-change: transform, opacity;
-        transition: transform .82s cubic-bezier(.2,.72,.2,1), opacity .42s ease; }
-      .tl-fsview.is-below { transform: translateY(116%); opacity: 0; }
-      /* Only the view you can actually see casts a shadow. All four sit in the same cell, and a
-         frame's shadow spills past its own backing, so leaving them all on stacked four shadows
-         around the top card and made its edge look muddy. */
-      .tl-fsview .tl-frame { box-shadow: none; }
-      .tl-fsview.is-on .tl-frame,
-      .tl-fsview.is-below .tl-frame { box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 10px 36px rgba(0,0,0,0.11); }
+      /* The page-coloured backing is what lets a view hide the one it rose in front of. It is
+         EXACTLY the frame's box (same left, same width, same top) plus the caption underneath, so
+         it has to carry the frame's radius too — a square backing painted its own corners over the
+         card behind it, and the rising card arrived with square shoulders sitting outside its
+         rounded ones. That is the "extra rectangular surface" that squared the corners off. */
+      .tl-fsview { grid-area: v; background: var(--bg); border-radius: clamp(20px, 2.4vw, 34px);
+        will-change: transform, opacity;
+        /* Opacity snaps solid at the START of a rise. It used to cross-fade over .42s of a .82s
+           trip, so for half the journey you were reading the outgoing screen straight through the
+           incoming one — the ghost is what made the change of view look unsettled. It rises from
+           outside the clip anyway, so it never needs to fade IN. */
+        transition: transform .82s cubic-bezier(.2,.72,.2,1), opacity .16s ease; }
+      /* going the other way it may fade as it drops, once it is on its way down */
+      .tl-fsview.is-below { transform: translateY(116%); opacity: 0;
+        transition: transform .82s cubic-bezier(.2,.72,.2,1), opacity .46s ease .2s; }
+      /* All four sit in the same cell and a frame's shadow spills past its own backing, so leaving
+         every shadow on stacks four of them around the top card. A view you have already passed
+         therefore drops its shadow — but only AFTER the card rising in front of it has arrived.
+         Killing it on the click (as before) popped the shadow off the card you were still looking at. */
+      .tl-fsview .tl-frame { transition: box-shadow .3s ease; }
+      .tl-fsview:not(.is-on):not(.is-below) .tl-frame { box-shadow: none; transition: box-shadow .24s ease .58s; }
     }
 
     /* ---- mobile: the same four views, swiped sideways, edge to edge ---- */
@@ -919,8 +930,15 @@
                   <div class="tl-frame__screen tl-screen--game" data-screen="game">
                     <img class="tl-frame__bg" src="talmind-game-empty.jpg" width="2400" height="1500" alt="Talmind drag-and-match game board" loading="lazy" />
                     <div class="tl-frame__scrim" aria-hidden="true"></div>
-                    <img class="tl-lift" data-lift src="talmind-drag-card.png" width="428" height="248" alt="" aria-hidden="true" style="--x:12.2%;--y:34.6%;--w:14.4%;--emph:1.12" />
-                    <img class="tl-lift" data-lift src="talmind-category-box.png" width="412" height="254" alt="" aria-hidden="true" style="--x:59%;--y:79%;--w:13.2%;--emph:1.12" />
+                    <!-- These two overlays fill the two holes in the empty board, so at rest they must be
+                         EXACTLY the size of the cards around them — they were ~13% small, which read as
+                         "the odd one out". The PNGs carry their own shadow padding, so --w sizes the whole
+                         PNG and the card body inside it comes out at the sibling's width:
+                         drag card   body 379 of 428 wide → 352/2400 of the board  → --w 16.56%
+                         category    body 363 of 412 wide → 342/2400 of the board  → --w 16.18%
+                         --x/--y are likewise the PNG's corner, i.e. the slot minus that padding. -->
+                    <img class="tl-lift" data-lift src="talmind-drag-card.png" width="428" height="248" alt="" aria-hidden="true" style="--x:10.99%;--y:33.12%;--w:16.56%;--emph:1.12" />
+                    <img class="tl-lift" data-lift src="talmind-category-box.png" width="412" height="254" alt="" aria-hidden="true" style="--x:57.56%;--y:78.31%;--w:16.18%;--emph:1.12" />
                   </div>
                   <button class="tl-zone tl-zone--prev" type="button" data-step="-1" aria-label="Previous note"><span class="tl-zone__i" aria-hidden="true">←</span></button>
                   <button class="tl-zone tl-zone--next" type="button" data-step="1" aria-label="Next note"><span class="tl-zone__i" aria-hidden="true">→</span></button>
@@ -1192,12 +1210,36 @@
         if (!v.raf) v.raf = requestAnimationFrame((t) => fsLoop(v, t));
       }
 
+      // ---- keep the four screenshots warm ----
+      // Views 1–3 wait 116% BELOW their cell, i.e. far outside the viewport, so `loading="lazy"`
+      // left their 2400×1500 backgrounds unfetched until the moment a dot was clicked: the card
+      // rose empty and grey, and the fetch + decode landed in the middle of the .82s transition.
+      // That was most of what read as "the new view doesn't come up smoothly". So the moment the
+      // section is anywhere near the screen we take all four off lazy and decode them up front —
+      // a reader who never reaches "Inside the project" still downloads nothing.
+      let fsWarmed = false;
+      function fsWarm() {
+        if (fsWarmed || !fshow) return;
+        fsWarmed = true;
+        fshow.querySelectorAll('.tl-frame__bg').forEach((img) => {
+          img.loading = 'eager';
+          if (img.decode) img.decode().catch(() => {});
+        });
+      }
+      if (fshow && 'IntersectionObserver' in window) {
+        const io = new IntersectionObserver((es) => {
+          if (es.some((e) => e.isIntersecting)) { fsWarm(); io.disconnect(); }
+        }, { rootMargin: '1200px 0px' });
+        io.observe(fshow);
+      } else { fsWarm(); }
+
       // ---- which of the four views is on show ----
       const fsMobile = () => window.matchMedia('(max-width: 760px)').matches;
       let fsActive = 0, fsScrollT = 0;
       const fsMarkDots = (n) => fsDots.forEach((d, i) => d.classList.toggle('is-active', i === n));
       function fsGoView(n, smooth) {
         if (!fsViews.length) return;
+        if (smooth) fsWarm();          // belt and braces; `smooth` means a person asked, not the boot call
         fsActive = clamp(n, 0, fsViews.length - 1);
         fsMarkDots(fsActive);
         fsViews.forEach((v) => v.el.classList.toggle('is-on', v.i === fsActive));   // only this one casts a shadow
