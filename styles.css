@@ -525,6 +525,9 @@ ul, ol { list-style: none; padding: 0; }
        row keeps headroom top and bottom instead of shaving the top edge off every card. */
     padding-block: 26px 14px;                    /* clears the 9px breathing lift + its shadow */
     scrollbar-width: none;                       /* no scrollbar under the tiles */
+    /* Without this, a drag that runs out of row keeps going into the page's own scroll — and on
+       iOS a drag that starts rightwards arms the back-swipe. Both read as the row resisting you. */
+    overscroll-behavior-x: contain;
   }
   .hero-work::-webkit-scrollbar { display: none; }
   .wtile { scroll-snap-align: center; }
@@ -533,6 +536,11 @@ ul, ol { list-style: none; padding: 0; }
   .wtile__frame { padding: 10px; border-radius: 20px; }
   .wtile__img { border-radius: 8px; }
 }
+
+/* While the phone's row is being dragged, the three tiles stop breathing — three large images
+   transform-animating under the thumb is compositor work the gesture is competing with. The class
+   goes on <html> from script.js on the row's first scroll event, and comes off once it settles. */
+.is-hswipe .wtile { animation-play-state: paused; }
 
 @media (prefers-reduced-motion: reduce) {
   .wtile { animation: none; }
@@ -624,10 +632,7 @@ ul, ol { list-style: none; padding: 0; }
 @media (max-width: 760px) {
   /* text first, then the cover: you read who is next, then see it */
   .nxt__link { grid-template-columns: 1fr; align-items: stretch; gap: 1.6rem; }
-  /* the cover stops short of the text column's edges and centres in it — at full width it read as
-     a screenshot of the next project, at this size it reads as a card standing for it.
-     justify-self, not margin: the row is a grid, and a stretched grid item ignores auto margins. */
-  .nxt__frame { width: min(84%, 340px); justify-self: center; padding: 10px; border-radius: 20px; }
+  .nxt__frame { width: 100%; padding: 10px; border-radius: 20px; }
   .nxt__img { border-radius: 8px; }
   .nxt__desc { max-width: none; }
   .nxt::before { background:

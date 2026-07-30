@@ -95,7 +95,10 @@ const hdrAvatarImg = document.querySelector('.hdr__avatar-img');
 // Both hero loops (the wordmark dots and the drifting halos) pause the moment the hero leaves the
 // viewport and resume when it comes back. There is nothing to look at while it is off screen, and
 // the frames they were spending are frames the browser can hand to the pointer instead.
-let heroOnScreen = true, dotsRaf = null, driftRaf = null;
+// They park for a second reason too: while the phone's project row is being dragged sideways.
+// See the .hero-work block near the end of this file.
+let heroOnScreen = true, heroBusy = false, dotsRaf = null, driftRaf = null;
+const heroLive = () => heroOnScreen && !heroBusy;
 let resumeDrift = () => {};   // assigned below, once the halos exist
 
 // ---- Two drifting halos that roam the whole hero ----
@@ -120,7 +123,7 @@ if ((orbA || orbB) && !reduced) {
       `translate(${((Math.sin(t) * 70 + Math.sin(t * 0.6) * 22) * ax).toFixed(1)}%, ${(Math.cos(t * 0.8) * 42 * ay).toFixed(1)}%) scale(${(1 + Math.sin(t * 0.5) * 0.12).toFixed(3)})`;
     if (orbB) orbB.style.transform =
       `translate(${((Math.cos(t * 0.7) * 66 - 12) * ax).toFixed(1)}%, ${(Math.sin(t * 0.9) * 40 * ay).toFixed(1)}%) scale(${(1 + Math.cos(t * 0.6) * 0.14).toFixed(3)})`;
-    driftRaf = heroOnScreen ? requestAnimationFrame(drift) : null;
+    driftRaf = heroLive() ? requestAnimationFrame(drift) : null;
   };
   driftRaf = requestAnimationFrame(drift);
   resumeDrift = () => { if (driftRaf === null) driftRaf = requestAnimationFrame(drift); };
@@ -282,7 +285,7 @@ function drawDots() {
   // unconditionally, so the wordmark canvas repainted every single frame for the whole session —
   // still burning the main thread while the reader was down at the footer, which is main-thread
   // time that is not going to their mouse. The footer particles already gate themselves this way.
-  if (!reduced && heroOnScreen) dotsRaf = requestAnimationFrame(drawDots); else dotsRaf = null;
+  if (!reduced && heroLive()) dotsRaf = requestAnimationFrame(drawDots); else dotsRaf = null;
 }
 
 if (canvas && ctx) {
@@ -309,6 +312,30 @@ if (hero && !reduced && 'IntersectionObserver' in window) {
     if (canvas && ctx && dotsRaf === null) dotsRaf = requestAnimationFrame(drawDots);
     resumeDrift();
   }, { threshold: 0 }).observe(hero);
+}
+
+// ---- Phones: hand the whole frame budget to the finger while the project row is being dragged ----
+// The tile strip sits INSIDE the hero, so a sideways drag happens while the wordmark canvas and the
+// two halos are both painting every frame and all three tiles are mid-breath — main-thread and
+// compositor work competing with the gesture itself, which is what made the row feel stiff under the
+// thumb. Same trade the observer above makes: no ambient motion is worth a frame the finger needs.
+// It parks on the first scroll event and comes back 220 ms after the row settles.
+const workRow = document.querySelector('.hero-work');
+if (workRow && !reduced) {
+  let settle = null;
+  workRow.addEventListener('scroll', () => {
+    if (!heroBusy) {
+      heroBusy = true;
+      document.documentElement.classList.add('is-hswipe');   // parks the tiles' breathing
+    }
+    clearTimeout(settle);
+    settle = setTimeout(() => {
+      heroBusy = false;
+      document.documentElement.classList.remove('is-hswipe');
+      if (canvas && ctx && dotsRaf === null) dotsRaf = requestAnimationFrame(drawDots);
+      resumeDrift();
+    }, 220);
+  }, { passive: true });
 }
 
 // ---- Phones: the wordmark colours itself in, then answers your finger ----
