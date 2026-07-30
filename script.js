@@ -47,12 +47,19 @@ const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2
 const POP_MS = 760;
 const popCurve = (t) => (t <= 0 || t >= 1) ? 0
   : (t < 0.38 ? easeOutCubic(t / 0.38) : 1 - easeInOutCubic((t - 0.38) / 0.62));
-// The phone's blink. A raised cosine: it leaves rest at zero speed, turns over at the top and
-// arrives back at zero speed, so the letter breathes to ink instead of snapping to it. The old
-// version set the dim to 1 and back to 0 as a step and let the colour easing absorb the edges,
-// which is what made it read as a flick.
-const BLINK_MS = 560;
-const blinkCurve = (t) => (t <= 0 || t >= 1) ? 0 : 0.5 - 0.5 * Math.cos(6.283185 * t);
+// The phone's blink: smoothstep down, HOLD at ink, smoothstep back up. Smoothstep has zero slope
+// at both ends, so the letter leaves and rejoins the purple without an edge — that is the soft part.
+// The hold in the middle is what makes it actually reach black: the colour itself eases at
+// 0.2/frame, and against a curve that only touches bottom for an instant (a plain raised cosine)
+// it bottomed out around 0.32 — a wash, not a letter turning black and coming back.
+const BLINK_MS = 820;
+const smoothstep = (k) => k * k * (3 - 2 * k);
+const blinkCurve = (t) => {
+  if (t <= 0 || t >= 1) return 0;
+  if (t < 0.30) return smoothstep(t / 0.30);            // down into ink
+  if (t < 0.62) return 1;                               // ...and sit there long enough to arrive
+  return 1 - smoothstep((t - 0.62) / 0.38);             // back up to purple
+};
 
 // ---- Floating pill header: collapse when scrolling down, re-expand when scrolling up ----
 const hdrFloat = document.querySelector('.hdr--float');
@@ -395,8 +402,9 @@ if (canvas && ctx && !reduced && hero && !window.matchMedia('(hover: hover) and 
   const PAINT_AT = 2260 + 1500, PER_LETTER = 105;
   const LETTER_SETTLE = 600;   // the last letter's colour easing still has to finish after its turn
   const HINT_WAIT = 1500;      // ...and then the line is simply left alone for a beat
-  const STEP_MS = 190, PASS_GAP = 3000;
-  let hintTimer = null, tapped = false;
+  const STEP_MS = 260, PASS_GAP = 3000;
+  let hintTimers = [], tapped = false;
+  const stopHint = () => { hintTimers.forEach(clearTimeout); hintTimers = []; };
 
   // The hint. Every other letter drops back to ink and returns, left to right — the skip is what
   // makes it read as a deliberate signal rather than the wordmark misbehaving. Each pass starts on
@@ -409,13 +417,14 @@ if (canvas && ctx && !reduced && hero && !window.matchMedia('(hover: hover) and 
     const ids = [];
     for (let i = parity; i < letters.length; i += 2) if (letterInk[i]) ids.push(i);
     if (!ids.length) return;
-    ids.forEach((li, n) => {
-      hintTimer = setTimeout(() => { if (!tapped) letterBlink[li] = performance.now(); }, n * STEP_MS);
-    });
+    // every id is kept, not just the last one: a tap has to be able to cancel the whole pass, and
+    // a single `hintTimer` variable only ever remembers the timer scheduled most recently
+    hintTimers = ids.map((li, n) =>
+      setTimeout(() => { letterBlink[li] = performance.now(); }, n * STEP_MS));
     // the gap is measured from the end of the wave, tail included, not from the last letter's start
-    hintTimer = setTimeout(() => {
-      if (!tapped) runHint(parity ? 0 : 1);
-    }, (ids.length - 1) * STEP_MS + BLINK_MS + PASS_GAP);
+    hintTimers.push(setTimeout(() => {
+      runHint(parity ? 0 : 1);
+    }, (ids.length - 1) * STEP_MS + BLINK_MS + PASS_GAP));
   }
 
   setTimeout(function paintIn() {
@@ -439,7 +448,7 @@ if (canvas && ctx && !reduced && hero && !window.matchMedia('(hover: hover) and 
         // flickering letters the reader has just set on purpose, which reads as a bug, not a cue.
         if (!tapped) {
           tapped = true;
-          clearTimeout(hintTimer);
+          stopHint();
           for (let j = 0; j < letterBlink.length; j++) { letterBlink[j] = 0; letterDim[j] = 0; }
         }
         letterOn[k] = letterOn[k] ? 0 : 1;
