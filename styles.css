@@ -624,7 +624,10 @@ ul, ol { list-style: none; padding: 0; }
 @media (max-width: 760px) {
   /* text first, then the cover: you read who is next, then see it */
   .nxt__link { grid-template-columns: 1fr; align-items: stretch; gap: 1.6rem; }
-  .nxt__frame { width: 100%; padding: 10px; border-radius: 20px; }
+  /* the cover stops short of the text column's edges and centres in it — at full width it read as
+     a screenshot of the next project, at this size it reads as a card standing for it.
+     justify-self, not margin: the row is a grid, and a stretched grid item ignores auto margins. */
+  .nxt__frame { width: min(84%, 340px); justify-self: center; padding: 10px; border-radius: 20px; }
   .nxt__img { border-radius: 8px; }
   .nxt__desc { max-width: none; }
   .nxt::before { background:
