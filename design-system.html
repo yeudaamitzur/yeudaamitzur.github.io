@@ -29,7 +29,7 @@
   <!-- favicon: the same ring as the site cursor — purple stroke, lighter purple fill -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
   <link rel="canonical" href="https://yeudaamitzur.github.io/design-system.html" />
-  <link rel="stylesheet" href="styles.css?v=35" />
+  <link rel="stylesheet" href="styles.css?v=36" />
 
   <style>
     /* =========================================================
@@ -200,11 +200,11 @@
 
     /* ---------- CTA (left-aligned, matches Talmind / Bianca) ---------- */
     /* the extra bottom room keeps the footer's ring pile (~56px tall) clear of the CTA and its links */
-    /* margin-top, not more padding: the closing rule has to sit clearly apart from the last
-       piece of content above it, instead of reading as that section's own bottom edge */
+    /* No hairline here any more. The rule that used to close this section now OPENS the
+       "Next project" hand-off above it, so the case study ends on one line instead of two
+       and the contact ask reads as part of the same closing move. See .nxt::after. */
     .ds-cta { margin-top: clamp(1.75rem, 4vw, 3.25rem);
-      padding-top: clamp(3.25rem, 6.5vw, 5.5rem); padding-bottom: calc(clamp(3.25rem, 6.5vw, 5.5rem) + 84px);
-      border-top: 1px solid var(--line-soft); }
+      padding-top: clamp(3.25rem, 6.5vw, 5.5rem); padding-bottom: calc(clamp(3.25rem, 6.5vw, 5.5rem) + 84px); }
     .ds-cta h2 { font-family: var(--f-display); font-weight: 700; font-size: clamp(2.2rem, 7vw, 4.5rem); letter-spacing: -0.03em; line-height: 1; max-width: 16ch; }
     .ds-cta .pill { margin-top: 2.25rem; }
     .ds-backall { display: inline-flex; align-items: center; gap: .5em; margin-top: 2.5rem; color: var(--ds-mut); font-family: var(--f-display); font-weight: 500; font-size: .95rem; transition: color .25s ease, gap .25s ease; }
@@ -259,7 +259,7 @@
         <nav class="hdr__nav" aria-label="Primary">
           <a href="index.html#top">Home</a>
           <a href="index.html#work">Work</a>
-          <a href="cv-yehuda-amitzur.pdf?v=35">CV</a>
+          <a href="cv-yehuda-amitzur.pdf?v=36">CV</a>
         </nav>
         <a class="hdr__cta" href="index.html#contact">Contact</a>
         <button class="hdr__menu" aria-label="Open menu" aria-expanded="false" aria-controls="hdr-drawer"><span></span><span></span></button>
@@ -273,7 +273,7 @@
       </div>
       <a href="index.html#top">Home</a>
       <a href="index.html#work">Projects</a>
-      <a href="cv-yehuda-amitzur.pdf?v=35">My cv</a>
+      <a href="cv-yehuda-amitzur.pdf?v=36">My cv</a>
       <a class="hdr__drawer-contact" href="index.html#contact">Contact</a>
     </div>
   </header>
@@ -437,6 +437,22 @@
       </div>
     </section>
 
+    <!-- ===== NEXT PROJECT — the loop, handed over before the contact ask ===== -->
+    <section class="nxt nxt--talmind" aria-label="Next project">
+      <div class="nxt__inner reveal">
+        <a class="nxt__link" href="talmind.html">
+          <span class="nxt__text">
+            <span class="nxt__label">Next project</span>
+            <span class="nxt__name">Talmind<i class="nxt__arrow" aria-hidden="true">→</i></span>
+            <span class="nxt__desc">A tablet learning app for Korean classrooms</span>
+          </span>
+          <span class="nxt__frame">
+            <img class="nxt__img" src="tile-talmind.jpg" width="1200" height="750" alt="" loading="lazy" />
+          </span>
+        </a>
+      </div>
+    </section>
+
     <!-- ===== CTA ===== -->
     <section class="ds-cta ds-wrap">
       <h2 class="reveal">Liked this project?<br>Let's talk.</h2>
@@ -453,7 +469,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=35"></script>
+  <script src="script.js?v=36"></script>
   <script>
     /* ---- Hero backdrop: a drifting field of settings cogs ----
        This is a page about a system, so the marks behind the title are the settings glyph:
@@ -630,7 +646,7 @@
       const targets = dots.map((d) => document.querySelector(d.getAttribute('href')));
       const revealSec = document.querySelector('#color');   // rail appears from Foundations onward
       const REVEAL = 0.15;   // ...meaning once Foundations has reached the top of the screen
-      const endSec = document.querySelector('.ds-cta');     // ...and ends with the content
+      const endSec = document.querySelector('.nxt');        // ...and ends with the content, at the hand-off
       const pgbar = document.querySelector('.pgbar');
       const pgfill = pgbar && pgbar.firstElementChild;
       function railUpdate() {

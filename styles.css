@@ -540,6 +540,104 @@ ul, ol { list-style: none; padding: 0; }
   .wtile:hover .wtile__frame, .wtile:active .wtile__frame { transform: none; }
 }
 
+/* =========================================================
+   Next project — the loop (shared by all three case studies)
+
+   Placement is the whole idea: this sits AFTER the last content
+   section and BEFORE "Liked this project? Let's talk." A reader
+   who has just finished a case study is still in browse mode, so
+   the next case is what they meet first; the contact ask stays
+   underneath as the floor, for the reader who declines it. Put
+   the other way round, the page has already ended by the time
+   the next project is offered.
+
+   It is deliberately NOT another button. There is no card, no
+   border and no rule — only a soft wash of the NEXT project's
+   own tint, so the bottom of every case study drifts into the
+   colour of the one it hands off to, and the cover is the exact
+   tile the reader already met in the homepage hero. One loud
+   thing per screen: the contact headline below stays the
+   largest type, this name sits a step under it.
+   ========================================================= */
+/* The extra air above the hand-off is MARGIN, not padding: the wash below is an inset overlay
+   centred on this box, so growing the padding would slide the glow off the content it belongs to.
+   Margin pushes the whole band down and leaves the wash sitting exactly where it should. */
+.nxt { position: relative; margin-top: clamp(3rem, 7vw, 5.5rem); padding-block: clamp(3.5rem, 8vw, 6.5rem); }
+/* The closing hairline — it used to open the contact CTA, and now opens the hand-off instead:
+   the case study ends at ONE line, and everything after it reads as a single closing move.
+   It is a pseudo-element, not a border, because the band is full-bleed while the rule has to
+   keep the wrap's geometry — 1180px centred, and edge to edge only once the viewport is
+   narrower than that. That is exactly the box the CTA's border-top used to span. */
+.nxt::after {
+  content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: min(1180px, 100%); height: 1px; background: var(--line-soft); pointer-events: none; z-index: 1;
+}
+/* The wash is an inset overlay, never a sized box — nothing here can widen the document.
+   Its vertical radius is deliberately small (58% of the height, transparent by 70% of that):
+   the ellipse has to reach zero INSIDE the section, or the section's own top and bottom edges
+   cut the gradient off mid-ramp and the "glow" turns back into a rectangle with two seams. */
+/* Two layers: a halo that gathers around the cover, and a wide veil underneath it so the whole
+   band — the text side included — shifts temperature rather than just glowing on the right. */
+.nxt::before {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(86% 58% at 66% 50%, var(--nx-wash) 0%, transparent 70%),
+    radial-gradient(120% 50% at 50% 50%, var(--nx-veil) 0%, transparent 74%);
+}
+.nxt__inner { position: relative; z-index: 1; width: 100%; max-width: 1180px; margin-inline: auto; padding-inline: var(--pad); }
+/* one link, whole row — on a phone the entire band is the tap target.
+   Grid, not space-between: the text column takes the leftover width so the description runs on
+   ONE line instead of breaking into a small stack that leaves the left half of the band empty. */
+.nxt__link { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: clamp(1.5rem, 5vw, 4rem); }
+.nxt__text { display: flex; flex-direction: column; align-items: flex-start; gap: .55rem; min-width: 0; }
+.nxt__label { font-family: var(--f-body); font-size: .72rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--brand); }
+.nxt__name { display: inline-flex; align-items: baseline; gap: .32em;
+  font-family: var(--f-display); font-weight: 700; font-size: clamp(2.1rem, 5vw, 3.6rem);
+  line-height: 1; letter-spacing: -0.03em; color: var(--ink); transition: color .25s ease; }
+.nxt__arrow { font-style: normal; font-size: .5em; transition: transform .38s cubic-bezier(.2,.7,.2,1); }
+/* 44ch clears the longest of the three one-liners, so none of them wraps */
+.nxt__desc { font-size: clamp(.95rem, 1.2vw, 1.08rem); line-height: 1.5; color: var(--ink-mute); max-width: 44ch; }
+/* same mat, same nested radii and same shadow as the homepage tile — this IS that tile */
+.nxt__frame { width: clamp(230px, 30vw, 400px);
+  padding: clamp(5px, .7vw, 9px); border-radius: clamp(14px, 1.7vw, 22px);
+  background: var(--nx-tint);
+  box-shadow: 0 2px 6px var(--nx-sh1), 0 18px 34px -16px var(--nx-sh2);
+  transition: transform .38s cubic-bezier(.2,.7,.2,1), box-shadow .38s ease; }
+.nxt__img { display: block; width: 100%; height: auto; border-radius: clamp(7px, .8vw, 10px); }
+
+@media (hover: hover) and (pointer: fine) {
+  .nxt__link:hover .nxt__frame { transform: translateY(-8px);
+    box-shadow: 0 4px 10px var(--nx-sh1), 0 30px 52px -18px var(--nx-sh2); }
+  .nxt__link:hover .nxt__name { color: var(--brand); }
+  .nxt__link:hover .nxt__arrow { transform: translateX(.35em); }
+}
+.nxt__link:active .nxt__frame { transform: translateY(-2px) scale(.988); transition-duration: .12s; }
+.nxt__link:focus-visible { outline: none; }
+.nxt__link:focus-visible .nxt__frame { outline: 2px solid var(--brand); outline-offset: 4px; }
+
+/* per-project tint — the same three palettes the homepage tiles carry, plus a wash:
+   the tile's own shadow hue, thinned until it only warms (or cools) the page behind it */
+.nxt--talmind { --nx-tint: linear-gradient(155deg, #D9DFF1, #F2F4FE); --nx-sh1: rgba(74,86,150,.16);  --nx-sh2: rgba(74,86,150,.42);  --nx-wash: rgba(74,86,150,.17);  --nx-veil: rgba(74,86,150,.10); }
+.nxt--bianca  { --nx-tint: linear-gradient(155deg, #F3E4D1, #F8F3EC); --nx-sh1: rgba(178,110,38,.16); --nx-sh2: rgba(178,110,38,.40); --nx-wash: rgba(196,124,44,.17); --nx-veil: rgba(196,124,44,.10); }
+.nxt--ds      { --nx-tint: linear-gradient(155deg, #B3ECCA, #EFFBF4); --nx-sh1: rgba(49,170,98,.16);  --nx-sh2: rgba(49,170,98,.40);  --nx-wash: rgba(49,170,98,.17);  --nx-veil: rgba(49,170,98,.11); }
+
+@media (max-width: 760px) {
+  /* text first, then the cover: you read who is next, then see it */
+  .nxt__link { grid-template-columns: 1fr; align-items: stretch; gap: 1.6rem; }
+  .nxt__frame { width: 100%; padding: 10px; border-radius: 20px; }
+  .nxt__img { border-radius: 8px; }
+  .nxt__desc { max-width: none; }
+  .nxt::before { background:
+      radial-gradient(130% 40% at 50% 64%, var(--nx-wash) 0%, transparent 72%),
+      radial-gradient(150% 46% at 50% 50%, var(--nx-veil) 0%, transparent 74%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nxt__frame, .nxt__name, .nxt__arrow { transition: none; }
+  .nxt__link:hover .nxt__frame, .nxt__link:active .nxt__frame { transform: none; }
+  .nxt__link:hover .nxt__arrow { transform: none; }
+}
+
 /* the stats band now sits after Experience, so it no longer needs the hero-veil gradient */
 .stats-sec { padding-block: clamp(2.5rem, 5vw, 4rem); }
 .stats {
