@@ -551,11 +551,6 @@ ul, ol { list-style: none; padding: 0; }
   .wtile__img { border-radius: 8px; }
 }
 
-/* While the phone's row is being dragged, the three tiles stop breathing — three large images
-   transform-animating under the thumb is compositor work the gesture is competing with. The class
-   goes on <html> from script.js on the row's first scroll event, and comes off once it settles. */
-.is-hswipe .wtile { animation-play-state: paused; }
-
 @media (prefers-reduced-motion: reduce) {
   .wtile { animation: none; }
   .wtile__frame, .wtile__name { transition: none; }

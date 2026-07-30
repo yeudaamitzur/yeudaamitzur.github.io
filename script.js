@@ -116,6 +116,10 @@ const hdrAvatarImg = document.querySelector('.hdr__avatar-img');
 // They park for a second reason too: while the phone's project row is being dragged sideways.
 // See the .hero-work block near the end of this file.
 let heroOnScreen = true, heroBusy = false, dotsRaf = null, driftRaf = null;
+// heroBusy parks the HALOS only. It used to park the wordmark canvas too, and that was wrong:
+// the letters were still colouring themselves in when the row was dragged, so the animation
+// visibly froze mid-sequence and picked up again afterwards. Nothing the reader is watching may
+// be stopped to buy frames — the halos drift behind everything and nobody can tell.
 const heroLive = () => heroOnScreen && !heroBusy;
 let resumeDrift = () => {};   // assigned below, once the halos exist
 
@@ -159,6 +163,11 @@ let dots = [], letters = [], letterHot = [], letterOn = [], letterLift = [], cw 
 // letterPop   = when the tap that is swelling this letter landed, 0 when idle → letterSwell (0..1)
 // letterInk   = does this index actually carry dots (false for the space)
 let letterDim = [], letterBlink = [], letterPop = [], letterSwell = [], letterInk = [];
+// letterTaps  = how many times this letter has been tapped, ever (not necessarily in a row)
+// letterBurst = when it shattered, 0 when intact  → letterGone once the debris has flown off
+let letterTaps = [], letterBurst = [], letterGone = [];
+let forceDraw = true;   // set whenever something changes outside the frame loop
+const BURST_MS = 1100;
 let textRight = 0, textMidY = 0, textH = 0, entryStart = 0, hoverLetter = -1, entryDone = false;
 let inkSprite = null, purpleSprite = null, spriteSize = 0;
 let mouseHX = -9999, mouseHY = -9999;   // cursor in hero coords (for the letter "push")
@@ -232,6 +241,12 @@ function buildDots() {
   letterBlink = new Array(letters.length).fill(0);
   letterPop = new Array(letters.length).fill(0);
   letterSwell = new Array(letters.length).fill(0);
+  letterBurst = new Array(letters.length).fill(0);
+  // a shattered letter stays shattered — a width change rebuilds the dots, it does not undo
+  // something the reader deliberately did
+  const prevGone = letterGone, prevTaps = letterTaps;
+  letterGone = new Array(letters.length).fill(false).map((v, i) => (prevGone && prevGone[i]) || false);
+  letterTaps = new Array(letters.length).fill(0).map((v, i) => (prevTaps && prevTaps[i]) || 0);
   letterOn = new Array(letters.length).fill(0).map((v, i) => (prevOn && prevOn[i]) || 0);
 
   const data = offx.getImageData(0, 0, cw, ch).data;
@@ -246,9 +261,13 @@ function buildDots() {
         let li = -1;
         for (let k = 0; k < letters.length; k++) { if (x >= letters[k].x0 && x < letters[k].x1) { li = k; break; } }
         const ang = Math.random() * 6.283, dist = 120 + Math.random() * maxDist;
+        const bang = Math.random() * 6.283, bspd = 180 + Math.random() * 520;
         // bias the scatter downward so the dots gather behind the project tiles as you scroll
         const oyBias = dist * 0.55;
-        dots.push({ hx: x, hy: y, li, ox: Math.cos(ang) * dist, oy: Math.sin(ang) * dist * 0.85 + oyBias, ph: Math.random() * 6.28, sp: 0.6 + Math.random() * 1.2, delay: Math.random() * 420, lx: 0, ly: 0 });
+        dots.push({ hx: x, hy: y, li, ox: Math.cos(ang) * dist, oy: Math.sin(ang) * dist * 0.85 + oyBias, ph: Math.random() * 6.28, sp: 0.6 + Math.random() * 1.2, delay: Math.random() * 420, lx: 0, ly: 0,
+          // where this dot goes when its letter is shattered: its own direction, its own speed,
+          // fixed at build time so the burst is the same explosion every frame it is drawn
+          bx: Math.cos(bang) * bspd, by: Math.sin(bang) * bspd });
       }
     }
   }
@@ -269,12 +288,16 @@ function buildDots() {
 
 function drawDots() {
   if (!ctx) return;
-  ctx.clearRect(0, 0, cw, ch);
+  // NOTE: the canvas is cleared further down, only once this frame has decided it is going to
+  // draw. Clearing up here would wipe the wordmark on every skipped frame and leave it blank.
   const now = performance.now(), nowS = now / 1000;
   if (!entryDone && now - entryStart > 1980) entryDone = true;   // the fly-in is a one-time event
   // disperse across the FULL height the canvas occupies (hero + its bleed under the stats bar),
   // so the dots are still visibly drifting for as long as any of them is on screen
   const scatter = clamp(window.scrollY / Math.max(1, ch * 0.9), 0, 1);
+  // scatter > 0 means the dots are dispersing AND wobbling; hoverLetter / mouseHX mean a cursor
+  // is working the letters. Any of those and the frame is live no matter what the letters say.
+  let busy = !entryDone || scatter > 0.0005 || hoverLetter >= 0 || mouseHX > -9000;
   for (let i = 0; i < letterHot.length; i++) {
     // Both of these are eased at 0.2/frame ON PURPOSE — Yehuda wants the wordmark to answer the
     // cursor slowly, so the dots swell and settle rather than snap. They were once sped up to
@@ -292,7 +315,24 @@ function drawDots() {
     // overwrite a letter the reader has toggled themselves.
     letterHot[i]  += ((letterOn[i] ? 1 : 0) * (1 - letterDim[i]) - letterHot[i]) * 0.2;   // colour — sticky
     letterLift[i] += ((i === hoverLetter ? 1 : 0) - letterLift[i]) * 0.2;   // motion — hover only
+    if (letterBurst[i] && now - letterBurst[i] > BURST_MS) {   // the debris has left the screen
+      letterBurst[i] = 0; letterGone[i] = true; forceDraw = true;
+    }
+    if (letterBlink[i] || letterPop[i] || letterBurst[i] || letterLift[i] > 0.002) busy = true;
+    if (Math.abs(letterHot[i] - (letterOn[i] ? 1 : 0) * (1 - letterDim[i])) > 0.002) busy = true;
   }
+
+  // Nothing is moving: every letter has reached its colour, none is blinking, swelling or
+  // shattering, the fly-in is over and the page has not scrolled — so `wob` is zero and this frame
+  // would be pixel-for-pixel the last one. Re-queue without touching the canvas.
+  //
+  // This replaces parking the loop during a sideways drag on the row, which is what used to buy
+  // those frames and cost the wordmark its animation. Skipping identical frames costs nothing
+  // visible and saves far more: the canvas used to repaint ~2700 sprites every frame for as long
+  // as the hero was on screen, including when it was completely still.
+  if (!busy && !forceDraw) { if (!reduced && heroOnScreen) dotsRaf = requestAnimationFrame(drawDots); else dotsRaf = null; return; }
+  forceDraw = false;
+  ctx.clearRect(0, 0, cw, ch);
 
   const half = spriteSize / 2, FADE = 190;   // px of self-fade at the canvas foot
   const hotDots = [];
@@ -308,6 +348,19 @@ function drawDots() {
     const swell = d.li >= 0 ? letterSwell[d.li] : 0;
     const fade = y > ch - FADE ? clamp((ch - y) / FADE, 0, 1) : 1;
     if (fade <= 0.01) continue;
+    if (d.li >= 0 && letterGone[d.li]) continue;                    // shattered — this dot is not coming back
+    // Mid-shatter: the dot runs off along its own vector and fades out. Handled here rather than in
+    // the hot pass below because it must ignore the swell and the hover lift entirely — it is no
+    // longer part of a letter, it is debris.
+    if (d.li >= 0 && letterBurst[d.li]) {
+      const bt = clamp((now - letterBurst[d.li]) / BURST_MS, 0, 1);
+      const k = easeOutCubic(bt), a = (1 - bt) * fade;
+      const bxp = x + d.bx * k, byp = y + d.by * k;
+      ctx.globalAlpha = a;
+      ctx.drawImage(inkSprite, bxp - half, byp - half, spriteSize, spriteSize);
+      if (hot > 0.03) { ctx.globalAlpha = a * hot; ctx.drawImage(purpleSprite, bxp - half, byp - half, spriteSize, spriteSize); }
+      continue;
+    }
     // `swell` is in this test on purpose: a letter tapped back to ink has hot ≈ 0, and without it
     // that letter would take the flat branch below and never animate.
     if (hot > 0.03 || lift > 0.03 || swell > 0.002) {
@@ -338,7 +391,7 @@ function drawDots() {
   // unconditionally, so the wordmark canvas repainted every single frame for the whole session —
   // still burning the main thread while the reader was down at the footer, which is main-thread
   // time that is not going to their mouse. The footer particles already gate themselves this way.
-  if (!reduced && heroLive()) dotsRaf = requestAnimationFrame(drawDots); else dotsRaf = null;
+  if (!reduced && heroOnScreen) dotsRaf = requestAnimationFrame(drawDots); else dotsRaf = null;
 }
 
 if (canvas && ctx) {
@@ -380,14 +433,10 @@ if (workRow && !reduced) {
   // still painting through the opening milliseconds of the drag — the part the hand actually
   // judges. This clears the frame budget the moment the finger lands, before anything has moved.
   const park = () => {
-    if (!heroBusy) { heroBusy = true; document.documentElement.classList.add('is-hswipe'); }
+    heroBusy = true;
     clearTimeout(settle);
-    settle = setTimeout(() => {
-      heroBusy = false;
-      document.documentElement.classList.remove('is-hswipe');
-      if (canvas && ctx && dotsRaf === null) dotsRaf = requestAnimationFrame(drawDots);
-      resumeDrift();
-    }, 400);   // long enough to cover the coast after the finger has already left
+    settle = setTimeout(() => { heroBusy = false; resumeDrift(); },
+      400);   // long enough to cover the coast after the finger has already left
   };
   workRow.addEventListener('touchstart', park, { passive: true });
   workRow.addEventListener('scroll', park, { passive: true });
@@ -453,8 +502,17 @@ if (canvas && ctx && !reduced && hero && !window.matchMedia('(hover: hover) and 
           stopHint();
           for (let j = 0; j < letterBlink.length; j++) { letterBlink[j] = 0; letterDim[j] = 0; }
         }
-        letterOn[k] = letterOn[k] ? 0 : 1;
-        letterPop[k] = performance.now();                             // and it swells under the thumb
+        if (letterGone[k]) break;                                     // nothing left there to press
+        letterTaps[k] = (letterTaps[k] || 0) + 1;
+        forceDraw = true;
+        if (letterTaps[k] >= 2) {
+          // Second press on this letter — whenever it comes, not necessarily the next tap — and it
+          // blows apart: every dot leaves on its own heading and the letter does not come back.
+          letterBurst[k] = performance.now();
+        } else {
+          letterOn[k] = letterOn[k] ? 0 : 1;
+          letterPop[k] = performance.now();                           // and it swells under the thumb
+        }
         break;
       }
     }
