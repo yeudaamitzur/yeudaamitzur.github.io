@@ -167,9 +167,10 @@ let letterDim = [], letterBlink = [], letterPop = [], letterSwell = [], letterIn
 // letterBurst = when it shattered, 0 when intact  → letterGone once the debris has flown off
 let letterTaps = [], letterBurst = [], letterGone = [];
 let forceDraw = true;   // set whenever something changes outside the frame loop
+let lastScatter = -1;   // so the first frame always counts as a change
 const BURST_MS = 1100;
 let textRight = 0, textMidY = 0, textH = 0, entryStart = 0, hoverLetter = -1, entryDone = false;
-let inkSprite = null, purpleSprite = null, spriteSize = 0;
+let inkSprite = null, purpleSprite = null, hotSprite = null, spriteSize = 0;
 let mouseHX = -9999, mouseHY = -9999;   // cursor in hero coords (for the letter "push")
 
 // Pre-render the dot + glowing-dot once, then blit with drawImage (fast, no per-frame blur)
@@ -188,6 +189,16 @@ function makeSprites() {
   const pc = purpleSprite.getContext('2d'); pc.scale(S, S);
   pc.fillStyle = '#B575DF';
   pc.beginPath(); pc.arc(spriteSize / 2, spriteSize / 2, dotR, 0, 6.283); pc.fill();
+
+  // A fully purple dot is drawn as ink first and purple over it at alpha 1 — two draws per dot,
+  // for every dot, in the state the phone sits in permanently once the wordmark has coloured
+  // itself in. This bakes that pair into one sprite. It is the same composite the runtime does,
+  // antialiased rim included, so it is pixel for pixel what was there before at half the calls.
+  hotSprite = document.createElement('canvas');
+  hotSprite.width = hotSprite.height = spriteSize * S;
+  const hc = hotSprite.getContext('2d'); hc.scale(S, S);
+  hc.drawImage(inkSprite, 0, 0, spriteSize, spriteSize);
+  hc.drawImage(purpleSprite, 0, 0, spriteSize, spriteSize);
 }
 
 function buildDots() {
@@ -297,7 +308,11 @@ function drawDots() {
   const scatter = clamp(window.scrollY / Math.max(1, ch * 0.9), 0, 1);
   // scatter > 0 means the dots are dispersing AND wobbling; hoverLetter / mouseHX mean a cursor
   // is working the letters. Any of those and the frame is live no matter what the letters say.
-  let busy = !entryDone || scatter > 0.0005 || hoverLetter >= 0 || mouseHX > -9000;
+  // `scatter !== lastScatter` is the one that matters on the way back up: the frame where scatter
+  // finally reaches 0 is the frame that puts every dot exactly on its letter. Testing only
+  // `scatter > 0` would skip it and leave the wordmark holding its last smeared frame.
+  let busy = !entryDone || scatter > 0.0005 || scatter !== lastScatter || hoverLetter >= 0 || mouseHX > -9000;
+  lastScatter = scatter;
   for (let i = 0; i < letterHot.length; i++) {
     // Both of these are eased at 0.2/frame ON PURPOSE — Yehuda wants the wordmark to answer the
     // cursor slowly, so the dots swell and settle rather than snap. They were once sped up to
@@ -341,8 +356,10 @@ function drawDots() {
     const entry = easeOutCubic(clamp((now - entryStart - d.delay) / 1500, 0, 1));
     const disperse = Math.max(1 - entry, scatter);
     const wob = 1.5 * disperse;   // ambient jitter only while flying in / scattering → dots sit perfectly still & crisp once settled
-    const x = d.hx + d.ox * disperse + Math.sin(nowS * d.sp + d.ph) * wob;
-    const y = d.hy + d.oy * disperse + Math.cos(nowS * d.sp * 0.9 + d.ph) * wob;
+    // settled is the common case: no disperse means no offset and no jitter, so skip the two trig
+    // calls per dot rather than computing a wobble that gets multiplied by zero
+    const x = wob ? d.hx + d.ox * disperse + Math.sin(nowS * d.sp + d.ph) * wob : d.hx;
+    const y = wob ? d.hy + d.oy * disperse + Math.cos(nowS * d.sp * 0.9 + d.ph) * wob : d.hy;
     const hot = d.li >= 0 ? letterHot[d.li] : 0;
     const lift = d.li >= 0 ? letterLift[d.li] : 0;
     const swell = d.li >= 0 ? letterSwell[d.li] : 0;
@@ -371,6 +388,7 @@ function drawDots() {
       ctx.drawImage(inkSprite, x - half, y - half, spriteSize, spriteSize);
     }
   }
+  const cursorOn = mouseHX > -9000;   // there is no cursor on a phone: skip the push maths entirely
   for (const d of hotDots) {
     let x = d._x, y = d._y;
     // A tapped letter swells around its OWN centre. Scaling the offset from L.cx/L.cy is what
@@ -381,10 +399,16 @@ function drawDots() {
       x = L.cx + (x - L.cx) * sc;
       y = L.cy + (y - L.cy) * sc;
     }
-    const dx = x - mouseHX, dy = y - mouseHY, dd = Math.hypot(dx, dy) || 1;   // cursor pushes the dots outward
-    if (dd < 90) { const push = (1 - dd / 90) * 24 * d._lift; x += dx / dd * push; y += dy / dd * push; }
-    ctx.globalAlpha = d._fade;          ctx.drawImage(inkSprite,    x - half, y - half, spriteSize, spriteSize);   // crisp base
-    ctx.globalAlpha = d._hot * d._fade; ctx.drawImage(purpleSprite, x - half, y - half, spriteSize, spriteSize);   // crisp purple — no blur/halo
+    if (cursorOn) {
+      const dx = x - mouseHX, dy = y - mouseHY, dd = Math.hypot(dx, dy) || 1;   // cursor pushes the dots outward
+      if (dd < 90) { const push = (1 - dd / 90) * 24 * d._lift; x += dx / dd * push; y += dy / dd * push; }
+    }
+    if (d._hot > 0.995) {                 // fully purple — one baked sprite instead of ink + purple
+      ctx.globalAlpha = d._fade;          ctx.drawImage(hotSprite, x - half, y - half, spriteSize, spriteSize);
+    } else {
+      ctx.globalAlpha = d._fade;          ctx.drawImage(inkSprite,    x - half, y - half, spriteSize, spriteSize);   // crisp base
+      ctx.globalAlpha = d._hot * d._fade; ctx.drawImage(purpleSprite, x - half, y - half, spriteSize, spriteSize);   // crisp purple — no blur/halo
+    }
   }
   ctx.globalAlpha = 1;
   // Only keep painting while the hero is actually on screen. This used to re-queue itself
