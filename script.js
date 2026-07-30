@@ -372,23 +372,25 @@ if (hero && !reduced && 'IntersectionObserver' in window) {
 // two halos are both painting every frame and all three tiles are mid-breath — main-thread and
 // compositor work competing with the gesture itself, which is what made the row feel stiff under the
 // thumb. Same trade the observer above makes: no ambient motion is worth a frame the finger needs.
-// It parks on the first scroll event and comes back 220 ms after the row settles.
+// It parks the moment a finger lands on the row and comes back 400 ms after it settles.
 const workRow = document.querySelector('.hero-work');
 if (workRow && !reduced) {
   let settle = null;
-  workRow.addEventListener('scroll', () => {
-    if (!heroBusy) {
-      heroBusy = true;
-      document.documentElement.classList.add('is-hswipe');   // parks the tiles' breathing
-    }
+  // touchstart, not scroll. Waiting for the first scroll event meant the canvas and the halos were
+  // still painting through the opening milliseconds of the drag — the part the hand actually
+  // judges. This clears the frame budget the moment the finger lands, before anything has moved.
+  const park = () => {
+    if (!heroBusy) { heroBusy = true; document.documentElement.classList.add('is-hswipe'); }
     clearTimeout(settle);
     settle = setTimeout(() => {
       heroBusy = false;
       document.documentElement.classList.remove('is-hswipe');
       if (canvas && ctx && dotsRaf === null) dotsRaf = requestAnimationFrame(drawDots);
       resumeDrift();
-    }, 220);
-  }, { passive: true });
+    }, 400);   // long enough to cover the coast after the finger has already left
+  };
+  workRow.addEventListener('touchstart', park, { passive: true });
+  workRow.addEventListener('scroll', park, { passive: true });
 }
 
 // ---- Phones: the wordmark colours itself in, hints that it is tappable, then answers your finger ----
