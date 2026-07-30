@@ -47,6 +47,12 @@ const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2
 const POP_MS = 760;
 const popCurve = (t) => (t <= 0 || t >= 1) ? 0
   : (t < 0.38 ? easeOutCubic(t / 0.38) : 1 - easeInOutCubic((t - 0.38) / 0.62));
+// The phone's blink. A raised cosine: it leaves rest at zero speed, turns over at the top and
+// arrives back at zero speed, so the letter breathes to ink instead of snapping to it. The old
+// version set the dim to 1 and back to 0 as a step and let the colour easing absorb the edges,
+// which is what made it read as a flick.
+const BLINK_MS = 560;
+const blinkCurve = (t) => (t <= 0 || t >= 1) ? 0 : 0.5 - 0.5 * Math.cos(6.283185 * t);
 
 // ---- Floating pill header: collapse when scrolling down, re-expand when scrolling up ----
 const hdrFloat = document.querySelector('.hdr--float');
@@ -140,10 +146,12 @@ const ctx = canvas ? canvas.getContext('2d') : null;
 const offc = document.createElement('canvas');
 const offx = offc.getContext('2d');
 let dots = [], letters = [], letterHot = [], letterOn = [], letterLift = [], cw = 0, ch = 0, dotR = 3;
-// letterDim = the phone's blink hint (1 = this letter is momentarily back to ink)
-// letterPop = the timestamp of the tap that is currently swelling this letter, 0 when idle
-// letterInk = does this index actually carry dots (false for the space)
-let letterDim = [], letterPop = [], letterSwell = [], letterInk = [];
+// The three timestamp/value pairs below all follow the same shape: the timestamp is the input the
+// scheduler writes, the value is what the frame loop derives from it through a curve.
+// letterBlink = when the hint started dimming this letter, 0 when idle  → letterDim  (0..1, ink)
+// letterPop   = when the tap that is swelling this letter landed, 0 when idle → letterSwell (0..1)
+// letterInk   = does this index actually carry dots (false for the space)
+let letterDim = [], letterBlink = [], letterPop = [], letterSwell = [], letterInk = [];
 let textRight = 0, textMidY = 0, textH = 0, entryStart = 0, hoverLetter = -1, entryDone = false;
 let inkSprite = null, purpleSprite = null, spriteSize = 0;
 let mouseHX = -9999, mouseHY = -9999;   // cursor in hero coords (for the letter "push")
@@ -214,6 +222,7 @@ function buildDots() {
   letterHot = new Array(letters.length).fill(0);
   letterLift = new Array(letters.length).fill(0);
   letterDim = new Array(letters.length).fill(0);
+  letterBlink = new Array(letters.length).fill(0);
   letterPop = new Array(letters.length).fill(0);
   letterSwell = new Array(letters.length).fill(0);
   letterOn = new Array(letters.length).fill(0).map((v, i) => (prevOn && prevOn[i]) || 0);
@@ -264,15 +273,18 @@ function drawDots() {
     // cursor slowly, so the dots swell and settle rather than snap. They were once sped up to
     // 0.5/instant to kill "lag"; that was the wrong call here and was put back. The no-lag rule
     // applies to the pointer follower (the photo), not to this.
-    // letterDim multiplies the TARGET rather than flipping letterOn, so the blink can never
-    // overwrite a letter the reader has toggled themselves. The 0.2 easing above is what
-    // turns a 150 ms dim into a soft dip to ink and back, instead of a hard strobe.
-    letterHot[i]  += ((letterOn[i] ? 1 : 0) * (1 - letterDim[i]) - letterHot[i]) * 0.2;   // colour — sticky
-    letterLift[i] += ((i === hoverLetter ? 1 : 0) - letterLift[i]) * 0.2;   // motion — hover only
-    // the tap swell is a property of the LETTER, so it is resolved once a frame here rather than
-    // per dot — there are a few thousand dots and only fourteen letters
+    // The swell and the blink are properties of the LETTER, so both are resolved once a frame here
+    // rather than per dot — there are a few thousand dots and only fourteen letters. They are
+    // resolved BEFORE letterHot below, which consumes letterDim in the same pass; computing them
+    // after would feed it last frame's value.
     letterSwell[i] = letterPop[i] ? popCurve((now - letterPop[i]) / POP_MS) : 0;
     if (letterPop[i] && now - letterPop[i] > POP_MS) letterPop[i] = 0;
+    letterDim[i] = letterBlink[i] ? blinkCurve((now - letterBlink[i]) / BLINK_MS) : 0;
+    if (letterBlink[i] && now - letterBlink[i] > BLINK_MS) letterBlink[i] = 0;
+    // letterDim multiplies the TARGET rather than flipping letterOn, so the blink can never
+    // overwrite a letter the reader has toggled themselves.
+    letterHot[i]  += ((letterOn[i] ? 1 : 0) * (1 - letterDim[i]) - letterHot[i]) * 0.2;   // colour — sticky
+    letterLift[i] += ((i === hoverLetter ? 1 : 0) - letterLift[i]) * 0.2;   // motion — hover only
   }
 
   const half = spriteSize / 2, FADE = 190;   // px of self-fade at the canvas foot
@@ -377,39 +389,42 @@ if (workRow && !reduced) {
 // another, left to right, and after that a tap on any letter toggles it back to ink — and back to
 // purple — for as long as you like.
 //
-// PAINT_AT is timed off the project tiles, not off load: the last tile starts at 2.26s and its
-// 1.5s rise is front-loaded, so it has visibly landed by ~3.2s. Starting the purple at 3.3s means
-// the wordmark picks up right as the row settles instead of leaving a dead beat between them.
+// PAINT_AT is the moment the project row finishes, not a round number: the third tile starts at
+// 2.26s and rises for 1.5s, so 3.76s is exactly when it lands. The wordmark takes over on that beat.
 if (canvas && ctx && !reduced && hero && !window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-  const PAINT_AT = 3300, PER_LETTER = 105;
-  const DIM_MS = 150, STEP_MS = 130, PASS_GAP = 1500;
+  const PAINT_AT = 2260 + 1500, PER_LETTER = 105;
+  const LETTER_SETTLE = 600;   // the last letter's colour easing still has to finish after its turn
+  const HINT_WAIT = 1500;      // ...and then the line is simply left alone for a beat
+  const STEP_MS = 190, PASS_GAP = 3000;
   let hintTimer = null, tapped = false;
 
-  // The hint. Every other letter drops back to ink for a moment and returns, left to right — the
-  // skip is what makes it read as a deliberate signal rather than the wordmark misbehaving. Each
-  // pass starts on the opposite letter to the last one, so over two passes the whole line has
-  // flickered; a fixed parity would mark the same half for ever and leave the rest looking dead.
+  // The hint. Every other letter drops back to ink and returns, left to right — the skip is what
+  // makes it read as a deliberate signal rather than the wordmark misbehaving. Each pass starts on
+  // the opposite letter to the last one, so over two passes the whole line has flickered; a fixed
+  // parity would mark the same half for ever and leave the rest looking dead.
+  //
+  // STEP_MS is deliberately shorter than BLINK_MS: each letter is still easing back up as the next
+  // one starts down, so the hint travels as one soft wave instead of a row of separate flicks.
   function runHint(parity) {
     const ids = [];
     for (let i = parity; i < letters.length; i += 2) if (letterInk[i]) ids.push(i);
     if (!ids.length) return;
     ids.forEach((li, n) => {
-      hintTimer = setTimeout(() => {
-        if (tapped) return;
-        letterDim[li] = 1;
-        setTimeout(() => { letterDim[li] = 0; }, DIM_MS);
-      }, n * STEP_MS);
+      hintTimer = setTimeout(() => { if (!tapped) letterBlink[li] = performance.now(); }, n * STEP_MS);
     });
+    // the gap is measured from the end of the wave, tail included, not from the last letter's start
     hintTimer = setTimeout(() => {
       if (!tapped) runHint(parity ? 0 : 1);
-    }, ids.length * STEP_MS + PASS_GAP);
+    }, (ids.length - 1) * STEP_MS + BLINK_MS + PASS_GAP);
   }
 
   setTimeout(function paintIn() {
     if (!letters.length) { setTimeout(paintIn, 200); return; }        // wait for the font/build
     letters.forEach((L, i) => setTimeout(() => { letterOn[i] = 1; }, i * PER_LETTER));
-    // the hint only starts once the last letter has actually taken its colour
-    setTimeout(() => { if (!tapped) runHint(0); }, letters.length * PER_LETTER + 700);
+    // the hint waits for the last letter to finish taking its colour, and then waits again — the
+    // line has to be allowed to just sit there fully purple before anything starts moving in it
+    setTimeout(() => { if (!tapped) runHint(0); },
+      (letters.length - 1) * PER_LETTER + LETTER_SETTLE + HINT_WAIT);
   }, PAINT_AT);
 
   hero.addEventListener('pointerdown', (e) => {
@@ -425,7 +440,7 @@ if (canvas && ctx && !reduced && hero && !window.matchMedia('(hover: hover) and 
         if (!tapped) {
           tapped = true;
           clearTimeout(hintTimer);
-          for (let j = 0; j < letterDim.length; j++) letterDim[j] = 0;
+          for (let j = 0; j < letterBlink.length; j++) { letterBlink[j] = 0; letterDim[j] = 0; }
         }
         letterOn[k] = letterOn[k] ? 0 : 1;
         letterPop[k] = performance.now();                             // and it swells under the thumb
