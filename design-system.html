@@ -29,7 +29,7 @@
   <!-- favicon: the same ring as the site cursor — purple stroke, lighter purple fill -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
   <link rel="canonical" href="https://yeudaamitzur.github.io/design-system.html" />
-  <link rel="stylesheet" href="styles.css?v=38" />
+  <link rel="stylesheet" href="styles.css?v=39" />
 
   <style>
     /* =========================================================
@@ -94,9 +94,11 @@
       font-size: clamp(1rem, 1.5vw, 1.2rem); line-height: 1.5; margin-top: 1.35rem; max-width: 46rem; }
     .ds-hero__sub b { color: var(--ink); font-weight: 600; }
     /* Hero art — the same two-beat opening as Bianca's dashboard: the title lands first, then
-       the art rises into place behind it. Quicker here, because this page's whole entrance is
-       quicker (its header arrives at .2s where Bianca's waits 1.5s) — the hero is resolved by
-       ~2s instead of Bianca's ~4.15s. It drifts with the cursor once it has settled.
+       the art rises into place behind it. Identical timing to .bn-tablet and .tl-tablet now
+       (1.15s rise, 2.2s in), so all three case studies open the same way — this page used to run
+       its own quicker entrance because its header arrived at .2s while the other two waited 1.5s,
+       and that reason is gone: every header now lands at .85s. It drifts with the cursor once it
+       has settled.
        The box-shadow sits on this element, not the <img>: this is the box with `overflow:
        hidden`, so a shadow on the child would be clipped away. */
     .ds-hero__shot { margin: clamp(2rem, 4.5vw, 3.25rem) auto 0;   /* centred */
@@ -104,7 +106,7 @@
       border-radius: clamp(12px, 1.5vw, 20px); overflow: hidden;   /* matches the image cards elsewhere */
       box-shadow: 0 44px 90px -46px rgba(40,37,30,0.55);           /* same lift as .bn-tablet__img */
       transform-style: preserve-3d; will-change: transform, opacity;
-      animation: dsShotIn .95s cubic-bezier(.2,.7,.2,1) 1.05s both; }
+      animation: dsShotIn 1.15s cubic-bezier(.2,.7,.2,1) 2.2s both; }
     .ds-hero__shot img { display: block; width: 100%; height: auto; border-radius: inherit; }
     @keyframes dsShotIn {
       from { opacity: 0; transform: translateY(72px) scale(1.1); }
@@ -222,7 +224,10 @@
     .ds-rail__dot.is-done { background: var(--brand); box-shadow: 0 0 0 2px var(--brand); }
     .ds-rail__dot.is-active { background: var(--brand); box-shadow: 0 0 0 4px var(--brand-soft); transform: scale(1.55); }
 
-    .ds .hdr--float { animation: hdrIn 1.15s cubic-bezier(.2,.7,.2,1) .2s both; }
+    /* One delay across all three case studies. Design System opened at .2s and the other two
+       at 1.5s, so the header arrived at a different moment depending on which project you
+       clicked; .85s is the midpoint, and the pill now lands the same way every time. */
+    .ds .hdr--float { animation: hdrIn 1.15s cubic-bezier(.2,.7,.2,1) .85s both; }
 
     /* ---------- Responsive ---------- */
     @media (max-width: 1024px) { .ds-rail { display: none; } }
@@ -259,7 +264,7 @@
         <nav class="hdr__nav" aria-label="Primary">
           <a href="index.html#top">Home</a>
           <a href="index.html#work">Work</a>
-          <a href="cv-yehuda-amitzur.pdf?v=38">CV</a>
+          <a href="cv-yehuda-amitzur.pdf?v=39">CV</a>
         </nav>
         <a class="hdr__cta" href="index.html#contact">Contact</a>
         <button class="hdr__menu" aria-label="Open menu" aria-expanded="false" aria-controls="hdr-drawer"><span></span><span></span></button>
@@ -273,7 +278,7 @@
       </div>
       <a href="index.html#top">Home</a>
       <a href="index.html#work">Projects</a>
-      <a href="cv-yehuda-amitzur.pdf?v=38">My cv</a>
+      <a href="cv-yehuda-amitzur.pdf?v=39">My cv</a>
       <a class="hdr__drawer-contact" href="index.html#contact">Contact</a>
     </div>
   </header>
@@ -469,7 +474,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=38"></script>
+  <script src="script.js?v=39"></script>
   <script>
     /* ---- Hero backdrop: a drifting field of settings cogs ----
        This is a page about a system, so the marks behind the title are the settings glyph:

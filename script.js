@@ -42,6 +42,11 @@ const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
 const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+// A tap swell: out fast, back slowly. Not a sine — a sine leaves at full speed and arrives at
+// full speed, which reads as a twitch. This one eases out of rest and settles back into it.
+const POP_MS = 760;
+const popCurve = (t) => (t <= 0 || t >= 1) ? 0
+  : (t < 0.38 ? easeOutCubic(t / 0.38) : 1 - easeInOutCubic((t - 0.38) / 0.62));
 
 // ---- Floating pill header: collapse when scrolling down, re-expand when scrolling up ----
 const hdrFloat = document.querySelector('.hdr--float');
@@ -135,6 +140,10 @@ const ctx = canvas ? canvas.getContext('2d') : null;
 const offc = document.createElement('canvas');
 const offx = offc.getContext('2d');
 let dots = [], letters = [], letterHot = [], letterOn = [], letterLift = [], cw = 0, ch = 0, dotR = 3;
+// letterDim = the phone's blink hint (1 = this letter is momentarily back to ink)
+// letterPop = the timestamp of the tap that is currently swelling this letter, 0 when idle
+// letterInk = does this index actually carry dots (false for the space)
+let letterDim = [], letterPop = [], letterSwell = [], letterInk = [];
 let textRight = 0, textMidY = 0, textH = 0, entryStart = 0, hoverLetter = -1, entryDone = false;
 let inkSprite = null, purpleSprite = null, spriteSize = 0;
 let mouseHX = -9999, mouseHY = -9999;   // cursor in hero coords (for the letter "push")
@@ -204,6 +213,9 @@ function buildDots() {
   const prevOn = letterOn;
   letterHot = new Array(letters.length).fill(0);
   letterLift = new Array(letters.length).fill(0);
+  letterDim = new Array(letters.length).fill(0);
+  letterPop = new Array(letters.length).fill(0);
+  letterSwell = new Array(letters.length).fill(0);
   letterOn = new Array(letters.length).fill(0).map((v, i) => (prevOn && prevOn[i]) || 0);
 
   const data = offx.getImageData(0, 0, cw, ch).data;
@@ -227,6 +239,10 @@ function buildDots() {
   const sums = {};
   dots.forEach((d) => { if (d.li < 0) return; const s = sums[d.li] || (sums[d.li] = { x: 0, y: 0, n: 0 }); s.x += d.hx; s.y += d.hy; s.n++; });
   letters.forEach((L, i) => { const s = sums[i]; if (s) { L.cx = s.x / s.n; L.cy = s.y / s.n; } });
+  // "UX/UI Designer" has a space in it, and a space owns a slice of the line with no dots in it.
+  // The phone's blink walks this list, not the raw string, so the hint never spends a beat on
+  // nothing — and a tap that lands in the gap doesn't silently toggle an invisible letter.
+  letterInk = letters.map((L, i) => !!sums[i]);
   dots.forEach((d) => { if (d.li >= 0) { const L = letters[d.li]; let vx = d.hx - L.cx, vy = d.hy - L.cy; const m = Math.hypot(vx, vy) || 1; d.lx = vx / m; d.ly = vy / m; } });
 
   makeSprites();
@@ -248,8 +264,15 @@ function drawDots() {
     // cursor slowly, so the dots swell and settle rather than snap. They were once sped up to
     // 0.5/instant to kill "lag"; that was the wrong call here and was put back. The no-lag rule
     // applies to the pointer follower (the photo), not to this.
-    letterHot[i]  += ((letterOn[i] ? 1 : 0) - letterHot[i]) * 0.2;          // colour — sticky
+    // letterDim multiplies the TARGET rather than flipping letterOn, so the blink can never
+    // overwrite a letter the reader has toggled themselves. The 0.2 easing above is what
+    // turns a 150 ms dim into a soft dip to ink and back, instead of a hard strobe.
+    letterHot[i]  += ((letterOn[i] ? 1 : 0) * (1 - letterDim[i]) - letterHot[i]) * 0.2;   // colour — sticky
     letterLift[i] += ((i === hoverLetter ? 1 : 0) - letterLift[i]) * 0.2;   // motion — hover only
+    // the tap swell is a property of the LETTER, so it is resolved once a frame here rather than
+    // per dot — there are a few thousand dots and only fourteen letters
+    letterSwell[i] = letterPop[i] ? popCurve((now - letterPop[i]) / POP_MS) : 0;
+    if (letterPop[i] && now - letterPop[i] > POP_MS) letterPop[i] = 0;
   }
 
   const half = spriteSize / 2, FADE = 190;   // px of self-fade at the canvas foot
@@ -263,11 +286,14 @@ function drawDots() {
     const y = d.hy + d.oy * disperse + Math.cos(nowS * d.sp * 0.9 + d.ph) * wob;
     const hot = d.li >= 0 ? letterHot[d.li] : 0;
     const lift = d.li >= 0 ? letterLift[d.li] : 0;
+    const swell = d.li >= 0 ? letterSwell[d.li] : 0;
     const fade = y > ch - FADE ? clamp((ch - y) / FADE, 0, 1) : 1;
     if (fade <= 0.01) continue;
-    if (hot > 0.03 || lift > 0.03) {
+    // `swell` is in this test on purpose: a letter tapped back to ink has hot ≈ 0, and without it
+    // that letter would take the flat branch below and never animate.
+    if (hot > 0.03 || lift > 0.03 || swell > 0.002) {
       d._x = x + d.lx * 11 * lift; d._y = y - 20 * lift + d.ly * 11 * lift;
-      d._hot = hot; d._lift = lift; d._fade = fade; hotDots.push(d);
+      d._hot = hot; d._lift = lift; d._swell = swell; d._fade = fade; hotDots.push(d);
     } else {
       ctx.globalAlpha = fade;
       ctx.drawImage(inkSprite, x - half, y - half, spriteSize, spriteSize);
@@ -275,6 +301,14 @@ function drawDots() {
   }
   for (const d of hotDots) {
     let x = d._x, y = d._y;
+    // A tapped letter swells around its OWN centre. Scaling the offset from L.cx/L.cy is what
+    // makes it a letter getting bigger; nudging every dot the same distance outward (which is what
+    // the hover lift does, on purpose) only puffs the outline and leaves the letter the same size.
+    if (d._swell > 0) {
+      const L = letters[d.li], sc = 1 + 0.17 * d._swell;
+      x = L.cx + (x - L.cx) * sc;
+      y = L.cy + (y - L.cy) * sc;
+    }
     const dx = x - mouseHX, dy = y - mouseHY, dd = Math.hypot(dx, dy) || 1;   // cursor pushes the dots outward
     if (dd < 90) { const push = (1 - dd / 90) * 24 * d._lift; x += dx / dd * push; y += dy / dd * push; }
     ctx.globalAlpha = d._fade;          ctx.drawImage(inkSprite,    x - half, y - half, spriteSize, spriteSize);   // crisp base
@@ -338,15 +372,44 @@ if (workRow && !reduced) {
   }, { passive: true });
 }
 
-// ---- Phones: the wordmark colours itself in, then answers your finger ----
-// There is no cursor to run across the letters, so once the project tiles have finished landing
-// (~3.8s) the letters take the brand purple one after another, left to right. After that a tap
-// on any letter toggles it back to ink — and back to purple — for as long as you like.
+// ---- Phones: the wordmark colours itself in, hints that it is tappable, then answers your finger ----
+// There is no cursor to run across the letters, so the letters take the brand purple one after
+// another, left to right, and after that a tap on any letter toggles it back to ink — and back to
+// purple — for as long as you like.
+//
+// PAINT_AT is timed off the project tiles, not off load: the last tile starts at 2.26s and its
+// 1.5s rise is front-loaded, so it has visibly landed by ~3.2s. Starting the purple at 3.3s means
+// the wordmark picks up right as the row settles instead of leaving a dead beat between them.
 if (canvas && ctx && !reduced && hero && !window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-  const PAINT_AT = 4000, PER_LETTER = 105;
+  const PAINT_AT = 3300, PER_LETTER = 105;
+  const DIM_MS = 150, STEP_MS = 130, PASS_GAP = 1500;
+  let hintTimer = null, tapped = false;
+
+  // The hint. Every other letter drops back to ink for a moment and returns, left to right — the
+  // skip is what makes it read as a deliberate signal rather than the wordmark misbehaving. Each
+  // pass starts on the opposite letter to the last one, so over two passes the whole line has
+  // flickered; a fixed parity would mark the same half for ever and leave the rest looking dead.
+  function runHint(parity) {
+    const ids = [];
+    for (let i = parity; i < letters.length; i += 2) if (letterInk[i]) ids.push(i);
+    if (!ids.length) return;
+    ids.forEach((li, n) => {
+      hintTimer = setTimeout(() => {
+        if (tapped) return;
+        letterDim[li] = 1;
+        setTimeout(() => { letterDim[li] = 0; }, DIM_MS);
+      }, n * STEP_MS);
+    });
+    hintTimer = setTimeout(() => {
+      if (!tapped) runHint(parity ? 0 : 1);
+    }, ids.length * STEP_MS + PASS_GAP);
+  }
+
   setTimeout(function paintIn() {
     if (!letters.length) { setTimeout(paintIn, 200); return; }        // wait for the font/build
     letters.forEach((L, i) => setTimeout(() => { letterOn[i] = 1; }, i * PER_LETTER));
+    // the hint only starts once the last letter has actually taken its colour
+    setTimeout(() => { if (!tapped) runHint(0); }, letters.length * PER_LETTER + 700);
   }, PAINT_AT);
 
   hero.addEventListener('pointerdown', (e) => {
@@ -355,7 +418,19 @@ if (canvas && ctx && !reduced && hero && !window.matchMedia('(hover: hover) and 
     const x = e.clientX - r.left, y = e.clientY - r.top;
     if (Math.abs(y - textMidY) > textH * 0.55) return;                // only taps on the wordmark itself
     for (let k = 0; k < letters.length; k++) {
-      if (x >= letters[k].x0 && x < letters[k].x1) { letterOn[k] = letterOn[k] ? 0 : 1; break; }
+      if (!letterInk[k]) continue;                                    // the space is not a letter
+      if (x >= letters[k].x0 && x < letters[k].x1) {
+        // The hint has done its job the moment it is answered. Leaving it running would keep
+        // flickering letters the reader has just set on purpose, which reads as a bug, not a cue.
+        if (!tapped) {
+          tapped = true;
+          clearTimeout(hintTimer);
+          for (let j = 0; j < letterDim.length; j++) letterDim[j] = 0;
+        }
+        letterOn[k] = letterOn[k] ? 0 : 1;
+        letterPop[k] = performance.now();                             // and it swells under the thumb
+        break;
+      }
     }
   }, { passive: true });
 }

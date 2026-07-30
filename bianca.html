@@ -32,8 +32,8 @@
   <!-- The hero dashboard is the largest thing on the first screen; without this the
        browser only discovers it after the CSS has parsed, by which time the hero video
        is already pulling. -->
-  <link rel="preload" as="image" href="bianca-hero.webp?v=38" fetchpriority="high" />
-  <link rel="stylesheet" href="styles.css?v=38" />
+  <link rel="preload" as="image" href="bianca-hero.webp?v=39" fetchpriority="high" />
+  <link rel="stylesheet" href="styles.css?v=39" />
 
   <style>
     /* =========================================================
@@ -254,7 +254,10 @@
        ========================================================= */
     /* Header pill glass + shape are shared (styles.css) so every page matches;
        here we only delay the entrance for the load sequence. */
-    .bn .hdr--float { animation: hdrIn 1.15s cubic-bezier(.2,.7,.2,1) 1.5s both; }
+    /* One delay across all three case studies. Design System opened at .2s and the other two
+       at 1.5s, so the header arrived at a different moment depending on which project you
+       clicked; .85s is the midpoint, and the pill now lands the same way every time. */
+    .bn .hdr--float { animation: hdrIn 1.15s cubic-bezier(.2,.7,.2,1) .85s both; }
 
     /* ---------- Responsive ---------- */
     @media (max-width: 1024px) { .bn-rail { display: none; } }
@@ -286,7 +289,7 @@
         <nav class="hdr__nav" aria-label="Primary">
           <a href="index.html#top">Home</a>
           <a href="index.html#work">Work</a>
-          <a href="cv-yehuda-amitzur.pdf?v=38">CV</a>
+          <a href="cv-yehuda-amitzur.pdf?v=39">CV</a>
         </nav>
         <a class="hdr__cta" href="index.html#contact">Contact</a>
         <button class="hdr__menu" aria-label="Open menu" aria-expanded="false" aria-controls="hdr-drawer"><span></span><span></span></button>
@@ -303,7 +306,7 @@
       <a href="index.html#top">Home</a>
       <a href="index.html#about">About</a>
       <a href="index.html#work">Projects</a>
-      <a href="cv-yehuda-amitzur.pdf?v=38">My cv</a>
+      <a href="cv-yehuda-amitzur.pdf?v=39">My cv</a>
       <a class="hdr__drawer-contact" href="index.html#contact">Contact</a>
     </div>
   </header>
@@ -339,7 +342,7 @@
              4459px wide and 2.4 MB — five times the pixels this can ever show, downloaded on
              every visit while it raced the hero video for bandwidth. bianca-hero.jpg is still
              on disk, untouched, as the master. -->
-        <img class="bn-tablet__img" src="bianca-hero.webp?v=38" width="1600" height="1400"
+        <img class="bn-tablet__img" src="bianca-hero.webp?v=39" width="1600" height="1400"
              fetchpriority="high" decoding="async"
              alt="The Bianca restaurant management dashboard" />
       </div>
@@ -534,7 +537,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=38"></script>
+  <script src="script.js?v=39"></script>
   <script>
     /* ---- Bianca case-study interactions (page-scoped) ---- */
     (function () {
