@@ -507,7 +507,17 @@ ul, ol { list-style: none; padding: 0; }
 @media (max-width: 700px) {
   .hero-work {
     grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 62vw;
-    overflow-x: auto; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch;
+    /* No scroll-snap. Snapping is what made this row feel like it was fighting the thumb: a flick
+       builds momentum and the snap immediately arrests it and drags the nearest tile to centre,
+       so the strip could never coast. Even `proximity` caught nearly every flick, because 62vw
+       tiles mean you always land near a snap point. Free momentum is the whole point of a strip
+       you push.
+       overflow-y is pinned to hidden ON PURPOSE: `overflow-x: auto` alone computes overflow-y to
+       auto as well, which makes this a two-axis scroller — and a two-axis scroller has to watch
+       the first few pixels of every touch to decide which way you meant. That wait is felt as
+       stickiness at the start of the drag, and it also let the row swallow vertical drags that
+       belonged to the page. Locked to one axis, the browser commits to the pan immediately. */
+    overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch;
     /* edge to edge: the row runs the full width of the phone with no side gutter, so the
        tiles are cut by the screen edges and read as a strip you can push. The hero is a
        centred flex column, so the row has to stretch out of that centring, not just take
@@ -530,7 +540,11 @@ ul, ol { list-style: none; padding: 0; }
     overscroll-behavior-x: contain;
   }
   .hero-work::-webkit-scrollbar { display: none; }
-  .wtile { scroll-snap-align: center; }
+  /* Phones drop the breathing float entirely. Pausing it once the drag had already started was
+     always a beat late — the first touch still landed on three transform-animating images, and
+     that first beat is exactly what the hand judges. A strip you push should be still until you
+     push it; the float stays on desktop, where nothing is competing with it. */
+  .wtile { animation-name: wtIn; animation-duration: 1.5s; }
   /* the grey mat around each screenshot is the frame you actually see on a phone — at 5px it
      read as a hairline, so it gets real width here */
   .wtile__frame { padding: 10px; border-radius: 20px; }
