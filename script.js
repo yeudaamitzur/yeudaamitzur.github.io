@@ -826,23 +826,31 @@ if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
 
   document.addEventListener('pointermove', (e) => {
     if (e.pointerType === 'touch') return;
+    // which letter is under the cursor (+ feed the cursor position to the dots)
+    const hr = heroRect();
+    const lx = e.clientX - hr.left;
+    let col = -1;
     if (overLine2(e.clientX, e.clientY)) {
+      for (let k = 0; k < letters.length; k++) { if (lx >= letters[k].x0 && lx < letters[k].x1) { col = k; break; } }
+    }
+    // The photo answers the WORDMARK, so it may only come out where there is wordmark left to
+    // answer. Being inside the line's box is not enough: a shattered letter leaves a hole, and the
+    // line box also runs on past where the right-aligned text starts. Handing the photo to either
+    // of those is what looked broken — it sat over blank canvas as if a letter were still there.
+    // The space between the two words is NOT a hole: it is part of the line and keeps the photo,
+    // so crossing between "UI" and "Designer" does not send it home and back.
+    if (col >= 0 && !letterGone[col]) {
       if (!active) flyOut(e.clientX, e.clientY);
       else {
         tx = e.clientX; ty = e.clientY;
         // locked = it IS the cursor now, so draw it in this event, not on the next frame
         if (locked) { cx = tx; cy = ty; render(); } else kick();
       }
-      // which letter is under the cursor (+ feed the cursor position to the dots)
-      const hr = heroRect();
-      const lx = e.clientX - hr.left;
       mouseHX = lx; mouseHY = e.clientY - hr.top;
-      let found = -1;
-      for (let k = 0; k < letters.length; k++) { if (lx >= letters[k].x0 && lx < letters[k].x1) { found = k; break; } }
       // toggle on ENTER only: a touched letter turns purple and stays purple until touched again
-      if (found !== hoverLetter) {
-        if (found >= 0 && letterOn.length > found) letterOn[found] = letterOn[found] ? 0 : 1;
-        hoverLetter = found;
+      if (col !== hoverLetter) {
+        if (letterOn.length > col) letterOn[col] = letterOn[col] ? 0 : 1;
+        hoverLetter = col;
       }
     } else {
       if (active) flyHome();
@@ -865,6 +873,17 @@ if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
     letterBurst[k] = performance.now();
     letterTaps[k] = (letterTaps[k] || 0) + 1;
     forceDraw = true;
+    // The letter the photo is sitting on is now on its way out, and the reader's hand is still.
+    // Nothing will fire another pointermove, so the check up there would never re-run and the photo
+    // would stay parked over the hole until they happened to move. Watch for the moment the letter
+    // is written off — it is counted, not timed, so there is no duration to hard-code — and let go
+    // then. Always terminates: a burst always finishes.
+    const watch = setInterval(() => {
+      if (!letterGone[k]) return;
+      clearInterval(watch);
+      if (hoverLetter === k) { hoverLetter = -1; mouseHX = -9999; mouseHY = -9999; forceDraw = true; }
+      if (active) flyHome();
+    }, 150);
   }, { passive: true });
 
   window.addEventListener('blur', () => { if (active) flyHome(); hoverLetter = -1; mouseHX = -9999; mouseHY = -9999; });
