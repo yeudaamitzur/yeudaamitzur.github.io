@@ -165,13 +165,16 @@ let dots = [], letters = [], letterHot = [], letterOn = [], letterLift = [], cw 
 let letterDim = [], letterBlink = [], letterPop = [], letterSwell = [], letterInk = [];
 // letterTaps  = how many times this letter has been tapped, ever (not necessarily in a row)
 // letterBurst = when it shattered, 0 when intact  → letterGone once the debris has flown off
-let letterTaps = [], letterBurst = [], letterGone = [];
+// burstDrawn  = how many of its dots the last frame actually painted; 0 means the debris is gone
+let letterTaps = [], letterBurst = [], letterGone = [], burstDrawn = [];
 let forceDraw = true;   // set whenever something changes outside the frame loop
 let lastScatter = -1;   // so the first frame always counts as a change
-// The shatter runs long on purpose: the KICK is over in a couple of frames so the click lands
-// instantly, and the rest of the window is the debris floating out of the canvas. BURST_STAGGER is
-// the spread of per-dot start times — without it the letter leaves as one rigid slab.
-const BURST_MS = 1600, BURST_STAGGER = 140;
+// BURST_MS is the SHAPE of the throw, not its end: the kick is spent inside it and the drift
+// carries on at a steady speed afterwards until the dot is off the canvas. It is not a deadline
+// and nothing is culled by it — see burstDrawn in drawDots. BURST_STAGGER is the spread of per-dot
+// start times; without it the letter leaves as one rigid slab. BFADE is the only alpha left in the
+// whole burst, and it is a property of the canvas FOOT, not of the flight.
+const BURST_MS = 1600, BURST_STAGGER = 140, BFADE = 48;
 let textRight = 0, textMidY = 0, textH = 0, entryStart = 0, hoverLetter = -1, entryDone = false;
 let inkSprite = null, purpleSprite = null, hotSprite = null, spriteSize = 0;
 let mouseHX = -9999, mouseHY = -9999;   // cursor in hero coords (for the letter "push")
@@ -237,14 +240,113 @@ function buildDots() {
   offx.clearRect(0, 0, cw, ch);
   offx.fillStyle = '#000';
   setFont(offx);
-  offx.textBaseline = 'middle'; offx.textAlign = 'right';
-  offx.fillText(TEXT, textRight, textMidY);
+  offx.textBaseline = 'middle'; offx.textAlign = 'left';
 
+  // The "/" in Hanken Grotesk hangs a long way below the baseline — measured at a 200px font its
+  // ink box runs -85.9 to +95.8 around the draw point while the capitals either side run -85.9 to
+  // +56.6, so its centre sits ~10% of the font size BELOW theirs and it reads as a slash that has
+  // slipped down the line. This puts its ink box back on the centre of the cap band. Measured off
+  // the font rather than typed in as a number, so it stays right at every size the hero picks.
+  const inkMid = (m) => (m.actualBoundingBoxDescent - m.actualBoundingBoxAscent) / 2;
+  const capMid = inkMid(offx.measureText(TEXT.replace(/[^A-Z]/g, '') || 'H'));
+  const slashDY = capMid - inkMid(offx.measureText('/'));
+
+  // Each character is placed on its own, not handed to one fillText of the whole string. Two things
+  // need that: the "/" cannot be nudged inside a single fillText, and every dot has to know which
+  // GLYPH painted it (see `owner` below). Checked against the single-fillText version at 200px:
+  // 900 pixels out of 77,456 differ and not one of them by more than a fraction of an alpha step —
+  // there is no kerning in this line for a per-character layout to lose.
   letters = [];
   const leftEdge = textRight - tw;
+  const charX = [];
   for (let i = 0; i < TEXT.length; i++) {
-    letters.push({ x0: leftEdge + offx.measureText(TEXT.slice(0, i)).width, x1: leftEdge + offx.measureText(TEXT.slice(0, i + 1)).width, cx: 0, cy: textMidY });
+    const x0 = leftEdge + offx.measureText(TEXT.slice(0, i)).width;
+    charX.push(x0);
+    letters.push({ x0, x1: leftEdge + offx.measureText(TEXT.slice(0, i + 1)).width, cx: 0, cy: textMidY });
   }
+  const bandTop = clamp(Math.round(textMidY - textH), 0, ch);
+  const bandH = clamp(Math.round(textH * 2), 1, ch - bandTop);
+
+  const drawGlyph = (i, dx, dy) => offx.fillText(TEXT[i], charX[i] + dx, textMidY + dy);
+  // the slice of canvas a glyph's ink actually lands on — its advance box is not it, the "/" alone
+  // hangs a good 12px to the left of where it is placed
+  const glyphBox = (i, dx) => {
+    const gm = offx.measureText(TEXT[i]);
+    return { x0: clamp(Math.floor(charX[i] + dx - gm.actualBoundingBoxLeft) - 3, 0, cw),
+             x1: clamp(Math.ceil(charX[i] + dx + gm.actualBoundingBoxRight) + 3, 0, cw) };
+  };
+  // draw one glyph on its own and report, for every row, its leftmost and rightmost inked column
+  const scanRows = (i, dx, dy) => {
+    const L = new Int32Array(bandH).fill(-1), R = new Int32Array(bandH).fill(-1);
+    const b = glyphBox(i, dx), w = b.x1 - b.x0;
+    if (w <= 0) return { L, R };
+    offx.clearRect(b.x0, bandTop, w, bandH);
+    drawGlyph(i, dx, dy);
+    const gd = offx.getImageData(b.x0, bandTop, w, bandH).data;
+    for (let gy = 0; gy < bandH; gy++) {
+      for (let gx = 0; gx < w; gx++) {
+        if (gd[(gy * w + gx) * 4 + 3] > 120) { if (L[gy] < 0) L[gy] = b.x0 + gx; R[gy] = b.x0 + gx; }
+      }
+    }
+    return { L, R };
+  };
+
+  // The "/" also sits hard against the X on its left while leaving a hole on its right — measured
+  // at a 200px font the X side is 0px of clearance and the U side is 25px, which is why it looks
+  // stuck to the X. "How close do these two shapes actually come" is a question about outlines,
+  // not about metrics — both glyphs lean, so their closest approach is nowhere near their bounding
+  // boxes — so it is measured row by row off the pixels. Moving the slash by half the difference
+  // makes the two gaps equal without changing the total space the pair occupies.
+  let slashDX = 0;
+  const si = TEXT.indexOf('/');
+  if (si > 0 && si < TEXT.length - 1) {
+    const before = scanRows(si - 1, 0, 0), slash = scanRows(si, 0, slashDY), after = scanRows(si + 1, 0, 0);
+    const minGap = (p, q) => {
+      let g = Infinity;
+      for (let y = 0; y < bandH; y++) if (p.R[y] >= 0 && q.L[y] >= 0) g = Math.min(g, q.L[y] - p.R[y]);
+      return g;
+    };
+    const gl = minGap(before, slash), gr = minGap(slash, after);
+    if (isFinite(gl) && isFinite(gr)) slashDX = (gr - gl) / 2;
+  }
+  const charDX = [], charDY = [];
+  for (let i = 0; i < TEXT.length; i++) {
+    charDX.push(TEXT[i] === '/' ? slashDX : 0);
+    charDY.push(TEXT[i] === '/' ? slashDY : 0);
+  }
+  const paintChar = (i) => drawGlyph(i, charDX[i], charDY[i]);
+
+  // Which glyph painted which pixel. The old code answered this with the letters' advance columns,
+  // and for a leaning glyph that is simply wrong: the whole lower half of the "/" sits inside the
+  // X's advance box, so those dots belonged to the X — the slash's tail lit up, swelled and flew
+  // away with the X instead of with itself. Ownership is taken from the glyphs themselves, one
+  // draw at a time, and only over the band the type occupies.
+  const owner = new Int8Array(cw * bandH).fill(-1);
+  const ownerA = new Uint8Array(cw * bandH);
+  for (let i = 0; i < TEXT.length; i++) {
+    if (TEXT[i] === ' ') continue;
+    // read back only this glyph's own bounding box, not the whole band — on a wide monitor the
+    // difference is 18M pixel reads versus about one text width's worth
+    const b = glyphBox(i, charDX[i]);
+    const gw = b.x1 - b.x0;
+    if (gw <= 0) continue;
+    // clearing exactly what is about to be drawn and read is what keeps the previous glyph — which
+    // overlaps this one's box — from being counted as ink here
+    offx.clearRect(b.x0, bandTop, gw, bandH);
+    paintChar(i);
+    const gd = offx.getImageData(b.x0, bandTop, gw, bandH).data;
+    for (let gy = 0; gy < bandH; gy++) {
+      for (let gx = 0; gx < gw; gx++) {
+        const a = gd[(gy * gw + gx) * 4 + 3];
+        if (!a) continue;
+        const p = gy * cw + (b.x0 + gx);
+        if (a > ownerA[p]) { ownerA[p] = a; owner[p] = i; }   // where two glyphs overlap, the more solid one owns the pixel
+      }
+    }
+  }
+
+  offx.clearRect(0, 0, cw, ch);
+  for (let i = 0; i < TEXT.length; i++) { if (TEXT[i] !== ' ') paintChar(i); }
   // letterHot = eased COLOUR (sticky: stays purple until the letter is touched again)
   // letterLift = eased MOTION (only while the cursor is actually on the letter)
   // letterOn   = the toggled purple state itself, preserved across rebuilds where possible
@@ -256,6 +358,7 @@ function buildDots() {
   letterPop = new Array(letters.length).fill(0);
   letterSwell = new Array(letters.length).fill(0);
   letterBurst = new Array(letters.length).fill(0);
+  burstDrawn = new Array(letters.length).fill(0);
   // a shattered letter stays shattered — a width change rebuilds the dots, it does not undo
   // something the reader deliberately did
   const prevGone = letterGone, prevTaps = letterTaps;
@@ -272,8 +375,8 @@ function buildDots() {
   for (let y = 0; y < ch; y += stepPx) {
     for (let x = 0; x < cw; x += stepPx) {
       if (data[(y * cw + x) * 4 + 3] > 130) {
-        let li = -1;
-        for (let k = 0; k < letters.length; k++) { if (x >= letters[k].x0 && x < letters[k].x1) { li = k; break; } }
+        const bandY = y - bandTop;
+        const li = (bandY >= 0 && bandY < bandH) ? owner[bandY * cw + x] : -1;
         const ang = Math.random() * 6.283, dist = 120 + Math.random() * maxDist;
         const bang = Math.random() * 6.283, bspd = 300 + Math.random() * 800;
         // bias the scatter downward so the dots gather behind the project tiles as you scroll
@@ -299,6 +402,11 @@ function buildDots() {
   // Only the FIRST build plays the fly-in. A later rebuild (a real width change) re-seats the
   // dots already assembled, so scrolling never replays the assembly animation.
   entryStart = entryDone ? performance.now() - 3000 : performance.now();
+  // A rebuild resizes the canvas, and resizing a canvas wipes it. Without this the next frame
+  // sees a settled wordmark that has not moved, takes the skip-identical-frames path, and never
+  // repaints — so a width change left the hero blank until something else happened to mark the
+  // frame busy. Nothing outside the loop may change the dots without saying so.
+  forceDraw = true;
 }
 
 function drawDots() {
@@ -334,9 +442,7 @@ function drawDots() {
     // overwrite a letter the reader has toggled themselves.
     letterHot[i]  += ((letterOn[i] ? 1 : 0) * (1 - letterDim[i]) - letterHot[i]) * 0.2;   // colour — sticky
     letterLift[i] += ((i === hoverLetter ? 1 : 0) - letterLift[i]) * 0.2;   // motion — hover only
-    if (letterBurst[i] && now - letterBurst[i] > BURST_MS + BURST_STAGGER) {   // the debris has left the screen
-      letterBurst[i] = 0; letterGone[i] = true; forceDraw = true;
-    }
+    if (letterBurst[i]) burstDrawn[i] = 0;   // recounted by the dot loop below
     if (letterBlink[i] || letterPop[i] || letterBurst[i] || letterLift[i] > 0.002) busy = true;
     if (Math.abs(letterHot[i] - (letterOn[i] ? 1 : 0) * (1 - letterDim[i])) > 0.002) busy = true;
   }
@@ -370,29 +476,42 @@ function drawDots() {
     const fade = y > ch - FADE ? clamp((ch - y) / FADE, 0, 1) : 1;
     if (fade <= 0.01) continue;
     if (d.li >= 0 && letterGone[d.li]) continue;                    // shattered — this dot is not coming back
-    // Mid-shatter: the dot runs off along its own vector and fades out. Handled here rather than in
-    // the hot pass below because it must ignore the swell and the hover lift entirely — it is no
-    // longer part of a letter, it is debris.
+    // Mid-shatter: the dot runs off along its own vector until it is out of the frame. Handled here
+    // rather than in the hot pass below because it must ignore the swell and the hover lift
+    // entirely — it is no longer part of a letter, it is debris.
     if (d.li >= 0 && letterBurst[d.li]) {
       const el = now - letterBurst[d.li] - d.bd;   // this dot's own clock — see BURST_STAGGER
       if (el > 0) {
-        const bt = clamp(el / BURST_MS, 0, 1);
+        const bt = el / BURST_MS;               // NOT clamped — see `glide` below
+        const kt = bt < 1 ? bt : 1;
         // Two motions, added. `kick` spends almost all of itself in the first ~200ms: that is the
         // answer to the click, and it has to be over before the reader can register it as a delay.
         // `glide` is linear and never decays, so once the kick has spent itself the debris is still
         // travelling — it drifts out of the canvas instead of parking mid-air the way a lone
-        // easeOutCubic did, which is what made the old burst read as "stopped" halfway.
-        const kick = 1 - Math.pow(1 - bt, 6);
+        // easeOutCubic did, which is what made the old burst read as "stopped" halfway. Letting bt
+        // run past 1 is what carries the slow dots off the edge: they keep the SAME steady speed
+        // they already had, for as long as it takes. Speeding them up instead is what made this
+        // read as nervous rather than calm, and it is not to be done again.
+        const kick = 1 - Math.pow(1 - kt, 6);
         const travel = 0.42 * kick + 0.58 * bt;
         // ...and on top of that a slow sway plus a little lift, so the flight is a float rather
-        // than fourteen hundred dots on rails. Both grow with bt: nothing sways at the instant of
-        // the hit, everything is drifting by the end.
-        const sway = Math.sin(nowS * d.sp * 1.4 + d.ph) * 16 * bt;
-        const rise = -34 * bt * bt;
-        // full ink for the first half of the flight, then out — so they leave the frame rather
-        // than dissolving on the spot the moment they are hit
-        const a = Math.pow(clamp((1 - bt) / 0.5, 0, 1), 1.4) * fade;
+        // than fourteen hundred dots on rails. Both grow with kt: nothing sways at the instant of
+        // the hit, everything is drifting by the end — and both stop growing once the throw is
+        // over, so a long straggler drifts straight instead of wandering further and further.
+        const sway = Math.sin(nowS * d.sp * 1.4 + d.ph) * 16 * kt;
+        const rise = -34 * kt * kt;
         const bxp = x + d.bx * travel + sway, byp = y + d.by * travel + rise;
+        // NO opacity fade on the way out — Yehuda's call, and he is right: a dot that dims while it
+        // is still on screen reads as the letter evaporating, not as it being thrown. Every dot
+        // holds full ink until it is off the canvas, and then it simply stops being drawn. Left,
+        // right and top the canvas edge IS the screen edge, so that cull is invisible.
+        if (bxp < -half || bxp > cw + half || byp < -half) continue;
+        // The foot is the one edge that sits mid-page rather than off it, so a hard cut there would
+        // be a visible line under the project tiles. BFADE is deliberately short — a couple of dot
+        // widths, a dot slipping under the page rather than a dot fading out.
+        const a = byp > ch - BFADE ? (ch - byp) / BFADE : 1;
+        if (a <= 0.01) continue;
+        burstDrawn[d.li]++;                     // this letter still has debris on screen
         ctx.globalAlpha = a;
         ctx.drawImage(inkSprite, bxp - half, byp - half, spriteSize, spriteSize);
         if (hot > 0.03) { ctx.globalAlpha = a * hot; ctx.drawImage(purpleSprite, bxp - half, byp - half, spriteSize, spriteSize); }
@@ -433,6 +552,15 @@ function drawDots() {
     }
   }
   ctx.globalAlpha = 1;
+  // A shattered letter is written off once its last dot has actually left the canvas — counted,
+  // not timed. A timer has to guess how long the slowest dot needs, and guessing short deletes
+  // debris that is still on screen at full ink. That pop is exactly what the opacity fade used to
+  // hide, so with the fade gone the count is the only honest way to decide it is over.
+  for (let i = 0; i < letterBurst.length; i++) {
+    if (letterBurst[i] && now - letterBurst[i] > BURST_STAGGER && !burstDrawn[i]) {
+      letterBurst[i] = 0; letterGone[i] = true; forceDraw = true;
+    }
+  }
   // Only keep painting while the hero is actually on screen. This used to re-queue itself
   // unconditionally, so the wordmark canvas repainted every single frame for the whole session —
   // still burning the main thread while the reader was down at the footer, which is main-thread
