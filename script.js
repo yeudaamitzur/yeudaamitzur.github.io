@@ -168,7 +168,10 @@ let letterDim = [], letterBlink = [], letterPop = [], letterSwell = [], letterIn
 let letterTaps = [], letterBurst = [], letterGone = [];
 let forceDraw = true;   // set whenever something changes outside the frame loop
 let lastScatter = -1;   // so the first frame always counts as a change
-const BURST_MS = 1100;
+// The shatter runs long on purpose: the KICK is over in a couple of frames so the click lands
+// instantly, and the rest of the window is the debris floating out of the canvas. BURST_STAGGER is
+// the spread of per-dot start times — without it the letter leaves as one rigid slab.
+const BURST_MS = 1600, BURST_STAGGER = 140;
 let textRight = 0, textMidY = 0, textH = 0, entryStart = 0, hoverLetter = -1, entryDone = false;
 let inkSprite = null, purpleSprite = null, hotSprite = null, spriteSize = 0;
 let mouseHX = -9999, mouseHY = -9999;   // cursor in hero coords (for the letter "push")
@@ -272,13 +275,14 @@ function buildDots() {
         let li = -1;
         for (let k = 0; k < letters.length; k++) { if (x >= letters[k].x0 && x < letters[k].x1) { li = k; break; } }
         const ang = Math.random() * 6.283, dist = 120 + Math.random() * maxDist;
-        const bang = Math.random() * 6.283, bspd = 180 + Math.random() * 520;
+        const bang = Math.random() * 6.283, bspd = 300 + Math.random() * 800;
         // bias the scatter downward so the dots gather behind the project tiles as you scroll
         const oyBias = dist * 0.55;
         dots.push({ hx: x, hy: y, li, ox: Math.cos(ang) * dist, oy: Math.sin(ang) * dist * 0.85 + oyBias, ph: Math.random() * 6.28, sp: 0.6 + Math.random() * 1.2, delay: Math.random() * 420, lx: 0, ly: 0,
-          // where this dot goes when its letter is shattered: its own direction, its own speed,
-          // fixed at build time so the burst is the same explosion every frame it is drawn
-          bx: Math.cos(bang) * bspd, by: Math.sin(bang) * bspd });
+          // where this dot goes when its letter is shattered: its own direction, its own speed and
+          // its own moment of letting go, fixed at build time so the burst is the same explosion
+          // every frame it is drawn
+          bx: Math.cos(bang) * bspd, by: Math.sin(bang) * bspd, bd: Math.random() * BURST_STAGGER });
       }
     }
   }
@@ -330,7 +334,7 @@ function drawDots() {
     // overwrite a letter the reader has toggled themselves.
     letterHot[i]  += ((letterOn[i] ? 1 : 0) * (1 - letterDim[i]) - letterHot[i]) * 0.2;   // colour — sticky
     letterLift[i] += ((i === hoverLetter ? 1 : 0) - letterLift[i]) * 0.2;   // motion — hover only
-    if (letterBurst[i] && now - letterBurst[i] > BURST_MS) {   // the debris has left the screen
+    if (letterBurst[i] && now - letterBurst[i] > BURST_MS + BURST_STAGGER) {   // the debris has left the screen
       letterBurst[i] = 0; letterGone[i] = true; forceDraw = true;
     }
     if (letterBlink[i] || letterPop[i] || letterBurst[i] || letterLift[i] > 0.002) busy = true;
@@ -370,13 +374,31 @@ function drawDots() {
     // the hot pass below because it must ignore the swell and the hover lift entirely — it is no
     // longer part of a letter, it is debris.
     if (d.li >= 0 && letterBurst[d.li]) {
-      const bt = clamp((now - letterBurst[d.li]) / BURST_MS, 0, 1);
-      const k = easeOutCubic(bt), a = (1 - bt) * fade;
-      const bxp = x + d.bx * k, byp = y + d.by * k;
-      ctx.globalAlpha = a;
-      ctx.drawImage(inkSprite, bxp - half, byp - half, spriteSize, spriteSize);
-      if (hot > 0.03) { ctx.globalAlpha = a * hot; ctx.drawImage(purpleSprite, bxp - half, byp - half, spriteSize, spriteSize); }
-      continue;
+      const el = now - letterBurst[d.li] - d.bd;   // this dot's own clock — see BURST_STAGGER
+      if (el > 0) {
+        const bt = clamp(el / BURST_MS, 0, 1);
+        // Two motions, added. `kick` spends almost all of itself in the first ~200ms: that is the
+        // answer to the click, and it has to be over before the reader can register it as a delay.
+        // `glide` is linear and never decays, so once the kick has spent itself the debris is still
+        // travelling — it drifts out of the canvas instead of parking mid-air the way a lone
+        // easeOutCubic did, which is what made the old burst read as "stopped" halfway.
+        const kick = 1 - Math.pow(1 - bt, 6);
+        const travel = 0.42 * kick + 0.58 * bt;
+        // ...and on top of that a slow sway plus a little lift, so the flight is a float rather
+        // than fourteen hundred dots on rails. Both grow with bt: nothing sways at the instant of
+        // the hit, everything is drifting by the end.
+        const sway = Math.sin(nowS * d.sp * 1.4 + d.ph) * 16 * bt;
+        const rise = -34 * bt * bt;
+        // full ink for the first half of the flight, then out — so they leave the frame rather
+        // than dissolving on the spot the moment they are hit
+        const a = Math.pow(clamp((1 - bt) / 0.5, 0, 1), 1.4) * fade;
+        const bxp = x + d.bx * travel + sway, byp = y + d.by * travel + rise;
+        ctx.globalAlpha = a;
+        ctx.drawImage(inkSprite, bxp - half, byp - half, spriteSize, spriteSize);
+        if (hot > 0.03) { ctx.globalAlpha = a * hot; ctx.drawImage(purpleSprite, bxp - half, byp - half, spriteSize, spriteSize); }
+        continue;
+      }
+      // still waiting its turn — falls through and is drawn in place, part of the letter
     }
     // `swell` is in this test on purpose: a letter tapped back to ink has hot ≈ 0, and without it
     // that letter would take the flat branch below and never animate.
@@ -699,6 +721,24 @@ if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
       hoverLetter = -1; mouseHX = -9999; mouseHY = -9999;
     }
   }, { passive: true });   // never calls preventDefault — let the browser composite without waiting on it
+
+  // ---- Click a letter and it comes apart ----
+  // The phone gets there on the second tap, because the first one is how you colour a letter in.
+  // With a mouse the colour is already handled by running across the letters, so a click has nothing
+  // else to mean and shatters straight away.
+  //
+  // `pointerdown`, not `click`: the letter has to start leaving on the way DOWN. Waiting for the
+  // release puts the length of the press between the reader and the response, and that is the whole
+  // of the effect — press, and it is already flying.
+  document.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'touch' || e.button !== 0) return;
+    const k = hoverLetter;   // kept up to date by the pointermove above; only ever set over line2
+    if (k < 0 || !letterInk[k] || letterGone[k] || letterBurst[k]) return;
+    letterBurst[k] = performance.now();
+    letterTaps[k] = (letterTaps[k] || 0) + 1;
+    forceDraw = true;
+  }, { passive: true });
+
   window.addEventListener('blur', () => { if (active) flyHome(); hoverLetter = -1; mouseHX = -9999; mouseHY = -9999; });
 }
 
