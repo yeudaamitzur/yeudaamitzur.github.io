@@ -839,7 +839,12 @@ if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
     // of those is what looked broken — it sat over blank canvas as if a letter were still there.
     // The space between the two words is NOT a hole: it is part of the line and keeps the photo,
     // so crossing between "UI" and "Designer" does not send it home and back.
-    if (col >= 0 && !letterGone[col]) {
+    //
+    // letterBurst is in this test alongside letterGone, and that is the whole point: a letter is
+    // not "there" from the moment it is HIT, but letterGone is only written two seconds later when
+    // the last of the debris has left the canvas. Testing letterGone alone meant the photo went on
+    // treating an empty slot as a letter for the entire length of the flight.
+    if (col >= 0 && !letterGone[col] && !letterBurst[col]) {
       if (!active) flyOut(e.clientX, e.clientY);
       else {
         tx = e.clientX; ty = e.clientY;
@@ -873,17 +878,12 @@ if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
     letterBurst[k] = performance.now();
     letterTaps[k] = (letterTaps[k] || 0) + 1;
     forceDraw = true;
-    // The letter the photo is sitting on is now on its way out, and the reader's hand is still.
-    // Nothing will fire another pointermove, so the check up there would never re-run and the photo
-    // would stay parked over the hole until they happened to move. Watch for the moment the letter
-    // is written off — it is counted, not timed, so there is no duration to hard-code — and let go
-    // then. Always terminates: a burst always finishes.
-    const watch = setInterval(() => {
-      if (!letterGone[k]) return;
-      clearInterval(watch);
-      if (hoverLetter === k) { hoverLetter = -1; mouseHX = -9999; mouseHY = -9999; forceDraw = true; }
-      if (active) flyHome();
-    }, 150);
+    // The letter the photo is sitting on has just left, and the reader's hand is still — no further
+    // pointermove is coming to re-run the check above. So let go right here, in the same event as
+    // the click. This used to poll for letterGone instead, which put the whole flight plus a poll
+    // interval between the letter leaving and the photo admitting it.
+    hoverLetter = -1; mouseHX = -9999; mouseHY = -9999;
+    if (active) flyHome();
   }, { passive: true });
 
   window.addEventListener('blur', () => { if (active) flyHome(); hoverLetter = -1; mouseHX = -9999; mouseHY = -9999; });
