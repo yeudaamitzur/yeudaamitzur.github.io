@@ -87,9 +87,6 @@
       </div>
 
       <!-- ===== SELECTED WORK — tiles live in the first screen (no scrolling needed) ===== -->
-      <!-- The wrap exists only so the "See more" control can hang off the right of the row and
-           centre itself against its height. On narrow screens it drops below the row instead. -->
-      <div class="hero-workwrap">
       <nav class="hero-work" id="work" aria-label="Selected work">
         <a class="wtile wtile--talmind" href="talmind.html">
           <span class="wtile__frame">
@@ -115,13 +112,14 @@
           <span class="wtile__name">Design System</span>
           <span class="wtile__desc">Tokens, components and a developer handoff</span>
         </a>
-      </nav>
 
-        <!-- Interim: the rest of the work still lives on Behance, so this leads there. When those
-             cases get their own pages here, only the href changes. -->
+        <!-- The link is the row's fourth cell, so it travels with the tiles: beside the last one on
+             a wide screen, at the end of the swipe strip on a phone. Interim — the rest of the work
+             still lives on Behance; when those cases get their own pages here, only the href
+             changes. The break is deliberate, not a wrap: two centred lines. -->
         <a class="hero-more" href="https://www.behance.net/69c44b8d" target="_blank" rel="noopener"
-           aria-label="See more projects on Behance">See more projects <span class="hero-more__arrow" aria-hidden="true">↗</span></a>
-      </div>
+           aria-label="See more projects on Behance">See more<br />projects <span class="hero-more__arrow" aria-hidden="true">↗</span></a>
+      </nav>
     </section>
 
     <!-- The previous work concept (sticky-stacking case cards) that used to sit here has moved
