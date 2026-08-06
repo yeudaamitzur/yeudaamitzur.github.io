@@ -170,11 +170,13 @@ let letterTaps = [], letterBurst = [], letterGone = [], burstDrawn = [];
 let forceDraw = true;   // set whenever something changes outside the frame loop
 let lastScatter = -1;   // so the first frame always counts as a change
 // BURST_MS is the SHAPE of the throw, not its end: the kick is spent inside it and the drift
-// carries on at a steady speed afterwards until the dot is off the canvas. It is not a deadline
-// and nothing is culled by it — see burstDrawn in drawDots. BURST_STAGGER is the spread of per-dot
-// start times; without it the letter leaves as one rigid slab. BFADE is the only alpha left in the
-// whole burst, and it is a property of the canvas FOOT, not of the flight.
-const BURST_MS = 1600, BURST_STAGGER = 140, BFADE = 48;
+// carries on at a steady speed afterwards until the dot is off the canvas or the tail fade has
+// taken it. It is not a deadline — see burstDrawn in drawDots. BURST_STAGGER is the spread of
+// per-dot start times; without it the letter leaves as one rigid slab.
+// BTAIL/BEND are the fade at the END of the flight, both measured in throws: full ink up to BTAIL,
+// gone by BEND. BEND sits past 1 so the fade outlives the throw and the slow dots ease out rather
+// than being cut off. BFADE is unrelated — it is the canvas FOOT, not the flight.
+const BURST_MS = 1600, BURST_STAGGER = 140, BFADE = 48, BTAIL = 0.7, BEND = 1.5;
 let textRight = 0, textMidY = 0, textH = 0, entryStart = 0, hoverLetter = -1, entryDone = false;
 let inkSprite = null, purpleSprite = null, hotSprite = null, spriteSize = 0;
 let mouseHX = -9999, mouseHY = -9999;   // cursor in hero coords (for the letter "push")
@@ -262,7 +264,9 @@ function buildDots() {
   for (let i = 0; i < TEXT.length; i++) {
     const x0 = leftEdge + offx.measureText(TEXT.slice(0, i)).width;
     charX.push(x0);
-    letters.push({ x0, x1: leftEdge + offx.measureText(TEXT.slice(0, i + 1)).width, cx: 0, cy: textMidY });
+    // y0/y1 are this glyph's OWN ink top and bottom, filled in by the ownership pass below. They
+    // start as an empty range, so a letter that never receives ink can never be hovered.
+    letters.push({ x0, x1: leftEdge + offx.measureText(TEXT.slice(0, i + 1)).width, y0: 0, y1: -1, cx: 0, cy: textMidY });
   }
   const bandTop = clamp(Math.round(textMidY - textH), 0, ch);
   const bandH = clamp(Math.round(textH * 2), 1, ch - bandTop);
@@ -335,14 +339,29 @@ function buildDots() {
     offx.clearRect(b.x0, bandTop, gw, bandH);
     paintChar(i);
     const gd = offx.getImageData(b.x0, bandTop, gw, bandH).data;
+    // ...and while the pixels are in hand, the glyph's own ink top and bottom. The threshold is the
+    // same 130 the dot grid uses further down, so the box is exactly the span the dots occupy — not
+    // a hair more.
+    let yMin = bandH, yMax = -1;
     for (let gy = 0; gy < bandH; gy++) {
       for (let gx = 0; gx < gw; gx++) {
         const a = gd[(gy * gw + gx) * 4 + 3];
         if (!a) continue;
         const p = gy * cw + (b.x0 + gx);
         if (a > ownerA[p]) { ownerA[p] = a; owner[p] = i; }   // where two glyphs overlap, the more solid one owns the pixel
+        if (a > 130) { if (gy < yMin) yMin = gy; if (gy > yMax) yMax = gy; }
       }
     }
+    if (yMax >= 0) { letters[i].y0 = bandTop + yMin; letters[i].y1 = bandTop + yMax; }
+  }
+
+  // The space carries no ink of its own, so it would end up unhoverable and the photo would drop
+  // every time the cursor crossed between "UI" and "Designer". It is a gap IN the line, not a hole
+  // where a letter should be, so it is given the line's full ink band and keeps the photo.
+  {
+    let t = Infinity, b = -Infinity;
+    letters.forEach((L) => { if (L.y1 >= L.y0) { t = Math.min(t, L.y0); b = Math.max(b, L.y1); } });
+    if (isFinite(t)) letters.forEach((L, i) => { if (TEXT[i] === ' ') { L.y0 = t; L.y1 = b; } });
   }
 
   offx.clearRect(0, 0, cw, ch);
@@ -501,15 +520,18 @@ function drawDots() {
         const sway = Math.sin(nowS * d.sp * 1.4 + d.ph) * 16 * kt;
         const rise = -34 * kt * kt;
         const bxp = x + d.bx * travel + sway, byp = y + d.by * travel + rise;
-        // NO opacity fade on the way out — Yehuda's call, and he is right: a dot that dims while it
-        // is still on screen reads as the letter evaporating, not as it being thrown. Every dot
-        // holds full ink until it is off the canvas, and then it simply stops being drawn. Left,
-        // right and top the canvas edge IS the screen edge, so that cull is invisible.
         if (bxp < -half || bxp > cw + half || byp < -half) continue;
+        // Full ink for the whole throw, then out on a fade at the very END of it. The distinction
+        // matters and was learned the hard way: an earlier version started fading at the halfway
+        // mark, and dots dimming while they were still crossing open screen read as the letter
+        // evaporating rather than being thrown. BTAIL holds them at full strength until the kick is
+        // long spent and they are far out, and BEND is past 1 on purpose — the fade outlasts the
+        // throw, so the slow stragglers ease away instead of being cut off at a fixed moment.
+        const tail = bt <= BTAIL ? 1 : Math.pow(Math.max(0, 1 - (bt - BTAIL) / (BEND - BTAIL)), 1.5);
         // The foot is the one edge that sits mid-page rather than off it, so a hard cut there would
         // be a visible line under the project tiles. BFADE is deliberately short — a couple of dot
         // widths, a dot slipping under the page rather than a dot fading out.
-        const a = byp > ch - BFADE ? (ch - byp) / BFADE : 1;
+        const a = tail * (byp > ch - BFADE ? (ch - byp) / BFADE : 1);
         if (a <= 0.01) continue;
         burstDrawn[d.li]++;                     // this letter still has debris on screen
         ctx.globalAlpha = a;
@@ -811,27 +833,32 @@ if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
     kick();
   };
 
-  // Both rects used to be read on EVERY pointermove. Reading layout inside an input handler forces
-  // a synchronous style+layout flush, and the halo loop dirties style every frame, so it was never
-  // free — it put a measurable stall between the mouse moving and anything drawing. They are cached
-  // and only re-read when something can actually have moved them.
-  let r2 = null, rh = null;
-  const dropRects = () => { r2 = null; rh = null; };
+  // The hero rect used to be read on EVERY pointermove. Reading layout inside an input handler
+  // forces a synchronous style+layout flush, and the halo loop dirties style every frame, so it was
+  // never free — it put a measurable stall between the mouse moving and anything drawing. It is
+  // cached and only re-read when something can actually have moved it.
+  // (line2's rect used to be cached here too, for a box test that the per-letter ink bounds have
+  // replaced — the letters now answer the "is the cursor on me" question themselves.)
+  let rh = null;
+  const dropRects = () => { rh = null; };
   addEventListener('scroll', dropRects, { passive: true });
   addEventListener('resize', dropRects, { passive: true });
-  const line2Rect = () => (r2 || (r2 = line2.getBoundingClientRect()));
   const heroRect = () => (rh || (rh = hero.getBoundingClientRect()));
-
-  const overLine2 = (x, y) => { const r = line2Rect(); return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; };
 
   document.addEventListener('pointermove', (e) => {
     if (e.pointerType === 'touch') return;
     // which letter is under the cursor (+ feed the cursor position to the dots)
     const hr = heroRect();
-    const lx = e.clientX - hr.left;
+    const lx = e.clientX - hr.left, ly = e.clientY - hr.top;
+    // Sideways this was always exact — the letter's own column. Vertically it used to be the whole
+    // of line2's box, which is 1.28× the font size tall and the same height for every letter, so
+    // coming at an "e" from above or below handed the photo over while the cursor was still a long
+    // way off the glyph. Each letter now carries its OWN ink top and bottom (see buildDots), so the
+    // test is the same tightness from every direction: a lowercase letter answers across its
+    // x-height, a "g" answers down into its descender, the "/" answers over its full height.
     let col = -1;
-    if (overLine2(e.clientX, e.clientY)) {
-      for (let k = 0; k < letters.length; k++) { if (lx >= letters[k].x0 && lx < letters[k].x1) { col = k; break; } }
+    for (let k = 0; k < letters.length; k++) {
+      if (lx >= letters[k].x0 && lx < letters[k].x1) { col = (ly >= letters[k].y0 && ly <= letters[k].y1) ? k : -1; break; }
     }
     // The photo answers the WORDMARK, so it may only come out where there is wordmark left to
     // answer. Being inside the line's box is not enough: a shattered letter leaves a hole, and the
