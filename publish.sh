@@ -7,7 +7,7 @@ SRC="/Users/yehudaamitzur/Desktop/Commands to Claude/website/netlify-deploy"
 cd "$(dirname "$0")" || exit 1
 [ -d "$SRC" ] || { echo "source folder not found: $SRC"; exit 1; }
 rsync -a --delete \
-  --exclude '.git' --exclude '.gitignore' --exclude 'publish.sh' \
+  --exclude '.git' --exclude '.github' --exclude '.gitignore' --exclude 'publish.sh' \
   --exclude-from='.gitignore' \
   "$SRC"/ .
 git add -A

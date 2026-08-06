@@ -1,0 +1,40 @@
+# Publishes the repo root as-is to GitHub Pages.
+#
+# Why this exists: the site used the classic "legacy" Pages builder, which on 2026-08-06 started
+# failing every build for this repo — five in a row, each sitting ~10 minutes and returning a bare
+# "Page build failed" with no log and duration 0. Nothing in the repo had changed but two text
+# files. This path skips that builder entirely: it uploads the folder and deploys it, and when it
+# does go wrong there is an actual log to read under the repo's Actions tab.
+#
+# The site is plain static HTML/CSS/JS — there is nothing to compile, so there is no build step.
+name: Deploy site to Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:      # so a stuck deploy can be re-run from the Actions tab without a commit
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a running deploy finish rather than cancelling it mid-flight; queue the next one behind it.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .          # the repo root IS the site
+      - id: deployment
+        uses: actions/deploy-pages@v4
