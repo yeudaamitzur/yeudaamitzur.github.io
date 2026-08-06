@@ -443,12 +443,33 @@ ul, ol { list-style: none; padding: 0; }
    (The previous sticky-stacking .case concept is kept below, unused —
     the full original page is also saved as index-cards-backup.html)
    ========================================================= */
+/* The wrap holds the row and the "See more" control. The row is the only thing in its flow, so
+   the wrap's box IS the row's box — which is what lets the control centre on the row's height
+   with a plain top:50% and no measuring. --row-half is the row's half width; the control hangs
+   off that, so the two stay together when the row narrows on short viewports. */
+.hero-workwrap {
+  /* One source of truth for the row's geometry, so the "See more" link can be placed off it
+     without measuring anything. --frame-h is the height of a tile's picture: the row is only ever
+     an exact --row-w wide while the link sits beside it (below 1320px the link drops under the
+     row), so the tile width is arithmetic, and every cover is 1200x750 → x .625. Aligning to the
+     PICTURES, not to the whole tile: the names and one-liners hang below them, and centring on
+     those would push the link visibly below the middle of the artwork. */
+  --row-w: 1000px;
+  --row-gap: clamp(.9rem, 2.2vw, 2rem);
+  --frame-pad: clamp(5px, .7vw, 9px);
+  --tile-w: calc((var(--row-w) - 2 * var(--row-gap)) / 3);
+  /* the mat's padding sits INSIDE the tile, so the picture is the tile minus both pads */
+  --frame-h: calc((var(--tile-w) - 2 * var(--frame-pad)) * .625 + 2 * var(--frame-pad));
+  position: relative; z-index: 3;
+  display: flex; flex-direction: column; align-items: center;
+  width: 100%;
+  margin-top: clamp(1.75rem, 4.5vh, 3.25rem);   /* moved off the row: the wrap's top is the row's top */
+}
 .hero-work {
   position: relative; z-index: 3;              /* above the dot canvas (z-index 2) */
   width: 100%; max-width: 1000px; margin-inline: auto;
-  margin-top: clamp(1.75rem, 4.5vh, 3.25rem);
   display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: clamp(.9rem, 2.2vw, 2rem);
+  gap: var(--row-gap);
   scroll-margin-top: calc(var(--hdr-h) + 1rem);
 }
 /* the dots finish assembling at ~1.9s, so the tiles ease up into place just after that:
@@ -469,7 +490,7 @@ ul, ol { list-style: none; padding: 0; }
    aspect-ratio. All three tiles are 1200x750, so they still come out exactly equal height. */
 .wtile__frame {
   display: block; width: 100%; flex: none;
-  padding: clamp(5px, .7vw, 9px);
+  padding: var(--frame-pad);
   border-radius: clamp(14px, 1.7vw, 22px);
   background: var(--wt-tint);
   box-shadow: 0 2px 6px var(--wt-sh1), 0 18px 34px -16px var(--wt-sh2);
@@ -500,8 +521,62 @@ ul, ol { list-style: none; padding: 0; }
    talmind's and bianca's shadows both sit. */
 .wtile--ds      { --wt-tint: linear-gradient(155deg, #B3ECCA, #EFFBF4); --wt-sh1: rgba(49,170,98,.16); --wt-sh2: rgba(49,170,98,.40); }
 
+/* ---- "See more" — hangs off the right of the row, centred on its height ----
+   Interim control: the rest of the work is still on Behance. Built as the same text-plus-↗ link
+   the contact row uses, on purpose — it reads as "there is more this way", not as a fourth
+   project competing with the tiles. The underline swipes in from the left on hover, exactly as
+   it does under Phone / Email / LinkedIn. */
+.hero-more {
+  position: absolute; top: calc(var(--frame-h) / 2); transform: translateY(-50%);
+  left: calc(50% + var(--row-w) / 2 + clamp(1rem, 2.2vw, 2rem));
+  white-space: nowrap; padding-bottom: 4px;
+  font-family: var(--f-display); font-weight: 500; font-size: 1.02rem; color: var(--ink-mute);
+  transition: color .25s ease;
+  /* the row's third tile lands at 3.76s; this arrives just behind it, sliding in from the right —
+     the centring lives INSIDE the keyframes, so the animation can own the transform outright */
+  animation: moreIn 1.5s cubic-bezier(.22,.61,.36,1) 2.4s both;
+}
+@keyframes moreIn {
+  from { opacity: 0; transform: translate(12px, -50%); }
+  to   { opacity: 1; transform: translate(0, -50%); }
+}
+/* the underline is a child, not ::after on the link: the link itself is mid-animation on a
+   transform, and ::after would ride it */
+.hero-more::before {
+  content: ""; position: absolute; left: 0; right: 100%; bottom: 0; height: 3px;
+  background: var(--brand); transition: right .3s cubic-bezier(.2,.7,.2,1);
+}
+/* the arrow is the part that answers the pointer — it travels the way it points */
+.hero-more__arrow {
+  display: inline-block; transition: transform .3s cubic-bezier(.2,.7,.2,1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .hero-more:hover { color: var(--brand); }
+  .hero-more:hover::before { right: 0; }
+  .hero-more:hover .hero-more__arrow { transform: translate(3px, -3px); }
+}
+.hero-more:focus-visible { outline: 2px solid var(--brand); outline-offset: 6px; border-radius: 4px; }
+
 /* short viewports: keep the row inside the first screen */
-@media (max-height: 760px) and (min-width: 701px) { .hero-work { max-width: 810px; } }
+@media (max-height: 760px) and (min-width: 701px) {
+  .hero-work { max-width: 810px; }
+  .hero-workwrap { --row-w: 810px; }           /* the link follows the row in, and so does its height */
+}
+
+/* Not enough side margin left for the link to sit beside the row (a 1000px row plus a ~140px
+   label and air on both sides needs a 1440-wide screen): it drops below the row and centres
+   there instead — which is also where it lands on tablets and phones. */
+@media (max-width: 1439px) {
+  .hero-more {
+    position: static; transform: none;
+    margin-top: clamp(1.1rem, 2.4vh, 1.6rem);
+    animation-name: moreInFlow;
+  }
+  @keyframes moreInFlow {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: none; }
+  }
+}
 
 /* phones: swipeable row instead of three cramped columns */
 @media (max-width: 700px) {
@@ -555,6 +630,10 @@ ul, ol { list-style: none; padding: 0; }
   .wtile { animation: none; }
   .wtile__frame, .wtile__name { transition: none; }
   .wtile:hover .wtile__frame, .wtile:active .wtile__frame { transform: none; }
+  /* the base rule already carries translateY(-50%), so dropping the animation keeps it centred */
+  .hero-more { animation: none; }
+  .hero-more__arrow { transition: none; }
+  .hero-more:hover .hero-more__arrow { transform: none; }
 }
 
 /* =========================================================

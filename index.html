@@ -36,7 +36,7 @@
   <!-- favicon: the same ring as the site cursor — purple stroke, lighter purple fill -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
   <link rel="canonical" href="https://yeudaamitzur.github.io/" />
-  <link rel="stylesheet" href="styles.css?v=48" />
+  <link rel="stylesheet" href="styles.css?v=49" />
 </head>
 <body>
   <a class="skip-link" href="#work">Skip to work</a>
@@ -87,6 +87,9 @@
       </div>
 
       <!-- ===== SELECTED WORK — tiles live in the first screen (no scrolling needed) ===== -->
+      <!-- The wrap exists only so the "See more" control can hang off the right of the row and
+           centre itself against its height. On narrow screens it drops below the row instead. -->
+      <div class="hero-workwrap">
       <nav class="hero-work" id="work" aria-label="Selected work">
         <a class="wtile wtile--talmind" href="talmind.html">
           <span class="wtile__frame">
@@ -113,6 +116,12 @@
           <span class="wtile__desc">Tokens, components and a developer handoff</span>
         </a>
       </nav>
+
+        <!-- Interim: the rest of the work still lives on Behance, so this leads there. When those
+             cases get their own pages here, only the href changes. -->
+        <a class="hero-more" href="https://www.behance.net/69c44b8d" target="_blank" rel="noopener"
+           aria-label="See more projects on Behance">See more projects <span class="hero-more__arrow" aria-hidden="true">↗</span></a>
+      </div>
     </section>
 
     <!-- The previous work concept (sticky-stacking case cards) that used to sit here has moved
@@ -203,6 +212,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=48"></script>
+  <script src="script.js?v=49"></script>
 </body>
 </html>
