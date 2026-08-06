@@ -520,15 +520,20 @@ ul, ol { list-style: none; padding: 0; }
    it does under Phone / Email / LinkedIn. */
 .hero-more {
   position: absolute; top: calc(var(--frame-h) / 2); transform: translateY(-50%);
-  left: calc(50% + var(--row-w) / 2 + clamp(1rem, 2.2vw, 2rem));
-  /* two centred lines — "See more" over "projects ↗". Breaking it keeps the link narrow enough to
-     live in the margin beside the row instead of running at the screen edge, and the stack reads
-     as a label for the row rather than a sentence trailing off it. */
+  /* The gap off the row grows with the leftover margin, not with the viewport: `9vw - 4.5rem` is
+     ~49px at 1340 — where the strip beside a 1000px row is only ~94px wide and the page's own 48px
+     gutter is the wall — and climbs to ~58px at 1440, ~84px at 1728, capped at 8rem. A plain vw
+     term can't do that; it would have to stay small everywhere to survive 1340. */
+  left: calc(50% + var(--row-w) / 2 + clamp(3rem, 9vw - 4.5rem, 8rem));
+  /* two lines flush left — "See more" over "projects ↗". Breaking it keeps the link narrow enough
+     to live in the margin beside the row instead of running at the screen edge, and the stack reads
+     as a label for the row rather than a sentence trailing off it. Left, not centred: centring
+     measured "projects ↗" against "See more" and left the WORD hanging half an arrow off-axis. */
   /* max-content or the two lines break again: the link is absolutely positioned past the right
      edge of the row that contains it, so shrink-to-fit offers it a negative width and it collapses
      to one word per line. With max-content the only break is the one in the markup. */
   width: max-content;
-  text-align: center; padding-bottom: 4px;
+  text-align: left; padding-bottom: 4px;
   font-family: var(--f-display); font-weight: 500; font-size: 1.02rem; line-height: 1.3;
   color: var(--ink-mute);
   transition: color .25s ease;
