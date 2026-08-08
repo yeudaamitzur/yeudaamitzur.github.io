@@ -158,7 +158,11 @@
           </div>
           <div class="glimpse__right">
             <figure class="glimpse__photo glimpse__photo--tall glimpse__anim" data-depth="30">
-              <img src="glimpse-piano.jpg" alt="Yehuda playing the piano" loading="lazy" style="object-position: center 45%;" />
+              <!-- 1179x652 into a 3:2 frame, so cover crops the WIDTH, not the height -
+                   object-position steers the horizontal crop. -->
+              <img src="glimpse-piano-2.jpg?v=52" width="1179" height="652"
+                   alt="Yehuda playing a street piano at night" loading="lazy"
+                   style="object-position: center;" />
             </figure>
           </div>
         </div>
