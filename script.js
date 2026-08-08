@@ -1368,3 +1368,16 @@ document.querySelectorAll('a[href="#top"]').forEach((a) => {
     }, { rootMargin: '250px' }).observe(foot);
   } else { live = true; raf = requestAnimationFrame(loop); }
 })();
+
+// ---- Keep the address bar clean, even when the visitor arrived on an old ".html" link ----
+// GitHub Pages serves /bianca and /bianca.html as the same page, and every link on the site now
+// points at the short form. But links shared before the custom domain went up still carry the
+// extension, so tidy those in place: replaceState rewrites the address without a reload and
+// without pushing a history entry, so Back still goes where the reader expects. The query and
+// hash are carried over, and index.html collapses to "/".
+(function () {
+  const p = location.pathname;
+  if (!p.endsWith('.html')) return;
+  const clean = p === '/index.html' ? '/' : p.slice(0, -5);
+  history.replaceState(history.state, '', clean + location.search + location.hash);
+})();
