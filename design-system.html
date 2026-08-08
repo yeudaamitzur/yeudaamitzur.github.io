@@ -3,37 +3,37 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Design System — Case study · Yehuda Amitzur</title>
-  <meta name="description" content="Talmind Design System — building a scalable design system from 72 base tokens: variables, semantic tokens, a component library and a developer handoff. A UX/UI case study by Yehuda Amitzur." />
+  <title>Design System case study · Yehuda Amitzur</title>
+  <meta name="description" content="The Talmind Design System: building a scalable design system from 72 base tokens: variables, semantic tokens, a component library and a developer handoff. A UX/UI case study by Yehuda Amitzur." />
 
 
-  <!-- Link previews — see the long note in index.html. The card image is this study's own tile. -->
+  <!-- Link previews - see the long note in index.html. The card image is this study's own tile. -->
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Yehuda Amitzur" />
   <meta property="og:url" content="https://yeudaamitzur.github.io/design-system.html" />
-  <meta property="og:title" content="Design System — Case study · Yehuda Amitzur" />
-  <meta property="og:description" content="Talmind Design System — building a scalable design system from 72 base tokens: variables, semantic tokens, a component library and a developer handoff. A UX/UI case study by Yehuda Amitzur." />
+  <meta property="og:title" content="Design System case study · Yehuda Amitzur" />
+  <meta property="og:description" content="The Talmind Design System: building a scalable design system from 72 base tokens: variables, semantic tokens, a component library and a developer handoff. A UX/UI case study by Yehuda Amitzur." />
   <meta property="og:image" content="https://yeudaamitzur.github.io/tile-ds.jpg?v=1" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="750" />
-  <meta property="og:image:alt" content="The design system — colours, typography and components" />
+  <meta property="og:image:alt" content="The design system: colours, typography and components" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Design System — Case study · Yehuda Amitzur" />
-  <meta name="twitter:description" content="Talmind Design System — building a scalable design system from 72 base tokens: variables, semantic tokens, a component library and a developer handoff. A UX/UI case study by Yehuda Amitzur." />
+  <meta name="twitter:title" content="Design System case study · Yehuda Amitzur" />
+  <meta name="twitter:description" content="The Talmind Design System: building a scalable design system from 72 base tokens: variables, semantic tokens, a component library and a developer handoff. A UX/UI case study by Yehuda Amitzur." />
   <meta name="twitter:image" content="https://yeudaamitzur.github.io/tile-ds.jpg?v=1" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <!-- favicon: the same ring as the site cursor — purple stroke, lighter purple fill -->
+  <!-- favicon: the same ring as the site cursor - purple stroke, lighter purple fill -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
   <link rel="canonical" href="https://yeudaamitzur.github.io/design-system.html" />
-  <link rel="stylesheet" href="styles.css?v=51" />
+  <link rel="stylesheet" href="styles.css?v=52" />
 
   <style>
     /* =========================================================
-       Design System — case study (page-scoped, reuses shared tokens)
+       Design System - case study (page-scoped, reuses shared tokens)
        Same light system as Talmind / Bianca: warm-neutral bg, brand
        purple chrome, open editorial layout (no content boxes).
        The signature here is that the system is RENDERED, not pictured:
@@ -56,19 +56,19 @@
     .ds-lead code, .ds-inline-code { font-family: var(--ds-mono); font-size: .88em; font-weight: 500;
       color: var(--brand); background: var(--brand-soft); padding: .12em .45em; border-radius: 6px; letter-spacing: -0.02em; }
 
-    /* ---------- Hero — title over the learning dashboard, then a meta strip ---------- */
-    /* ---------- Hero: same construction as Talmind / Bianca — a pinned video behind everything,
+    /* ---------- Hero - title over the learning dashboard, then a meta strip ---------- */
+    /* ---------- Hero: same construction as Talmind / Bianca - a pinned video behind everything,
        the gradient veil locked onto it, and the page sheet scrolling up over the pair ---------- */
     .ds-hero { position: relative; z-index: 1; overflow: visible;
       padding-top: calc(var(--hdr-h) + clamp(2rem, 6vw, 4.5rem)); padding-bottom: clamp(1rem, 3vw, 2rem); }
     .ds-hero > :not(.ds-hero__bg) { position: relative; z-index: 2; }
 
-    /* drifting settings cogs — PINNED to the viewport, so only the page moves */
+    /* drifting settings cogs - PINNED to the viewport, so only the page moves */
     .ds-hero__bg { position: fixed; top: 0; left: 50%; transform: translateX(-50%);
       width: 100vw; height: clamp(600px, 56vw, 820px); z-index: 0; overflow: hidden; pointer-events: none; }
     .ds-hero__cogs { display: block; width: 100%; height: 100%; }
     /* the veil is LOCKED onto the backdrop so the two never separate on scroll. Its top stop is
-       #B3ECCA — the very same colour as this project's card on the homepage, where Bianca's is
+       #B3ECCA - the very same colour as this project's card on the homepage, where Bianca's is
        the restaurant's warm orange. The hero artwork carries only a trace of it, so this wash is
        what actually colours the hero (at 0.48 it lands around #D8F3E1 on screen). */
     .ds-hero__bg::after { content: ""; position: absolute; inset: 0; pointer-events: none;
@@ -76,7 +76,7 @@
         linear-gradient(180deg, rgba(179,236,202,0.48) 0%, rgba(255,255,255,0.70) 56.49%, #F0EFE9 100%),
         linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 50.24%, #F0EFE9 100%); }
 
-    /* the sheet the rest of the page rides on — fades in from transparent so the meta row sits
+    /* the sheet the rest of the page rides on - fades in from transparent so the meta row sits
        on the video instead of cutting a hard seam (same as .tl-cover / .bn-cover) */
     .ds-cover { position: relative; z-index: 2;
       background: linear-gradient(180deg, rgba(240,239,233,0) 0, var(--bg) clamp(200px, 26vh, 340px)); }
@@ -84,7 +84,7 @@
       font-family: var(--f-display); font-weight: 700; font-size: .8rem; letter-spacing: .14em; text-transform: uppercase;
       color: var(--brand); background: var(--brand-soft); padding: .5em 1.05em; border-radius: 999px; }
     .ds-hero__chip::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--brand); }
-    /* same size + weight as the Bianca hero title, so the case studies open alike — and centred
+    /* same size + weight as the Bianca hero title, so the case studies open alike - and centred
        the same way: block centred in the wrap, lines centred on each other */
     .ds-hero__title { font-family: var(--f-display); font-weight: 500; color: var(--ink);
       font-size: clamp(1.35rem, 2.35vw, 2.15rem); line-height: 1.3; letter-spacing: -0.018em;
@@ -93,9 +93,9 @@
     .ds-hero__sub { color: var(--ds-mut); font-family: var(--f-display); font-weight: 500;
       font-size: clamp(1rem, 1.5vw, 1.2rem); line-height: 1.5; margin-top: 1.35rem; max-width: 46rem; }
     .ds-hero__sub b { color: var(--ink); font-weight: 600; }
-    /* Hero art — the same two-beat opening as Bianca's dashboard: the title lands first, then
+    /* Hero art - the same two-beat opening as Bianca's dashboard: the title lands first, then
        the art rises into place behind it. Identical timing to .bn-tablet and .tl-tablet now
-       (1.15s rise, 2.2s in), so all three case studies open the same way — this page used to run
+       (1.15s rise, 2.2s in), so all three case studies open the same way - this page used to run
        its own quicker entrance because its header arrived at .2s while the other two waited 1.5s,
        and that reason is gone: every header now lands at .85s. It drifts with the cursor once it
        has settled.
@@ -123,7 +123,7 @@
     .ds-wordmark { font-family: var(--f-display); font-weight: 800; letter-spacing: -0.02em;
       font-size: clamp(2.6rem, 8vw, 5.6rem); line-height: .92; color: var(--ink); }
 
-    /* documentation sheets — laid down flat: no frame, no shadow of any kind */
+    /* documentation sheets - laid down flat: no frame, no shadow of any kind */
     .ds-figure--flat { margin-top: clamp(1.6rem, 3vw, 2.25rem); }
     /* left-aligned in the grid by default; the two component maps opt into centring */
     .ds-figure { margin-inline: 0; }
@@ -138,7 +138,7 @@
     .ds-figstack { gap: clamp(3rem, 6vw, 4.75rem); }
     .ds-figure + .ds-h2, .ds-figure + .ds-subhead { margin-top: clamp(3rem, 6vw, 4.5rem); }
 
-    /* ---------- Colour primitives — real swatch rows ---------- */
+    /* ---------- Colour primitives - real swatch rows ---------- */
     .ds-note { display: inline-flex; align-items: center; gap: .5em; margin-top: 1.25rem;
       font-family: var(--f-body); font-size: .82rem; color: var(--ds-mut); }
     .ds-note::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--brand); opacity: .5; }
@@ -153,7 +153,7 @@
       font-family: var(--ds-mono); font-size: .68rem; font-weight: 600; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.07); }
     .ds-sw__hex { font-family: var(--ds-mono); font-size: .58rem; color: var(--ds-mut); letter-spacing: -0.03em; white-space: nowrap; }
 
-    /* ---------- Semantic tokens — grouped rows, each points to one primitive ---------- */
+    /* ---------- Semantic tokens - grouped rows, each points to one primitive ---------- */
     .ds-tokens { margin-top: clamp(1.75rem, 3.5vw, 2.5rem); display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(1.5rem, 4vw, 3rem) clamp(2rem, 5vw, 4rem); }
     .ds-tokengroup__title { font-family: var(--f-display); font-weight: 700; font-size: 1.05rem; letter-spacing: -0.01em; color: var(--ink); margin-bottom: .35rem; }
     .ds-tokenlist { display: flex; flex-direction: column; }
@@ -165,7 +165,7 @@
     .ds-token__arrow { grid-column: 2; color: var(--brand); opacity: .55; font-size: .8rem; }
     .ds-token__prim { grid-column: 3; font-family: var(--ds-mono); font-size: .74rem; color: var(--brand); text-align: right; white-space: nowrap; }
 
-    /* ---------- Typography — a live, rendered scale ---------- */
+    /* ---------- Typography - a live, rendered scale ---------- */
     .ds-type { margin-top: clamp(1.75rem, 3.5vw, 2.5rem); }
     .ds-typerow { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 1rem 2rem;
       padding-block: clamp(1rem, 2.2vw, 1.5rem); border-top: 1px solid var(--line); }
@@ -175,7 +175,7 @@
     .ds-type__tok { display: block; font-family: var(--ds-mono); font-size: .8rem; font-weight: 600; color: var(--brand); }
     .ds-type__spec { display: block; font-family: var(--ds-mono); font-size: .72rem; color: var(--ds-mut); margin-top: .25rem; white-space: nowrap; }
 
-    /* ---------- Flat imagery (icons + component maps) — no frame box, just the artwork ---------- */
+    /* ---------- Flat imagery (icons + component maps) - no frame box, just the artwork ---------- */
     .ds-figure { margin-top: clamp(1.75rem, 3.5vw, 2.5rem); }
     .ds-figure img { display: block; width: 100%; height: auto; border-radius: 0; box-shadow: none; }
     .ds-figure figcaption { margin-top: .9rem; font-family: var(--f-body); font-size: .9rem; color: var(--ds-mut); }
@@ -183,7 +183,7 @@
     .ds-figstack { display: grid; gap: clamp(2rem, 4vw, 3rem); margin-top: clamp(1.75rem, 3.5vw, 2.5rem); }
     .ds-figstack .ds-figure { margin-top: 0; }
 
-    /* ---------- Handoff tables — open, hairline-ruled ---------- */
+    /* ---------- Handoff tables - open, hairline-ruled ---------- */
     .ds-tablewrap { margin-top: clamp(1.5rem, 3vw, 2.25rem); overflow-x: auto; }
     .ds-table { width: 100%; border-collapse: collapse; min-width: 640px; }
     .ds-table th, .ds-table td { text-align: left; vertical-align: top; padding: .85rem 1rem .85rem 0; border-top: 1px solid var(--line); }
@@ -242,7 +242,7 @@
     }
     @media (prefers-reduced-motion: reduce) {
       .ds .hdr--float { animation: none !important; }
-      /* the entrance fills backwards from opacity 0 — without this the art never appears */
+      /* the entrance fills backwards from opacity 0 - without this the art never appears */
       .ds-hero__shot { animation: none !important; opacity: 1 !important; transform: none !important; }
       /* fall back to a normal scrolling hero (no pinned video), same as the other case studies */
       .ds-hero__bg { position: absolute; }
@@ -257,14 +257,14 @@
   <!-- ===== HEADER (shared floating pill) ===== -->
   <header class="hdr hdr--float" id="top">
     <div class="hdr__pill">
-      <a class="hdr__logo" href="index.html#top" aria-label="Yehuda Amitzur — home">
+      <a class="hdr__logo" href="index.html#top" aria-label="Yehuda Amitzur, home">
         <span class="hdr__avatar"><img class="hdr__avatar-img" src="profile.png" alt="Yehuda Amitzur" width="46" height="46" /></span>
       </a>
       <div class="hdr__expand">
         <nav class="hdr__nav" aria-label="Primary">
           <a href="index.html#top">Home</a>
           <a href="index.html#work">Work</a>
-          <a href="cv-yehuda-amitzur.pdf?v=51">CV</a>
+          <a href="cv-yehuda-amitzur.pdf?v=52" target="_blank" rel="noopener">CV</a>
         </nav>
         <a class="hdr__cta" href="index.html#contact">Contact</a>
         <button class="hdr__menu" aria-label="Open menu" aria-expanded="false" aria-controls="hdr-drawer"><span></span><span></span></button>
@@ -278,7 +278,7 @@
       </div>
       <a href="index.html#top">Home</a>
       <a href="index.html#work">Projects</a>
-      <a href="cv-yehuda-amitzur.pdf?v=51">My cv</a>
+      <a href="cv-yehuda-amitzur.pdf?v=52" target="_blank" rel="noopener">My cv</a>
       <a class="hdr__drawer-contact" href="index.html#contact">Contact</a>
     </div>
   </header>
@@ -298,7 +298,7 @@
 
   <main>
     <!-- ===== HERO ===== -->
-    <h1 class="sr-only">Talmind Design System — from 72 base tokens to a full product</h1>
+    <h1 class="sr-only">Talmind Design System: from 72 base tokens to a full product</h1>
     <section class="ds-hero ds-wrap">
       <div class="ds-hero__bg" aria-hidden="true">
         <canvas class="ds-hero__cogs" data-cogs></canvas>
@@ -308,7 +308,7 @@
       <!-- no .reveal here: the timed entrance owns this element's opacity and transform, the way
            Bianca's .bn-tablet does. Two of them would fight over the same two properties. -->
       <figure class="ds-hero__shot" data-hero-art>
-        <img src="ds-hero.jpg?v=25" width="1938" height="1374" alt="Talmind Design System &amp; Handoff — colours, typography and components" />
+        <img src="ds-hero.jpg?v=25" width="1938" height="1374" alt="Talmind Design System &amp; Handoff: colours, typography and components" />
       </figure>
     </section>
 
@@ -321,11 +321,11 @@
         <div><dt>Role</dt><dd>Product Designer · Solo</dd></div>
         <div><dt>Type</dt><dd>Design system → product</dd></div>
         <div><dt>Foundation</dt><dd>72 base tokens</dd></div>
-        <div><dt>Tools</dt><dd>Figma · Variables · Claude</dd></div>
+        <div><dt>Tools</dt><dd>Figma · Variables</dd></div>
       </dl>
     </section>
 
-    <!-- ===== FOUNDATIONS — COLOUR PRIMITIVES (rendered) ===== -->
+    <!-- ===== FOUNDATIONS - COLOUR PRIMITIVES (rendered) ===== -->
     <section class="ds-section ds-wrap" id="color">
       <span class="ds-eyebrow reveal">Foundations</span>
       <h2 class="ds-h2 reveal">Colors</h2>
@@ -333,18 +333,18 @@
         (<code>--color-brand-default</code>) reference a primitive (<code>brand-500</code>) instead of hardcoding it.
         Change the primitive once, and every screen using that semantic token updates automatically.</p>
       <figure class="ds-figure ds-figure--flat reveal" style="max-width: 780px;">
-        <img src="ds-colors.jpg" width="1468" height="1710" alt="Talmind colour primitives — Brand, Neutral, UI Accent and Functional scales from 50 to 950" loading="lazy" />
+        <img src="ds-colors.jpg" width="1468" height="1710" alt="Talmind colour primitives: Brand, Neutral, UI Accent and Functional scales from 50 to 950" loading="lazy" />
       </figure>
     </section>
 
-    <!-- ===== FOUNDATIONS — SEMANTIC TOKENS (rendered) ===== -->
+    <!-- ===== FOUNDATIONS - SEMANTIC TOKENS (rendered) ===== -->
     <section class="ds-section ds-wrap" id="tokens">
       <h2 class="ds-h2 reveal">Semantic tokens</h2>
-      <p class="ds-lead reveal">A semantic token is a name that describes a color's role, not its value — like
+      <p class="ds-lead reveal">A semantic token is a name that describes a color's role rather than its value, like
         <code>--color-brand-default</code> instead of a raw hex code. Each one maps to exactly one primitive:
         <code>--color-brand-default</code> is always <code>brand-500</code>, everywhere it's used.</p>
       <figure class="ds-figure ds-figure--flat reveal" style="max-width: 700px;">
-        <img src="ds-semantic.jpg" width="1168" height="1832" alt="Semantic tokens — Brand and accents, Surfaces and text, Status, and Game category boxes, each mapped to a primitive and hex" loading="lazy" />
+        <img src="ds-semantic.jpg" width="1168" height="1832" alt="Semantic tokens: Brand and accents, Surfaces and text, Status, and Game category boxes, each mapped to a primitive and hex" loading="lazy" />
       </figure>
     </section>
 
@@ -352,32 +352,32 @@
     <section class="ds-section ds-wrap" id="type">
       <h2 class="ds-h2 reveal">Typography</h2>
       <figure class="ds-figure ds-figure--flat reveal">
-        <img src="ds-typography.jpg" width="1670" height="1544" alt="Talmind type scale — Display Large, Display, H1, H2, Subtitle, Label, Body, Caption and Tiny with weights, sizes, usage and samples" loading="lazy" />
+        <img src="ds-typography.jpg" width="1670" height="1544" alt="Talmind type scale: Display Large, Display, H1, H2, Subtitle, Label, Body, Caption and Tiny with weights, sizes, usage and samples" loading="lazy" />
       </figure>
       <h2 class="ds-h2 reveal" style="margin-top: clamp(2.5rem, 5vw, 3.75rem);">Icons &amp; illustration</h2>
       <figure class="ds-figure ds-figure--flat reveal">
-        <img src="ds-icons.jpg" width="2492" height="1408" alt="Talmind icon and illustration set — line icons plus 3D illustrations (play, backpack, game controller, mascot, trophy, AI robot)" loading="lazy" />
+        <img src="ds-icons.jpg" width="2492" height="1408" alt="Talmind icon and illustration set: line icons plus 3D illustrations (play, backpack, game controller, mascot, trophy, AI robot)" loading="lazy" />
       </figure>
     </section>
 
     <!-- ===== PRIMITIVES → COMPONENTS ===== -->
     <section class="ds-section ds-wrap" id="components">
-      <span class="ds-eyebrow reveal">System — Components</span>
+      <span class="ds-eyebrow reveal">System · Components</span>
       <h2 class="ds-h2 reveal">How a single atom becomes a whole system</h2>
       <p class="ds-lead reveal">Components build in layers: primitive &rarr; component &rarr; screen template. The
         DailyPrepCard's three lesson-prep tiles, for example, share a single primitive with defined states (done,
-        in-progress, locked) — change the primitive once, and it updates everywhere.</p>
+        in-progress, locked). Change the primitive once, and it updates everywhere.</p>
       <p class="ds-lead reveal">When the flow needed a new state, I added it as a variant instead of a new component.
         It inherited the existing typography, spacing, and color tokens automatically, with zero changes to screens
         already built.</p>
-      <p class="ds-figintro reveal"><b>Primitives.</b> Atoms and small building blocks — badges, text styles, nav items,
+      <p class="ds-figintro reveal"><b>Primitives.</b> Atoms and small building blocks: badges, text styles, nav items,
         the InsightItem, and the three ActivityCard states (Video / Quiz / Game) with their progress, done and locked variants.</p>
       <figure class="ds-figure ds-figure--center reveal">
-        <img src="ds-primitives.jpg" width="1950" height="1774" alt="Primitive components — atoms, content blocks, navigation, leaderboard, lesson topic card and activity cards, each shown with its variants" loading="lazy" />
+        <img src="ds-primitives.jpg" width="1950" height="1774" alt="Primitive components: atoms, content blocks, navigation, leaderboard, lesson topic card and activity cards, each shown with its variants" loading="lazy" />
       </figure>
       <p class="ds-figintro reveal"><b>Composed components.</b> The primitives assembled into screen-level pieces used across the product.</p>
       <figure class="ds-figure ds-figure--center reveal">
-        <img src="ds-components.jpg" width="2520" height="1694" alt="Composed components — Sidebar, TopBar, DailyPrepCard, QuestionCard with all four AnswerOption variants, ScoreCard, TargetZone and more" loading="lazy" />
+        <img src="ds-components.jpg" width="2520" height="1694" alt="Composed components: Sidebar, TopBar, DailyPrepCard, QuestionCard with all four AnswerOption variants, ScoreCard, TargetZone and more" loading="lazy" />
       </figure>
     </section>
 
@@ -386,9 +386,9 @@
       <span class="ds-eyebrow reveal">Handoff</span>
       <h2 class="ds-h2 reveal">Handed off to developers, not just to myself</h2>
       <p class="ds-lead reveal">I built a separate Handoff page that documents the system in the language a developer
-        needs — not just "here's how it looks," but exact tokens, states, and edge cases. It includes a component
-        inventory with variants and states per component, and a motion table with exact duration and easing values
-        instead of "there's an animation."</p>
+        needs: exact tokens, states and edge cases, rather than a picture of how it looks. It includes a component
+        inventory with variants and states per component, and a motion table that gives the real duration and easing
+        values instead of a note saying "there's an animation."</p>
 
       <h3 class="ds-subhead reveal">Component inventory
         <span class="ds-subhead__note">15 components · where each is used, its variants, and the implementation note that travels with it</span>
@@ -410,7 +410,7 @@
             <tr><td class="ds-td-name">WhatToRememberCard</td><td class="ds-usedin">Lesson</td><td><div class="ds-vpills"><span>Default</span></div></td><td>InsightItem list (Ownership / Empathy) beside the AI-helper panel.</td></tr>
             <tr><td class="ds-td-name">SkillCard</td><td class="ds-usedin">Lesson</td><td><div class="ds-vpills"><span>Questioning</span><span>Solve</span><span>Creativity</span></div></td><td>Metric "104 / 120" + tinted blob; one variant per tracked skill.</td></tr>
             <tr><td class="ds-td-name">QuestionCard</td><td class="ds-usedin">Quiz</td><td><div class="ds-vpills"><span>Default</span></div></td><td>Prompt + step dots (3 / 8); composes four AnswerOptions.</td></tr>
-            <tr><td class="ds-td-name">AnswerOption</td><td class="ds-usedin">Quiz</td><td><div class="ds-vpills"><span>Default</span><span>Correct</span><span>CorrectReveal</span><span>Wrong</span></div></td><td>One primitive, four states — drives every piece of quiz feedback.</td></tr>
+            <tr><td class="ds-td-name">AnswerOption</td><td class="ds-usedin">Quiz</td><td><div class="ds-vpills"><span>Default</span><span>Correct</span><span>CorrectReveal</span><span>Wrong</span></div></td><td>One primitive with four states drives every piece of quiz feedback.</td></tr>
             <tr><td class="ds-td-name">ScoreCard</td><td class="ds-usedin">Quiz</td><td><div class="ds-vpills"><span>Default</span></div></td><td>Current balance + "+10 pts" chip + monster mascot.</td></tr>
             <tr><td class="ds-td-name">DraggableCard</td><td class="ds-usedin">Game</td><td><div class="ds-vpills"><span>Idle</span><span>Dragging</span><span>Placed</span></div></td><td>Concept chip dragged into a TargetZone; shadow lifts while dragging.</td></tr>
             <tr><td class="ds-td-name">TargetZone</td><td class="ds-usedin">Game</td><td><div class="ds-vpills"><span>Torah Source</span><span>Item Status</span><span>Ruling</span><span>Signs</span></div></td><td>Dashed category box; accepts DraggableCards; colour bound to its category token.</td></tr>
@@ -419,7 +419,7 @@
       </div>
 
       <h3 class="ds-subhead reveal">Motion &amp; animation
-        <span class="ds-subhead__note">every motion documented with its trigger, duration and easing — not "there's an animation"</span>
+        <span class="ds-subhead__note">every motion documented with its trigger, duration and easing, instead of a note saying "there's an animation"</span>
       </h3>
       <div class="ds-tablewrap reveal">
         <table class="ds-table">
@@ -427,22 +427,22 @@
             <tr><th scope="col">Element</th><th scope="col">Trigger</th><th scope="col">Duration</th><th scope="col">Animation &amp; easing</th></tr>
           </thead>
           <tbody>
-            <tr><td class="ds-td-name">Page — app frame</td><td>On load</td><td class="ds-mono-cell">600 ms</td><td>Fade + scale-in 0.98 → 1 · <span class="ds-mono-cell">cubic-bezier(.2,.7,.2,1)</span></td></tr>
-            <tr><td class="ds-td-name">Page — content blocks</td><td>On load (stagger)</td><td class="ds-mono-cell">500 ms · 60 ms step</td><td>Fade + rise 16 px → 0 · <span class="ds-mono-cell">ease-out</span></td></tr>
-            <tr><td class="ds-td-name">Page — exit</td><td>On route change</td><td class="ds-mono-cell">300 ms</td><td>Fade + rise 0 → −12 px · <span class="ds-mono-cell">ease-in</span></td></tr>
+            <tr><td class="ds-td-name">Page: app frame</td><td>On load</td><td class="ds-mono-cell">600 ms</td><td>Fade + scale-in 0.98 → 1 · <span class="ds-mono-cell">cubic-bezier(.2,.7,.2,1)</span></td></tr>
+            <tr><td class="ds-td-name">Page: content blocks</td><td>On load (stagger)</td><td class="ds-mono-cell">500 ms · 60 ms step</td><td>Fade + rise 16 px → 0 · <span class="ds-mono-cell">ease-out</span></td></tr>
+            <tr><td class="ds-td-name">Page: exit</td><td>On route change</td><td class="ds-mono-cell">300 ms</td><td>Fade + rise 0 → −12 px · <span class="ds-mono-cell">ease-in</span></td></tr>
             <tr><td class="ds-td-name">Sidebar nav item</td><td>On select</td><td class="ds-mono-cell">250 ms</td><td>Active pill slides + icon tint crossfade · <span class="ds-mono-cell">ease-out</span></td></tr>
             <tr><td class="ds-td-name">Back button</td><td>On press</td><td class="ds-mono-cell">200 ms</td><td>Tap scale 0.94 + arrow nudge −3 px · <span class="ds-mono-cell">ease-out</span></td></tr>
             <tr><td class="ds-td-name">Points badge</td><td>On points earned</td><td class="ds-mono-cell">600 ms</td><td>Count-up + pop 1 → 1.12 → 1 · <span class="ds-mono-cell">cubic-bezier(.34,1.56,.64,1)</span></td></tr>
             <tr><td class="ds-td-name">"+N" fly chip</td><td>On correct answer</td><td class="ds-mono-cell">900 ms</td><td>Chip flies AnswerOption → points badge · <span class="ds-mono-cell">cubic-bezier(.2,.72,.2,1)</span></td></tr>
-            <tr><td class="ds-td-name">Monster — idle</td><td>Ambient loop</td><td class="ds-mono-cell">7 s · infinite</td><td>Gentle float translateY ±13 px + scale · <span class="ds-mono-cell">ease-in-out</span></td></tr>
-            <tr><td class="ds-td-name">Monster — happy</td><td>On quiz complete</td><td class="ds-mono-cell">1600 ms</td><td>Wave rotate ±12° (keyframed) · <span class="ds-mono-cell">ease-in-out</span></td></tr>
+            <tr><td class="ds-td-name">Monster: idle</td><td>Ambient loop</td><td class="ds-mono-cell">7 s · infinite</td><td>Gentle float translateY ±13 px + scale · <span class="ds-mono-cell">ease-in-out</span></td></tr>
+            <tr><td class="ds-td-name">Monster: happy</td><td>On quiz complete</td><td class="ds-mono-cell">1600 ms</td><td>Wave rotate ±12° (keyframed) · <span class="ds-mono-cell">ease-in-out</span></td></tr>
             <tr><td class="ds-td-name">Sparkles</td><td>On quiz complete</td><td class="ds-mono-cell">1200 ms</td><td>Twinkle scale + opacity, staggered · <span class="ds-mono-cell">ease-in-out</span></td></tr>
           </tbody>
         </table>
       </div>
     </section>
 
-    <!-- ===== NEXT PROJECT — the loop, handed over before the contact ask ===== -->
+    <!-- ===== NEXT PROJECT - the loop, handed over before the contact ask ===== -->
     <section class="nxt nxt--talmind" aria-label="Next project">
       <div class="nxt__inner reveal">
         <a class="nxt__link" href="talmind.html">
@@ -469,17 +469,17 @@
 
   <footer class="foot">
     <div class="wrap foot__inner">
-      <span>© 2026 Yehuda Amitzur — built with Claude</span>
+      <span>© 2026 Yehuda Amitzur</span>
       <a href="#top">Back to top ↑</a>
     </div>
   </footer>
 
-  <script src="script.js?v=51"></script>
+  <script src="script.js?v=52"></script>
   <script>
     /* ---- Hero backdrop: a drifting field of settings cogs ----
        This is a page about a system, so the marks behind the title are the settings glyph:
        toothed cogs in light grey, some solid and some drawn as outlines, at mixed sizes and
-       tooth counts. The MOTION is unchanged from the discs they replace — each one carries a
+       tooth counts. The MOTION is unchanged from the discs they replace - each one carries a
        slow velocity of its own plus a wandering term, so no two ever travel the same straight
        line, and they wrap around the edges so the field never empties. A cog that drifted
        without turning would read as a sticker, so each also spins slowly on its own axis, some
@@ -491,7 +491,7 @@
       const ctx = cv.getContext('2d');
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const TAU = Math.PI * 2;
-      // light grey, a few steps of it — the lilac veil above sits at 0.48, so anything paler
+      // light grey, a few steps of it - the lilac veil above sits at 0.48, so anything paler
       // than this simply disappears under it
       const GREYS = [
         [186, 184, 178],
@@ -517,7 +517,7 @@
         const n = Math.round(cap((W * H) / 15000, 24, 44));
         // Sizes are scaled to the viewport: a 100px cog is a detail on a desktop hero and a
         // quarter of the screen on a phone, which turns the field into wallpaper. But the scale
-        // has a floor and so does the radius — under about 11px the teeth close up and the mark
+        // has a floor and so does the radius - under about 11px the teeth close up and the mark
         // is just a dot, which is what the phone was showing before.
         const S = Math.max(0.62, Math.min(1, W / 1000));
         cogs = [];
@@ -611,7 +611,7 @@
       const hero = art.closest('.ds-hero') || art;
       let raf = null, tx = 0, ty = 0, cx = 0, cy = 0, ready = false;
       // dropping the animation reverts to the base style, which is where its last keyframe
-      // already left the element — so the handoff is invisible
+      // already left the element - so the handoff is invisible
       const settle = () => { if (ready) return; art.style.animation = 'none'; ready = true; };
       art.addEventListener('animationend', (e) => { if (e.animationName === 'dsShotIn') settle(); });
       setTimeout(settle, 2600);   // fallback: the entrance never ran (skipped, or the tab opened hidden)
@@ -631,7 +631,7 @@
       hero.addEventListener('pointerleave', () => { if (!ready) return; tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(apply); });
     })();
 
-    /* ---- Design System — right-side progress rail (page-scoped) ---- */
+    /* ---- Design System - right-side progress rail (page-scoped) ---- */
     (function () {
       const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -655,14 +655,14 @@
       const pgbar = document.querySelector('.pgbar');
       const pgfill = pgbar && pgbar.firstElementChild;
       function railUpdate() {
-        // Progress starts at ZERO the moment the rail reveals — it must never appear already
+        // Progress starts at ZERO the moment the rail reveals - it must never appear already
         // part-filled. Stops = [reveal point, ...section anchors, end of page], and dot i sits at
         // ((i+1)/segments)*100, so nothing is lit at p=0 and the end cap closes it out at 100.
         const doc = document.documentElement;
         const maxScroll = Math.max(1, doc.scrollHeight - doc.clientHeight);
         const y = doc.scrollTop, vh = window.innerHeight;
         // A section counts as reached once its top is just under the header, and the track opens a
-        // hair before the first of them — so the rail turns up AT Foundations, not a screen early.
+        // hair before the first of them - so the rail turns up AT Foundations, not a screen early.
         const reach = targets.map((t) => (t ? Math.max(0, t.getBoundingClientRect().top + window.scrollY - vh * 0.10) : 0));
         let startY = revealSec ? revealSec.getBoundingClientRect().top + window.scrollY - vh * REVEAL : 0;
         if (!(startY < reach[0])) startY = reach[0] - 1;

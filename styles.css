@@ -1,5 +1,5 @@
 /* =========================================================
-   Yehuda Amitzur — UX Designer portfolio
+   Yehuda Amitzur - UX Designer portfolio
    Light, warm-neutral palette. Gradients kept for depth,
    strokes, and motion. Hero/header/cards mirror amitux.in.
    ========================================================= */
@@ -26,7 +26,7 @@
   --brand-lit:  #9a5fc0;  /* brand hover */
   --brand-soft: rgba(119, 63, 156, 0.10);
 
-  /* tag tints — light pills, saturated text */
+  /* tag tints - light pills, saturated text */
   --t-gold-bg:   #f2ead4;  --t-gold-fg:   #856318;
   --t-green-bg:  #e6efdc;  --t-green-fg:  #4c7434;
   --t-blue-bg:   #e1eaf0;  --t-blue-fg:   #3c6076;
@@ -215,7 +215,7 @@ ul, ol { list-style: none; padding: 0; }
 }
 .hdr--float.is-scrolled .hdr__pill { padding: 8px 20px 8px 10px; }
 .hdr--float .hdr__avatar { width: 46px; height: 46px; flex: none; }
-/* overflow:hidden is what lets this collapse to width 0 on scroll — but it also clips the
+/* overflow:hidden is what lets this collapse to width 0 on scroll - but it also clips the
    Contact button, which is exactly as tall as this box. The 5px block padding (cancelled again
    by an equal negative margin, so the pill's height is untouched) opens the clip box just enough
    for the button's 1px hover lift and its focus ring to stay whole. */
@@ -259,7 +259,7 @@ ul, ol { list-style: none; padding: 0; }
    the ring's outer edge was landing exactly on the clip line and getting shaved flat on one side.
    Padding opens the clip box; the matching negative margin hands the space straight
    back, so the ring now draws into the pill's own 20px of padding and the pill's width is
-   unchanged — same trick as .hdr__expand above. The pulse ring reaches ~8px past the dot on every
+   unchanged - same trick as .hdr__expand above. The pulse ring reaches ~8px past the dot on every
    side, so the padding is now 12px (right) and 7px (top/bottom) with matching negative margins:
    the clip box opens far enough for the ring to finish, and the pill's own box is untouched. */
 .hdr--float.is-scrolled .hdr__status { max-width: 260px; opacity: 1; padding: 7px 12px 7px 12px; margin: -7px -12px -7px 0; }
@@ -268,8 +268,8 @@ ul, ol { list-style: none; padding: 0; }
   .hdr--float .hdr__nav, .hdr--float .hdr__cta { display: none; }
   .hdr--float .hdr__expand, .hdr--float.is-scrolled .hdr__expand { max-width: none; opacity: 1; padding: 5px .3rem 5px .55rem; }
   .hdr--float .hdr__status, .hdr--float.is-scrolled .hdr__status { max-width: 0; opacity: 0; padding: 0; margin-right: 0; }
-  /* Nothing inside the pill changes on scroll at this width — the nav and the status are both
-     out — so the pill must not change either. Without this it inherited the desktop scrolled
+  /* Nothing inside the pill changes on scroll at this width - the nav and the status are both
+     out - so the pill must not change either. Without this it inherited the desktop scrolled
      padding (10px → 20px on the right) and quietly grew 10px sideways as you scrolled. */
   .hdr--float .hdr__pill, .hdr--float.is-scrolled .hdr__pill { padding: 8px 10px; }
   .hdr--float .hdr__menu { display: flex; width: 40px; height: 40px; }
@@ -277,7 +277,7 @@ ul, ol { list-style: none; padding: 0; }
   /* when the menu is open, the pill gives way so the card reads as the bar expanded (one unit) */
   .hdr--float.menu-open .hdr__pill { opacity: 0; visibility: hidden; pointer-events: none; }
 
-  /* the drawer grows straight out of the bar — same top position, one continuous frosted unit */
+  /* the drawer grows straight out of the bar - same top position, one continuous frosted unit */
   .hdr--float .hdr__drawer {
     position: fixed; top: 12px; left: 50%; right: auto; transform: translateX(-50%); z-index: 61;
     width: min(340px, calc(100% - 24px));
@@ -297,7 +297,7 @@ ul, ol { list-style: none; padding: 0; }
   .hdr__drawer-top { display: flex; align-items: center; justify-content: space-between; }
   .hdr__drawer-ava { width: 46px; height: 46px; border-radius: 50%; overflow: hidden; border: 1.5px solid var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
   .hdr__drawer-ava img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  /* subtle close — two thin bars (no loud purple circle) that arrive from the hamburger and cross into an X */
+  /* subtle close - two thin bars (no loud purple circle) that arrive from the hamburger and cross into an X */
   .hdr__drawer-close { position: relative; width: 40px; height: 40px; border: 0; background: none; cursor: pointer; border-radius: 50%;
     display: inline-flex; align-items: center; justify-content: center; transition: background .2s ease; }
   .hdr__drawer-close:hover { background: rgba(119, 63, 156, 0.10); }
@@ -310,7 +310,7 @@ ul, ol { list-style: none; padding: 0; }
 
   .hdr--float .hdr__drawer a { text-align: center; border-bottom: 0; padding: 0; font-size: 1.4rem; color: var(--ink);
     font-family: var(--f-display); font-weight: 500; }
-  /* the CTA has to out-specify the blanket `a` rule above — otherwise it loses its white
+  /* the CTA has to out-specify the blanket `a` rule above - otherwise it loses its white
      label and its side padding and reads as a bare purple blob behind black text */
   .hdr--float .hdr__drawer a.hdr__drawer-contact,
   .hdr__drawer-contact { align-self: center; display: inline-flex; align-items: center; justify-content: center; margin: 8px 0 6px;
@@ -380,7 +380,7 @@ ul, ol { list-style: none; padding: 0; }
     background: radial-gradient(circle at 50% 50%, rgba(181,117,223,0.38) 0%, rgba(181,117,223,0.18) 40%, rgba(181,117,223,0) 70%); }
 }
 
-/* Particle "UX/UI Designer" — the canvas covers the whole hero so dots can fly across it */
+/* Particle "UX/UI Designer" - the canvas covers the whole hero so dots can fly across it */
 .hero__line--2 { position: relative; width: 100%; }
 .hero__dots {
   position: absolute; top: 0; left: 0;   /* width/height set by JS so the canvas can extend below the hero */
@@ -402,7 +402,7 @@ ul, ol { list-style: none; padding: 0; }
 }
 .hero__cursor img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
 
-/* Per-letter hover for "UX Designer" — vivid tint + external glow */
+/* Per-letter hover for "UX Designer" - vivid tint + external glow */
 .hero__letter { display: inline-block; transition: color .3s ease, text-shadow .35s ease, transform .3s cubic-bezier(.2,.9,.3,1.4); will-change: color, transform; }
 .hero__letter.is-lit { transform: translateY(-0.09em) scale(1.09); }
 @keyframes glowIn { from { opacity: 0; } to { opacity: 1; } }
@@ -438,25 +438,16 @@ ul, ol { list-style: none; padding: 0; }
    part-way down: transparent at its top edge, fully on --bg by the time the numbers begin.
    Same "sheet fades in over the hero" move as .tl-cover / .bn-cover on the case studies. */
 /* =========================================================
-   Hero project tiles — the work index, sitting in the first screen.
+   Hero project tiles - the work index, sitting in the first screen.
    Each tile is a button: project-tinted frame, cover, name + one line.
-   (The previous sticky-stacking .case concept is kept below, unused —
+   (The previous sticky-stacking .case concept is kept below, unused -
     the full original page is also saved as index-cards-backup.html)
    ========================================================= */
 .hero-work {
-  /* One source of truth for the row's geometry, so the "See more" link can be placed off the row
-     without measuring anything. --frame-h is the height of a tile's PICTURE — the link centres on
-     the artwork, not on the whole tile: the names and one-liners hang below the pictures, and
-     centring on those would sit the link visibly below the middle of the row. Every cover is
-     1200x750, hence x .625, and the mat's padding is inside the tile, so the picture is the tile
-     minus both pads. The row is only ever exactly --row-w wide wherever the link sits beside it,
-     so the tile width is arithmetic. The phone block overrides --tile-w / --frame-pad and the
-     whole chain re-solves itself. */
-  --row-w: 1000px;
+  /* Three equal tiles, centred on the page. --frame-pad is the grey mat inside each tile and is
+     restated in the phone block below, where the row turns into a swipe strip. */
   --row-gap: clamp(.9rem, 2.2vw, 2rem);
   --frame-pad: clamp(5px, .7vw, 9px);
-  --tile-w: calc((var(--row-w) - 2 * var(--row-gap)) / 3);
-  --frame-h: calc((var(--tile-w) - 2 * var(--frame-pad)) * .625 + 2 * var(--frame-pad));
   position: relative; z-index: 3;              /* above the dot canvas (z-index 2) */
   width: 100%; max-width: 1000px; margin-inline: auto;
   margin-top: clamp(1.75rem, 4.5vh, 3.25rem);
@@ -465,7 +456,7 @@ ul, ol { list-style: none; padding: 0; }
   scroll-margin-top: calc(var(--hdr-h) + 1rem);
 }
 /* the dots finish assembling at ~1.9s, so the tiles ease up into place just after that:
-   a long, soft rise + fade (no scale pop), each one close behind the last — then they breathe
+   a long, soft rise + fade (no scale pop), each one close behind the last - then they breathe
    continuously, the same gentle float the Glimpse photos use. */
 @keyframes wtIn { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes wtBreathe { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-9px) scale(1.008); } }
@@ -477,7 +468,7 @@ ul, ol { list-style: none; padding: 0; }
 .wtile:nth-child(2) { animation-delay: 2.13s, 3.73s; animation-duration: 1.5s, 8.2s; }
 .wtile:nth-child(3) { animation-delay: 2.26s, 3.86s; animation-duration: 1.5s, 7.6s; }
 /* The frame does NOT set its own ratio. It is a mat that wraps the screenshot, and the
-   screenshot keeps its intrinsic proportions (height: auto, no object-fit) — so there is
+   screenshot keeps its intrinsic proportions (height: auto, no object-fit) - so there is
    nothing left in the box that can crop it, on any engine, whatever box-sizing does to
    aspect-ratio. All three tiles are 1200x750, so they still come out exactly equal height. */
 .wtile__frame {
@@ -505,100 +496,33 @@ ul, ol { list-style: none; padding: 0; }
 /* per-project tint + shadow hue, taken from each case study's own palette */
 .wtile--talmind { --wt-tint: linear-gradient(155deg, #D9DFF1, #F2F4FE); --wt-sh1: rgba(74,86,150,.16);  --wt-sh2: rgba(74,86,150,.42); }
 .wtile--bianca  { --wt-tint: linear-gradient(155deg, #F3E4D1, #F8F3EC); --wt-sh1: rgba(178,110,38,.16); --wt-sh2: rgba(178,110,38,.40); }
-/* Design System sits at hue 100 — the green of its own hero artwork. Same saturation and
+/* Design System sits at hue 100 - the green of its own hero artwork. Same saturation and
    lightness as the lilac it replaced, so it reads as one of the family, just a different hue. */
-/* DS: #B3ECCA is Yehuda's own pick for the mat — the same colour the case study's hero veil uses;
-   the other two values are derived from it the way the tiles above are built — the light stop is
+/* DS: #B3ECCA is Yehuda's own pick for the mat - the same colour the case study's hero veil uses;
+   the other two values are derived from it the way the tiles above are built - the light stop is
    the same hue taken to near-white, and the shadow is the same hue again at L~43%, where
    talmind's and bianca's shadows both sit. */
 .wtile--ds      { --wt-tint: linear-gradient(155deg, #B3ECCA, #EFFBF4); --wt-sh1: rgba(49,170,98,.16); --wt-sh2: rgba(49,170,98,.40); }
 
-/* ---- "See more" — hangs off the right of the row, centred on its height ----
-   Interim control: the rest of the work is still on Behance. Built as the same text-plus-↗ link
-   the contact row uses, on purpose — it reads as "there is more this way", not as a fourth
-   project competing with the tiles. The underline swipes in from the left on hover, exactly as
-   it does under Phone / Email / LinkedIn. */
-.hero-more {
-  position: absolute; top: calc(var(--frame-h) / 2); transform: translateY(-50%);
-  /* The gap off the row grows with the leftover margin, not with the viewport: `9vw - 4.5rem` is
-     ~49px at 1340 — where the strip beside a 1000px row is only ~94px wide and the page's own 48px
-     gutter is the wall — and climbs to ~58px at 1440, ~84px at 1728, capped at 8rem. A plain vw
-     term can't do that; it would have to stay small everywhere to survive 1340. */
-  left: calc(50% + var(--row-w) / 2 + clamp(3rem, 9vw - 4.5rem, 8rem));
-  /* two lines flush left — "See more" over "projects ↗". Breaking it keeps the link narrow enough
-     to live in the margin beside the row instead of running at the screen edge, and the stack reads
-     as a label for the row rather than a sentence trailing off it. Left, not centred: centring
-     measured "projects ↗" against "See more" and left the WORD hanging half an arrow off-axis. */
-  /* max-content or the two lines break again: the link is absolutely positioned past the right
-     edge of the row that contains it, so shrink-to-fit offers it a negative width and it collapses
-     to one word per line. With max-content the only break is the one in the markup. */
-  width: max-content;
-  text-align: left; padding-bottom: 4px;
-  font-family: var(--f-display); font-weight: 500; font-size: 1.02rem; line-height: 1.3;
-  color: var(--ink-mute);
-  transition: color .25s ease;
-  /* the row's third tile lands at 3.76s; this arrives just behind it, sliding in from the right —
-     the centring lives INSIDE the keyframes, so the animation can own the transform outright */
-  animation: moreIn 1.5s cubic-bezier(.22,.61,.36,1) 2.4s both;
-}
-@keyframes moreIn {
-  from { opacity: 0; transform: translate(12px, -50%); }
-  to   { opacity: 1; transform: translate(0, -50%); }
-}
-/* the underline is a child, not ::after on the link: the link itself is mid-animation on a
-   transform, and ::after would ride it */
-.hero-more::before {
-  content: ""; position: absolute; left: 0; right: 100%; bottom: 0; height: 3px;
-  background: var(--brand); transition: right .3s cubic-bezier(.2,.7,.2,1);
-}
-/* the arrow is the part that answers the pointer — it travels the way it points */
-.hero-more__arrow {
-  display: inline-block; transition: transform .3s cubic-bezier(.2,.7,.2,1);
-}
-@media (hover: hover) and (pointer: fine) {
-  .hero-more:hover { color: var(--brand); }
-  .hero-more:hover::before { right: 0; }
-  .hero-more:hover .hero-more__arrow { transform: translate(3px, -3px); }
-}
-.hero-more:focus-visible { outline: 2px solid var(--brand); outline-offset: 6px; border-radius: 4px; }
-
 /* short viewports: keep the row inside the first screen */
 @media (max-height: 760px) and (min-width: 701px) {
-  .hero-work { max-width: 810px; --row-w: 810px; }   /* the link follows the row in, and so does its height */
-}
-
-/* Tablets and small laptops: no side margin left for the link to sit beside a 1000px row, so it
-   comes back into the grid as a full-width fourth cell and centres under the three tiles. Phones
-   put it back beside the last tile — see the block below, which comes after this one on purpose. */
-@media (max-width: 1339px) {
-  .hero-more {
-    position: static; transform: none;
-    grid-column: 1 / -1; justify-self: center;
-    margin-top: clamp(1.1rem, 2.4vh, 1.6rem);
-    animation-name: moreInFlow;
-  }
-  @keyframes moreInFlow {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: none; }
-  }
+  .hero-work { max-width: 810px; }
 }
 
 /* phones: swipeable row instead of three cramped columns */
 @media (max-width: 700px) {
   .hero-work {
-    /* Explicit tracks rather than 62vw auto-columns: the fourth track is the "See more" link, and
-       it has to be max-content or the strip would keep scrolling through 62vw of dead space after
-       it. --tile-w and --frame-pad are restated for the phone so --frame-h — and with it the
-       link's vertical centring on the artwork — re-solves itself from the same formula. */
-    --tile-w: 62vw; --frame-pad: 10px;
-    grid-template-columns: repeat(3, 62vw) max-content;
+    /* Explicit 62vw tracks rather than auto-columns, so the strip ends right after the third
+       tile instead of scrolling on through dead space. */
+    --frame-pad: 10px;
+    grid-template-columns: repeat(3, 62vw);
     /* No scroll-snap. Snapping is what made this row feel like it was fighting the thumb: a flick
        builds momentum and the snap immediately arrests it and drags the nearest tile to centre,
        so the strip could never coast. Even `proximity` caught nearly every flick, because 62vw
        tiles mean you always land near a snap point. Free momentum is the whole point of a strip
        you push.
        overflow-y is pinned to hidden ON PURPOSE: `overflow-x: auto` alone computes overflow-y to
-       auto as well, which makes this a two-axis scroller — and a two-axis scroller has to watch
+       auto as well, which makes this a two-axis scroller - and a two-axis scroller has to watch
        the first few pixels of every touch to decide which way you meant. That wait is felt as
        stickiness at the start of the drag, and it also let the row swallow vertical drags that
        belonged to the page. Locked to one axis, the browser commits to the pan immediately. */
@@ -606,10 +530,10 @@ ul, ol { list-style: none; padding: 0; }
     /* edge to edge: the row runs the full width of the phone with no side gutter, so the
        tiles are cut by the screen edges and read as a strip you can push. The hero is a
        centred flex column, so the row has to stretch out of that centring, not just take
-       negative margins — a centred item just re-centres itself inside them. */
+       negative margins - a centred item just re-centres itself inside them. */
     align-self: stretch; width: auto; max-width: none;
     /* the TRACK is full-bleed (tiles run off both screen edges as you push it) but the row still
-       opens and closes on a gutter — the first tile never sits flush against the left bezel, and
+       opens and closes on a gutter - the first tile never sits flush against the left bezel, and
        there is air after the last one. align-self matters: .hero is a centred flex column, and a
        centred item just re-centres itself inside negative margins. */
     padding-inline: var(--pad); margin-inline: calc(var(--pad) * -1);
@@ -620,42 +544,30 @@ ul, ol { list-style: none; padding: 0; }
        row keeps headroom top and bottom instead of shaving the top edge off every card. */
     padding-block: 26px 14px;                    /* clears the 9px breathing lift + its shadow */
     scrollbar-width: none;                       /* no scrollbar under the tiles */
-    /* Without this, a drag that runs out of row keeps going into the page's own scroll — and on
+    /* Without this, a drag that runs out of row keeps going into the page's own scroll - and on
        iOS a drag that starts rightwards arms the back-swipe. Both read as the row resisting you. */
     overscroll-behavior-x: contain;
   }
   .hero-work::-webkit-scrollbar { display: none; }
   /* Phones drop the breathing float entirely. Pausing it once the drag had already started was
-     always a beat late — the first touch still landed on three transform-animating images, and
+     always a beat late - the first touch still landed on three transform-animating images, and
      that first beat is exactly what the hand judges. A strip you push should be still until you
      push it; the float stays on desktop, where nothing is competing with it. */
   .wtile { animation-name: wtIn; animation-duration: 1.5s; }
-  /* the grey mat around each screenshot is the frame you actually see on a phone — at 5px it
+  /* the grey mat around each screenshot is the frame you actually see on a phone - at 5px it
      read as a hairline, so it gets real width here (the width itself is --frame-pad, above) */
   .wtile__frame { border-radius: 20px; }
   .wtile__img { border-radius: 8px; }
-
-  /* Same idea as the desktop: the link rides at the end of the strip, beside the last tile and
-     level with the middle of the pictures — so pushing the row to its end IS how you find it. */
-  .hero-more {
-    grid-column: 4; justify-self: start; align-self: start;
-    margin-top: calc(var(--frame-h) / 2); transform: translateY(-50%);
-    animation-name: moreIn;                      /* the keyframes that keep the -50% */
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .wtile { animation: none; }
   .wtile__frame, .wtile__name { transition: none; }
   .wtile:hover .wtile__frame, .wtile:active .wtile__frame { transform: none; }
-  /* the base rule already carries translateY(-50%), so dropping the animation keeps it centred */
-  .hero-more { animation: none; }
-  .hero-more__arrow { transition: none; }
-  .hero-more:hover .hero-more__arrow { transform: none; }
 }
 
 /* =========================================================
-   Next project — the loop (shared by all three case studies)
+   Next project - the loop (shared by all three case studies)
 
    Placement is the whole idea: this sits AFTER the last content
    section and BEFORE "Liked this project? Let's talk." A reader
@@ -666,7 +578,7 @@ ul, ol { list-style: none; padding: 0; }
    the next project is offered.
 
    It is deliberately NOT another button. There is no card, no
-   border and no rule — only a soft wash of the NEXT project's
+   border and no rule - only a soft wash of the NEXT project's
    own tint, so the bottom of every case study drifts into the
    colour of the one it hands off to, and the cover is the exact
    tile the reader already met in the homepage hero. One loud
@@ -677,21 +589,21 @@ ul, ol { list-style: none; padding: 0; }
    centred on this box, so growing the padding would slide the glow off the content it belongs to.
    Margin pushes the whole band down and leaves the wash sitting exactly where it should. */
 .nxt { position: relative; margin-top: clamp(3rem, 7vw, 5.5rem); padding-block: clamp(3.5rem, 8vw, 6.5rem); }
-/* The closing hairline — it used to open the contact CTA, and now opens the hand-off instead:
+/* The closing hairline - it used to open the contact CTA, and now opens the hand-off instead:
    the case study ends at ONE line, and everything after it reads as a single closing move.
    It is a pseudo-element, not a border, because the band is full-bleed while the rule has to
-   keep the wrap's geometry — 1180px centred, and edge to edge only once the viewport is
+   keep the wrap's geometry - 1180px centred, and edge to edge only once the viewport is
    narrower than that. That is exactly the box the CTA's border-top used to span. */
 .nxt::after {
   content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
   width: min(1180px, 100%); height: 1px; background: var(--line-soft); pointer-events: none; z-index: 1;
 }
-/* The wash is an inset overlay, never a sized box — nothing here can widen the document.
+/* The wash is an inset overlay, never a sized box - nothing here can widen the document.
    Its vertical radius is deliberately small (58% of the height, transparent by 70% of that):
    the ellipse has to reach zero INSIDE the section, or the section's own top and bottom edges
    cut the gradient off mid-ramp and the "glow" turns back into a rectangle with two seams. */
 /* Two layers: a halo that gathers around the cover, and a wide veil underneath it so the whole
-   band — the text side included — shifts temperature rather than just glowing on the right. */
+   band - the text side included - shifts temperature rather than just glowing on the right. */
 .nxt::before {
   content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
   background:
@@ -699,7 +611,7 @@ ul, ol { list-style: none; padding: 0; }
     radial-gradient(120% 50% at 50% 50%, var(--nx-veil) 0%, transparent 74%);
 }
 .nxt__inner { position: relative; z-index: 1; width: 100%; max-width: 1180px; margin-inline: auto; padding-inline: var(--pad); }
-/* one link, whole row — on a phone the entire band is the tap target.
+/* one link, whole row - on a phone the entire band is the tap target.
    Grid, not space-between: the text column takes the leftover width so the description runs on
    ONE line instead of breaking into a small stack that leaves the left half of the band empty. */
 .nxt__link { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: clamp(1.5rem, 5vw, 4rem); }
@@ -711,7 +623,7 @@ ul, ol { list-style: none; padding: 0; }
 .nxt__arrow { font-style: normal; font-size: .5em; transition: transform .38s cubic-bezier(.2,.7,.2,1); }
 /* 44ch clears the longest of the three one-liners, so none of them wraps */
 .nxt__desc { font-size: clamp(.95rem, 1.2vw, 1.08rem); line-height: 1.5; color: var(--ink-mute); max-width: 44ch; }
-/* same mat, same nested radii and same shadow as the homepage tile — this IS that tile */
+/* same mat, same nested radii and same shadow as the homepage tile - this IS that tile */
 .nxt__frame { width: clamp(230px, 30vw, 400px);
   padding: clamp(5px, .7vw, 9px); border-radius: clamp(14px, 1.7vw, 22px);
   background: var(--nx-tint);
@@ -729,7 +641,7 @@ ul, ol { list-style: none; padding: 0; }
 .nxt__link:focus-visible { outline: none; }
 .nxt__link:focus-visible .nxt__frame { outline: 2px solid var(--brand); outline-offset: 4px; }
 
-/* per-project tint — the same three palettes the homepage tiles carry, plus a wash:
+/* per-project tint - the same three palettes the homepage tiles carry, plus a wash:
    the tile's own shadow hue, thinned until it only warms (or cools) the page behind it */
 .nxt--talmind { --nx-tint: linear-gradient(155deg, #D9DFF1, #F2F4FE); --nx-sh1: rgba(74,86,150,.16);  --nx-sh2: rgba(74,86,150,.42);  --nx-wash: rgba(74,86,150,.17);  --nx-veil: rgba(74,86,150,.10); }
 .nxt--bianca  { --nx-tint: linear-gradient(155deg, #F3E4D1, #F8F3EC); --nx-sh1: rgba(178,110,38,.16); --nx-sh2: rgba(178,110,38,.40); --nx-wash: rgba(196,124,44,.17); --nx-veil: rgba(196,124,44,.10); }
@@ -803,7 +715,7 @@ ul, ol { list-style: none; padding: 0; }
   padding: clamp(1.1rem, 2.5vw, 1.6rem);
   min-height: clamp(460px, 46vw, 620px);   /* ~25% taller frames */
 }
-/* one soft shadow via a pseudo layer — its opacity fades when the card gets covered,
+/* one soft shadow via a pseudo layer - its opacity fades when the card gets covered,
    so stacked cards never pile shadow-on-shadow */
 .case__inner::after {
   content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: -1;
@@ -813,13 +725,13 @@ ul, ol { list-style: none; padding: 0; }
 }
 .case:nth-child(even) .case__media { order: 2; }
 
-/* directional tint — the brand colour sits on the image side for contrast (no white patch) */
+/* directional tint - the brand colour sits on the image side for contrast (no white patch) */
 .case__inner--talmind { background: linear-gradient(to right, #D9DFF1, #F2F4FE 60%); }
 .case__inner--bianca  { background: linear-gradient(to left,  #F3E4D1, #F8F3EC 60%); }
 .case__inner--tesi    { background: linear-gradient(to right, #D8E2F2, #EFF3F9 60%); }
 .case__inner--ds      { background: linear-gradient(to right, #E4D6F2, #F6F2FB 60%); }
 
-/* clickable case (opens a project page) — no hover stroke, just a shadow lift */
+/* clickable case (opens a project page) - no hover stroke, just a shadow lift */
 a.case__inner { color: inherit; text-decoration: none; cursor: pointer; }
 a.case__inner:hover::after { box-shadow: 0 42px 74px -32px rgba(40, 37, 30, 0.5); }
 .case__open {
@@ -833,7 +745,7 @@ a.case__inner:hover::after { box-shadow: 0 42px 74px -32px rgba(40, 37, 30, 0.5)
 a.case__inner:hover .case__open { background: var(--brand); color: #fff; }
 a.case__inner:hover .case__open span { transform: translateX(3px); }
 
-/* the screenshot sits clean on the card tint — no box, no shadow */
+/* the screenshot sits clean on the card tint - no box, no shadow */
 .case__media { position: relative; display: flex; align-items: center; justify-content: center; padding: clamp(.75rem, 2vw, 1.6rem); }
 .case__img {
   width: 100%; height: auto; max-height: clamp(300px, 38vw, 500px);
@@ -953,7 +865,7 @@ a.case__inner:hover .case__open span { transform: translateX(3px); }
    Contact  (headline + centered socials)
    ========================================================= */
 /* the ring pile settles on the footer's top rule and stands ~56px over it, so the last block on
-   the page keeps that much clear air plus a margin — the rings never reach the links */
+   the page keeps that much clear air plus a margin - the rings never reach the links */
 .contact { text-align: center; padding-block: clamp(3.5rem, 8vw, 6.25rem); padding-bottom: calc(clamp(3.5rem, 8vw, 6.25rem) + 84px); }
 .contact__headline {
   display: block; font-family: var(--f-display); font-weight: 700;
@@ -1003,10 +915,10 @@ a.case__inner:hover .case__open span { transform: translateX(3px); }
 /* =========================================================
    Footer
    ========================================================= */
-/* footer keeps its original size — the ring canvas is absolutely positioned and sits BEHIND
+/* footer keeps its original size - the ring canvas is absolutely positioned and sits BEHIND
    every element (z-index -1), so it adds no height and shifts nothing. It reaches well above
    the footer so the rings can be knocked upward out of frame. */
-/* z-index 3 puts the whole footer — including its ring canvas — above the case-study page
+/* z-index 3 puts the whole footer - including its ring canvas - above the case-study page
    sheets (.tl-cover / .bn-cover sit at z-index 2 with an opaque background, which was hiding
    the pile completely on those pages). The canvas still paints behind the footer's own text. */
 .foot { position: relative; z-index: 3; border-top: 1px solid var(--line-soft); padding-block: 2rem; }
@@ -1027,7 +939,7 @@ a.case__inner:hover .case__open span { transform: translateX(3px); }
    ========================================================= */
 @media (max-width: 900px) {
   .case__inner, .case:nth-child(even) .case__inner { grid-template-columns: 1fr; }
-  /* drop the tall min-height on mobile — it created dead space that hid the description */
+  /* drop the tall min-height on mobile - it created dead space that hid the description */
   .case__inner { min-height: 0; padding: clamp(.9rem, 3vw, 1.4rem); gap: clamp(1rem, 3vw, 1.5rem); }
   .case:nth-child(even) .case__media { order: 0; }
   .case__media { aspect-ratio: 16 / 10; overflow: hidden; min-width: 0; padding: clamp(.5rem, 2vw, 1rem); }
@@ -1065,7 +977,7 @@ a.case__inner:hover .case__open span { transform: translateX(3px); }
     justify-items: center; gap: 1.3rem 2.5rem; }
 }
 
-/* phones: the footer reads bottom-up — the action first, the small print under it */
+/* phones: the footer reads bottom-up - the action first, the small print under it */
 @media (max-width: 700px) {
   .foot__inner { flex-direction: column-reverse; align-items: flex-start; gap: .55rem; }
 }

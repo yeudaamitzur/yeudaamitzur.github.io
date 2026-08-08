@@ -3,41 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Talmind — Case study · Yehuda Amitzur</title>
-  <meta name="description" content="Talmind — a tablet app that brings authentic Talmud study into Korean classrooms, teaching the questioning, reasoning mind behind it. A UX/UI case study by Yehuda Amitzur." />
+  <title>Talmind case study · Yehuda Amitzur</title>
+  <meta name="description" content="Talmind is a tablet app that brings authentic Talmud study into Korean classrooms, teaching the questioning, reasoning mind behind it. A UX/UI case study by Yehuda Amitzur." />
 
 
-  <!-- Link previews — see the long note in index.html. The card image is this study's own tile. -->
+  <!-- Link previews - see the long note in index.html. The card image is this study's own tile. -->
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Yehuda Amitzur" />
   <meta property="og:url" content="https://yeudaamitzur.github.io/talmind.html" />
-  <meta property="og:title" content="Talmind — Case study · Yehuda Amitzur" />
-  <meta property="og:description" content="Talmind — a tablet app that brings authentic Talmud study into Korean classrooms, teaching the questioning, reasoning mind behind it. A UX/UI case study by Yehuda Amitzur." />
+  <meta property="og:title" content="Talmind case study · Yehuda Amitzur" />
+  <meta property="og:description" content="Talmind is a tablet app that brings authentic Talmud study into Korean classrooms, teaching the questioning, reasoning mind behind it. A UX/UI case study by Yehuda Amitzur." />
   <meta property="og:image" content="https://yeudaamitzur.github.io/tile-talmind.jpg?v=1" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="750" />
   <meta property="og:image:alt" content="The Talmind learning dashboard" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Talmind — Case study · Yehuda Amitzur" />
-  <meta name="twitter:description" content="Talmind — a tablet app that brings authentic Talmud study into Korean classrooms, teaching the questioning, reasoning mind behind it. A UX/UI case study by Yehuda Amitzur." />
+  <meta name="twitter:title" content="Talmind case study · Yehuda Amitzur" />
+  <meta name="twitter:description" content="Talmind is a tablet app that brings authentic Talmud study into Korean classrooms, teaching the questioning, reasoning mind behind it. A UX/UI case study by Yehuda Amitzur." />
   <meta name="twitter:image" content="https://yeudaamitzur.github.io/tile-talmind.jpg?v=1" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <!-- favicon: the same ring as the site cursor — purple stroke, lighter purple fill -->
+  <!-- favicon: the same ring as the site cursor - purple stroke, lighter purple fill -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
   <link rel="canonical" href="https://yeudaamitzur.github.io/talmind.html" />
   <!-- The hero dashboard is the largest thing on the first screen; without this the
        browser only discovers it after the CSS has parsed, by which time the hero video
        is already pulling. -->
-  <link rel="preload" as="image" href="talmind-tablet.webp?v=51" fetchpriority="high" />
-  <link rel="stylesheet" href="styles.css?v=51" />
+  <link rel="preload" as="image" href="talmind-tablet.webp?v=52" fetchpriority="high" />
+  <link rel="stylesheet" href="styles.css?v=52" />
 
   <style>
     /* =========================================================
-       Talmind — case study (page-scoped, reuses shared tokens)
+       Talmind - case study (page-scoped, reuses shared tokens)
        Left-aligned editorial. Warm-neutral + brand purple.
        Cards used sparingly: glassy, no stroke.
        Shadows mirror the "Glimpse" photos: 0 30px 60px -34px rgba(40,37,30,.4)
@@ -82,21 +82,21 @@
     }
     .tl-hero > :not(.tl-hero__bg) { position: relative; z-index: 2; }   /* content above the video */
 
-    /* full-bleed video — PINNED to the viewport (only the video stays put) */
+    /* full-bleed video - PINNED to the viewport (only the video stays put) */
     .tl-hero__bg { position: fixed; top: 0; left: 50%; transform: translateX(-50%);
       width: 100vw; height: clamp(600px, 57vw, 819px); z-index: 0; overflow: hidden; pointer-events: none; }
 
-    /* gradient veil — LOCKED onto the pinned video so the two never separate (no seam on scroll) */
+    /* gradient veil - LOCKED onto the pinned video so the two never separate (no seam on scroll) */
     .tl-hero__bg::after { content: ""; position: absolute; inset: 0; pointer-events: none;
       background:
         linear-gradient(180deg, rgba(173,179,197,0.92) 0%, rgba(255,255,255,0.67) 47.12%, #F0EFE9 100%),
         linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 50.24%, #F0EFE9 100%); }
 
-    /* lead copy — held in place from the first pixel and dissolves almost instantly on scroll */
+    /* lead copy - held in place from the first pixel and dissolves almost instantly on scroll */
     /* `.tl-hero > .tl-hero__head` beats the blanket `.tl-hero > :not(.tl-hero__bg)` rule above */
     .tl-hero > .tl-hero__head { position: sticky; top: calc(var(--hdr-h) + clamp(2.25rem, 6vw, 5rem)); z-index: 3; will-change: opacity; }
 
-    /* sheet holding the rest of the page — scrolls up over the pinned video; its TOP edge fades in
+    /* sheet holding the rest of the page - scrolls up over the pinned video; its TOP edge fades in
        from transparent so the meta frame blends onto the hero instead of cutting a hard seam */
     .tl-cover { position: relative; z-index: 2;
       background: linear-gradient(180deg, rgba(240,239,233,0) 0, var(--bg) clamp(200px, 26vh, 340px)); }
@@ -111,7 +111,7 @@
       color: var(--brand); font-weight: 600; font-size: .9rem; border-bottom: 1px solid transparent; transition: border-color .25s ease; }
     .tl-hero__src:hover { border-color: var(--brand); }
 
-    /* floating hands-tablet — rises up & settles from a larger size ~3s after load, then drifts with the cursor */
+    /* floating hands-tablet - rises up & settles from a larger size ~3s after load, then drifts with the cursor */
     .tl-tablet { position: relative; z-index: 2; width: min(1120px, 100%); margin: clamp(2rem, 5vw, 4.5rem) auto 0;
       transform-style: preserve-3d; will-change: transform, opacity;
       animation: tlTabletIn 1.15s cubic-bezier(.2,.7,.2,1) 2.2s both; }
@@ -120,7 +120,7 @@
       from { opacity: 0; transform: translateY(80px) scale(1.16); }
       to   { opacity: 1; transform: translateY(0) scale(1); }
     }
-    /* project wordmark — the crown of the hierarchy, deliberately unlike the thin section eyebrows */
+    /* project wordmark - the crown of the hierarchy, deliberately unlike the thin section eyebrows */
     .tl-hero__brand { align-self: flex-start; display: inline-flex; align-items: center; gap: .55em;
       font-family: var(--f-display); font-weight: 700; font-size: .95rem; letter-spacing: .14em; text-transform: uppercase;
       color: var(--brand); background: var(--brand-soft); padding: .5em 1.05em; border-radius: 999px; }
@@ -130,7 +130,7 @@
     .tl-hero__sub { color: var(--ink); font-size: clamp(1.1rem, 1.7vw, 1.42rem); line-height: 1.5; margin-top: 1.4rem; max-width: 54rem; }
     .tl-hero__sub b { color: var(--brand); font-weight: 600; }
 
-    /* floating product icons — drift up across the whole hero background, contained to the hero */
+    /* floating product icons - drift up across the whole hero background, contained to the hero */
     .tl-hero-float { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: clip; }
     .tl-float { position: absolute; top: 0; width: 84px; opacity: 0; will-change: transform, opacity;
       filter: drop-shadow(0 16px 22px rgba(40,37,30,0.14)); animation: tlFloatUp 16s ease-in-out infinite; }
@@ -147,14 +147,14 @@
       100% { transform: translateY(-52vh) rotate(9deg); opacity: 0; }
     }
 
-    /* meta row (Role / Timeline / Platform / Tools) — aligned inside the grid, not edge-to-edge */
+    /* meta row (Role / Timeline / Platform / Tools) - aligned inside the grid, not edge-to-edge */
     .tl-metabar { margin-top: clamp(1.5rem, 3.5vw, 2.75rem); }
     .tl-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1.25rem 2.5rem; border-bottom: 1px solid var(--line); padding-block: clamp(1.15rem, 2.6vw, 1.7rem); }
     .tl-meta div { display: flex; flex-direction: column; gap: .25rem; }
     .tl-meta dt { font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; color: var(--brand); font-weight: 600; }
     .tl-meta dd { font-family: var(--f-display); font-weight: 500; font-size: .98rem; color: var(--ink); }
 
-    /* hero media — starts around the upper third of the viewport */
+    /* hero media - starts around the upper third of the viewport */
     .tl-hero-media { padding-bottom: clamp(1rem, 3vw, 2.5rem); }
     .tl-hero-media__fig { position: relative; border-radius: clamp(20px, 3vw, 30px); overflow: hidden; box-shadow: var(--tl-shadow); background: var(--bg-deep); }
     .tl-hero-media__fig img { width: 100%; height: clamp(400px, 76vh, 860px); object-fit: cover; object-position: center 32%; will-change: transform; }
@@ -164,7 +164,7 @@
     .tl-about__grid p { color: var(--ink); font-size: clamp(1.15rem, 1.9vw, 1.6rem); line-height: 1.4; margin-top: .9rem; font-family: var(--f-display); font-weight: 500; letter-spacing: -0.01em; }
     .tl-about__grid p b { color: var(--brand); }
 
-    /* ---------- Journey — header + horizontal facts pinned together, grid-aligned ---------- */
+    /* ---------- Journey - header + horizontal facts pinned together, grid-aligned ---------- */
     .tl-journey { position: relative; }
     .tl-journey__sticky { position: sticky; top: 0; height: 100vh; overflow: hidden;
       display: flex; flex-direction: column; justify-content: center; gap: clamp(1.5rem, 3vw, 2.5rem); }
@@ -190,7 +190,7 @@
     .tl-quote-src { display: inline-flex; align-items: center; gap: .4em; margin-top: 1.25rem; color: var(--brand); font-weight: 600; font-size: .92rem; border-bottom: 1px solid transparent; transition: border-color .25s ease; }
     .tl-quote-src:hover { border-color: var(--brand); }
 
-    /* ---------- What is Gemara — dry vs alive diptych ---------- */
+    /* ---------- What is Gemara - dry vs alive diptych ---------- */
     .tl-diptych { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: clamp(1rem, 2.5vw, 2rem); margin-top: clamp(2rem, 4vw, 3rem); }
     .tl-side { border-radius: 24px; padding: clamp(1.5rem, 3vw, 2.4rem); }
     .tl-side h3 { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.3rem, 2.4vw, 1.9rem); line-height: 1.1; margin-top: .8rem; letter-spacing: -0.01em; }
@@ -246,9 +246,9 @@
     .tl-scard__cap { color: #28251e; font-family: var(--f-body); font-size: clamp(1rem, 1.25vw, 1.125rem); line-height: 1.6; max-width: 100%; text-align: left; }
     .tl-scard__cap b { color: #18160f; font-weight: 600; }
 
-    /* ---------- Inside the project — 4 SEPARATE views; the page just scrolls past them ----------
+    /* ---------- Inside the project - 4 SEPARATE views; the page just scrolls past them ----------
        Nothing here is driven by scroll any more. Each of the four screens is its own view (grey
-       frame card + its own caption). Desktop: the views stack in one grid cell — everything still
+       frame card + its own caption). Desktop: the views stack in one grid cell - everything still
        to come waits below the clip edge and rises, card and all, when its dot is clicked; going
        back drops the view that no longer applies straight back down and out of frame. Mobile: the
        very same views become a snap-scrolling row you swipe sideways. In both, the notes inside a
@@ -258,8 +258,8 @@
     /* dots hang in the left gutter (desktop) or in a row under the views (mobile) */
     .tl-fsstage { position: relative; width: max-content; max-width: 100%; margin-inline: auto; }
     .tl-fsview { display: flex; flex-direction: column; align-items: center; gap: clamp(14px, 2vw, 22px); }
-    /* The rail centres on the FRAME, not on the whole view. Given 100% it measured the view —
-       frame + gap + caption — so its middle sat ~40px below the middle of the screen it belongs
+    /* The rail centres on the FRAME, not on the whole view. Given 100% it measured the view -
+       frame + gap + caption - so its middle sat ~40px below the middle of the screen it belongs
        to, which is what read as "a bit low". This is the frame's exact height: the 16:10 stage
        plus its mat, top and bottom. */
     /* --dot drives the circle, the space between circles and the active ring together, so the three
@@ -282,24 +282,24 @@
       box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 10px 36px rgba(0,0,0,0.11); }
     /* The screenshots carry their OWN rounded corners baked in, with white squares outside the
        curve. A clip whose radius is smaller than that baked one leaves those white wedges sitting
-       in the corners — which is why the frame read as "not really round". Clipping at a radius at
+       in the corners - which is why the frame read as "not really round". Clipping at a radius at
        least as large as the baked one (measured: up to 2.04% of the shot's width) swallows them
        whole, with no zoom and no re-cropping, so every overlay coordinate stays valid. */
     .tl-frame__stage { position: relative; aspect-ratio: 16 / 10; overflow: clip; background: #d0ccc3;
       border-radius: max(18px, calc(var(--stagew) * 0.024)); }
 
-    /* one screen per view now — it simply fills its own stage */
+    /* one screen per view now - it simply fills its own stage */
     .tl-frame__screen { position: absolute; inset: 0; z-index: 1; }
     .tl-frame__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 
-    /* darkening scrim — fades in when the screen's content lifts to the front */
+    /* darkening scrim - fades in when the screen's content lifts to the front */
     .tl-frame__scrim { position: absolute; inset: 0; z-index: 2; opacity: 0; pointer-events: none;
       background: radial-gradient(125% 120% at 50% 42%, rgba(14,10,34,0.22), rgba(8,6,22,0.55));
       transition: opacity .8s ease; }
     .tl-screen--home.is-lift .tl-frame__scrim,
     .tl-frame__screen.is-emph .tl-frame__scrim { opacity: 1; }
 
-    /* SCREEN 1 — liftable "prepare" component + badges + progress overlaid on their baked-in twins */
+    /* SCREEN 1 - liftable "prepare" component + badges + progress overlaid on their baked-in twins */
     .tl-comp { position: absolute; z-index: 3; left: var(--comp-l); top: var(--comp-t); width: var(--comp-w);
       transform-origin: 50% 44%; transform: translateY(0) scale(1); will-change: transform;
       transition: transform .9s cubic-bezier(.2,.72,.2,1), filter .9s ease; filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
@@ -317,7 +317,7 @@
     .tl-comp.is-prog .tl-comp__prog { transform: translateY(-18%) scale(1.66);
       filter: drop-shadow(0 18px 30px rgba(26,18,58,0.5)); }
 
-    /* SCREENS 2–4 — generic "lift to the front" overlays (panels, cards) */
+    /* SCREENS 2-4 - generic "lift to the front" overlays (panels, cards) */
     .tl-lift { position: absolute; z-index: 3; left: var(--x); top: var(--y); width: var(--w); height: auto;
       transform-origin: var(--o, 50% 50%); transform: translateY(0) scale(1); will-change: transform;
       transition: transform .8s cubic-bezier(.2,.72,.2,1), filter .8s ease; filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
@@ -331,7 +331,7 @@
     @keyframes tlWave { 0%{transform:rotate(0) scale(1)} 16%{transform:rotate(-12deg) scale(1.07)} 32%{transform:rotate(10deg) scale(1.09)}
       48%{transform:rotate(-9deg) scale(1.08)} 64%{transform:rotate(6deg) scale(1.05)} 82%{transform:rotate(-3deg) scale(1.03)} 100%{transform:rotate(0) scale(1)} }
 
-    /* caption under the frame — persistent bold label + typed suffix; brand-purple caret.
+    /* caption under the frame - persistent bold label + typed suffix; brand-purple caret.
        The height is BOXED at the tallest line any view will ever type (measured in JS → --capH),
        because a caption that grows as it types would shove the dots, and the whole next section,
        up and down while you read. */
@@ -343,24 +343,24 @@
     /* ---- desktop: the four views share one cell; the ones still to come wait below the clip ---- */
     @media (min-width: 761px) {
       .tl-fsviews { display: grid; grid-template-areas: "v"; overflow: clip; overflow-clip-margin: 56px; }
-      /* Out here they are twice the phone's size — 33px was a third too big, and the rail sat too
+      /* Out here they are twice the phone's size - 33px was a third too big, and the rail sat too
          close to the card. The gap and the ring follow --dot on their own (see the note above),
          so only these two numbers ever change. */
       .tl-dots { --dot: 22px; margin-right: clamp(30px, 4.6vw, 64px); }
       /* The page-coloured backing is what lets a view hide the one it rose in front of. It is
          EXACTLY the frame's box (same left, same width, same top) plus the caption underneath, so
-         it has to carry the frame's radius too — a square backing painted its own corners over the
+         it has to carry the frame's radius too - a square backing painted its own corners over the
          card behind it, and the rising card arrived with square shoulders sitting outside its
          rounded ones. That is the "extra rectangular surface" that squared the corners off.
          TOP corners only, though. The bottom of the backing sits under the caption, and rounding
          it there cut two notches out of the cover through which the SECOND LINE of a passed view's
-         caption showed — text from a screen you are no longer on, peeking out below the one you are. */
+         caption showed - text from a screen you are no longer on, peeking out below the one you are. */
       .tl-fsview { grid-area: v; background: var(--bg);
         border-radius: clamp(20px, 2.4vw, 34px) clamp(20px, 2.4vw, 34px) 0 0;
         will-change: transform, opacity;
         /* Opacity snaps solid at the START of a rise. It used to cross-fade over .42s of a .82s
            trip, so for half the journey you were reading the outgoing screen straight through the
-           incoming one — the ghost is what made the change of view look unsettled. It rises from
+           incoming one - the ghost is what made the change of view look unsettled. It rises from
            outside the clip anyway, so it never needs to fade IN. */
         transition: transform .82s cubic-bezier(.2,.72,.2,1), opacity .16s ease; }
       /* going the other way it may fade as it drops, once it is on its way down */
@@ -368,7 +368,7 @@
         transition: transform .82s cubic-bezier(.2,.72,.2,1), opacity .46s ease .2s; }
       /* All four sit in the same cell and a frame's shadow spills past its own backing, so leaving
          every shadow on stacks four of them around the top card. A view you have already passed
-         therefore drops its shadow — but only AFTER the card rising in front of it has arrived.
+         therefore drops its shadow - but only AFTER the card rising in front of it has arrived.
          Killing it on the click (as before) popped the shadow off the card you were still looking at. */
       .tl-fsview .tl-frame { transition: box-shadow .3s ease; }
       .tl-fsview:not(.is-on):not(.is-below) .tl-frame { box-shadow: none; transition: box-shadow .24s ease .58s; }
@@ -393,12 +393,12 @@
       /* --fw is a percentage here, so the calc above would resolve per-axis and bend the corner
          into an ellipse. A phone stage never needs more than 18px to swallow the baked corner. */
       .tl-frame__stage { border-radius: 18px; }
-      /* the dots are a fixed landmark — they sit under the track and never move with the caption */
-      /* The bottom margin is NOT decoration — it is clearance for the footer's ring pile. Those
+      /* the dots are a fixed landmark - they sit under the track and never move with the caption */
+      /* The bottom margin is NOT decoration - it is clearance for the footer's ring pile. Those
          rings are seeded across a band 0.42 × their 150vh canvas deep (so 63vh), measured up from
          the footer's top rule, and on a tall phone the top of that band lands ON the dot row: until
-         they drop, the dots sit behind a scatter of lilac circles. Pushing the CTA — and with it the
-         footer, and with it the whole band — down by the shortfall is the only lever there is: the
+         they drop, the dots sit behind a scatter of lilac circles. Pushing the CTA - and with it the
+         footer, and with it the whole band - down by the shortfall is the only lever there is: the
          canvas lives in .foot at z-index 3 and the dots are sealed inside .tl-cover at 2, so no
          z-index can lift them over it. The dot row sits 471px above the footer rule on its own, so
          the shortfall is 63vh − 471 + 40px of air; `vh` is the same unit the canvas is sized in, so
@@ -408,21 +408,21 @@
         margin: 16px 0 clamp(0px, calc(63vh - 431px), 150px); }
       /* the section starts further down, so it is clearly its own thing and not the tail of "Before" */
       #product { padding-top: clamp(3.5rem, 10vw, 5rem); }
-      /* the hero tablet is the first thing you see — let it use the full width of the phone
+      /* the hero tablet is the first thing you see - let it use the full width of the phone
          instead of sitting inside the text gutter. EXACTLY 100vw: a single pixel wider and the
          document scrolls sideways under your finger, which drags the whole page off-centre. */
       .tl-tablet { width: 100vw; margin-inline: calc(50% - 50vw); }
     }
 
-    /* reduced motion — no rising, no sliding; the views simply sit where they are */
+    /* reduced motion - no rising, no sliding; the views simply sit where they are */
     @media (prefers-reduced-motion: reduce) {
       .tl-fsview { transition: none; }
       .tl-hint { transition: none; }
     }
 
-    /* ---------- Tap zones — the right half of a screen advances its notes, the left half steps back ----------
+    /* ---------- Tap zones - the right half of a screen advances its notes, the left half steps back ----------
        They sit above the artwork and the pencil, below the dark hint that explains them. */
-    /* the arrows ride low — down in the bottom quarter of the screen, out of the artwork's way —
+    /* the arrows ride low - down in the bottom quarter of the screen, out of the artwork's way -
        and stay semi-transparent so they read as a hint rather than as chrome bolted on top */
     .tl-zone { position: absolute; top: 0; bottom: 0; width: 50%; z-index: 4; border: 0; margin: 0;
       background: none; cursor: pointer; -webkit-tap-highlight-color: transparent;
@@ -440,7 +440,7 @@
     }
     .tl-zone:focus-visible { opacity: .85; outline: 2px solid var(--brand); outline-offset: -5px; border-radius: 16px; }
 
-    /* ---------- The dark hint — shown once, when the first view settles into the middle of the screen ---------- */
+    /* ---------- The dark hint - shown once, when the first view settles into the middle of the screen ---------- */
     .tl-hint { position: absolute; inset: 0; z-index: 5; border-radius: inherit; pointer-events: none;
       display: flex; align-items: center; justify-content: center; padding: clamp(16px, 3vw, 34px);
       background: linear-gradient(180deg, rgba(10,7,26,0.74), rgba(8,5,20,0.86));
@@ -456,7 +456,7 @@
     .tl-hint__k { display: inline-flex; align-items: center; gap: .45em; padding: .5em 1em; border-radius: 999px;
       background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22);
       font-family: var(--f-display); font-weight: 600; font-size: clamp(.76rem, 1vw, .88rem); white-space: nowrap; }
-    /* one wording for fingers, another for a mouse — only one is ever on screen */
+    /* one wording for fingers, another for a mouse - only one is ever on screen */
     .tl-hint__p--touch { display: none; }
     /* a phone-sized 16:10 stage is only ~200px tall, so the card tightens up to stay inside it */
     @media (max-width: 760px) {
@@ -476,26 +476,26 @@
       .tl-hint__k { font-size: .7rem; padding: .35em .7em; }
     }
 
-    /* ---------- "Before" card — the home screen sits in the flow and gets lassoed in pencil on tap ---------- */
+    /* ---------- "Before" card - the home screen sits in the flow and gets lassoed in pencil on tap ---------- */
     /* the section is a normal block now: the page scrolls straight past it, and the three notes are
        stepped through by tapping the halves of the image, not by scrolling. */
     /* margin-top matches the heading→content gap used elsewhere (e.g. .tl-frameshow) */
     .tl-scrolly { position: relative; margin-top: clamp(1.75rem, 3.5vw, 2.75rem); }
     .tl-scrolly__pin { display: flex; align-items: flex-start; justify-content: center; }
 
-    /* the flat before card — no grey frame: reset the inherited card box (no bg, padding, clip or big radius),
+    /* the flat before card - no grey frame: reset the inherited card box (no bg, padding, clip or big radius),
        leaving just the image (with its own shadow + modest radius) and the caption below it */
     .tl-scard--before-flat { position: static; top: auto; transform: none; opacity: 1; z-index: auto; gap: 0; align-self: flex-start;
       background: none; padding: 0; box-shadow: none; border-radius: 0; overflow: visible;
       /* the shot is shown at exactly the size the screens in "Inside the project" are shown at
          (--stagew = the frame card minus its mat), so the product reads at one scale all page.
-         Its section carries .tl-wrap, so 100% here IS the grid — the image can't spill past it. */
+         Its section carries .tl-wrap, so 100% here IS the grid - the image can't spill past it. */
       width: 100%; max-width: min(100%, var(--stagew)); margin-inline: auto; }
     .tl-scard--before-flat .tl-scard__fig { position: relative; max-width: 100%; border-radius: 20px; }
     /* radius matches the page's screenshot images (.tl-scard__fig img = 20px); shadow no longer clipped */
     .tl-scard--before-flat .tl-scard__fig > img { border-radius: 20px; box-shadow: 0 18px 40px -12px rgba(40,37,30,0.28); }
 
-    /* pencil mark-up layer — red, drawn on by scroll via stroke-dashoffset */
+    /* pencil mark-up layer - red, drawn on by scroll via stroke-dashoffset */
     .tl-pencil { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; overflow: visible; pointer-events: none; }
     .tl-pencil path { fill: none; stroke: #CB1F1F; stroke-width: 5.5; stroke-linecap: round; stroke-linejoin: round;
       filter: drop-shadow(0 1px 1.5px rgba(150,18,18,0.28));
@@ -554,7 +554,7 @@
     .tl-wordmark { font-family: var(--f-display); font-weight: 800; letter-spacing: -0.02em;
       font-size: clamp(3rem, 9vw, 6.6rem); line-height: .92; color: var(--ink); text-transform: uppercase; }
 
-    /* ---------- Two-screen showcase — slide in from the sides, purple thread draws L→R ---------- */
+    /* ---------- Two-screen showcase - slide in from the sides, purple thread draws L→R ---------- */
     .tl-duo { position: relative; overflow: hidden; padding-block: clamp(1.5rem, 4vw, 3.25rem); }
     .tl-duo__stage { position: relative; width: 100%; max-width: 1240px; margin-inline: auto; aspect-ratio: 1440 / 470; }
     .tl-duo__thread { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; overflow: visible; }
@@ -565,13 +565,13 @@
     .tl-duo__screen--left  { left: -1%;  transform: translate(var(--dx, -150%), -50%); }
     .tl-duo__screen--right { right: -1%; transform: translate(var(--dx, 150%),  -50%); z-index: 3; }
 
-    /* ---------- Single quiz screen — rotates up from below in 3D ---------- */
+    /* ---------- Single quiz screen - rotates up from below in 3D ---------- */
     .tl-solo { perspective: 1500px; overflow: hidden; padding-block: clamp(1.5rem, 4vw, 3rem); }
     .tl-solo__screen { display: block; width: min(780px, 84%); height: auto; margin-inline: auto;
       transform-origin: 50% 100%; transform: var(--t3d, rotateX(42deg) translateY(150px)); opacity: var(--o3d, 0);
       will-change: transform, opacity; }
 
-    /* ---------- Journey — numbered list (matches Figma) ---------- */
+    /* ---------- Journey - numbered list (matches Figma) ---------- */
     .tl-facts { margin-top: clamp(2rem, 4.5vw, 3.25rem); display: flex; flex-direction: column; gap: clamp(1.4rem, 3vw, 2.1rem); }
     .tl-factrow { display: grid; grid-template-columns: auto 1fr; gap: clamp(1rem, 2.4vw, 1.75rem); align-items: start; }
     .tl-factrow__n { font-family: var(--f-serif); font-style: italic; font-size: clamp(2.2rem, 3.6vw, 2.9rem); line-height: .85; color: var(--brand); }
@@ -595,7 +595,7 @@
     .tl-success__list li::before { content: ""; position: absolute; left: .25rem; top: .55em; width: 6px; height: 6px; border-radius: 50%; background: var(--tl-mut); }
     .tl-success__list b { font-family: var(--f-display); font-weight: 800; color: var(--ink); margin-right: .35rem; }
 
-    /* ---------- Journey eyebrow — research-source continuation (matches the eyebrow, muted colour) ---------- */
+    /* ---------- Journey eyebrow - research-source continuation (matches the eyebrow, muted colour) ---------- */
     .tl-eyebrow__gem { color: rgba(24, 22, 15, 0.55); }
 
     /* inline "Source ↗" link that closes each journey fact */
@@ -605,7 +605,7 @@
     .tl-factrow__src:hover { border-color: var(--brand); }
     .tl-factrow__src span { font-size: .85em; }
 
-    /* ---------- Sketch — single composed collage (stays whole at every width) ---------- */
+    /* ---------- Sketch - single composed collage (stays whole at every width) ---------- */
     .tl-sketch__stage { margin: clamp(2rem, 4.5vw, 3.5rem) auto 0; }
     .tl-sketch__stage img { display: block; width: 100%; height: auto; }
 
@@ -655,14 +655,14 @@
   <!-- ===== HEADER (floating pill → collapses to a status badge on scroll) ===== -->
   <header class="hdr hdr--float" id="top">
     <div class="hdr__pill">
-      <a class="hdr__logo" href="index.html#top" aria-label="Yehuda Amitzur — home">
+      <a class="hdr__logo" href="index.html#top" aria-label="Yehuda Amitzur, home">
         <span class="hdr__avatar"><img class="hdr__avatar-img" src="profile.png" alt="Yehuda Amitzur" width="46" height="46" /></span>
       </a>
       <div class="hdr__expand">
         <nav class="hdr__nav" aria-label="Primary">
           <a href="index.html#top">Home</a>
           <a href="index.html#work">Work</a>
-          <a href="cv-yehuda-amitzur.pdf?v=51">CV</a>
+          <a href="cv-yehuda-amitzur.pdf?v=52" target="_blank" rel="noopener">CV</a>
         </nav>
         <a class="hdr__cta" href="index.html#contact">Contact</a>
         <button class="hdr__menu" aria-label="Open menu" aria-expanded="false" aria-controls="hdr-drawer"><span></span><span></span></button>
@@ -676,7 +676,7 @@
       </div>
       <a href="index.html#top">Home</a>
       <a href="index.html#work">Projects</a>
-      <a href="cv-yehuda-amitzur.pdf?v=51">My cv</a>
+      <a href="cv-yehuda-amitzur.pdf?v=52" target="_blank" rel="noopener">My cv</a>
       <a class="hdr__drawer-contact" href="index.html#contact">Contact</a>
     </div>
   </header>
@@ -696,7 +696,7 @@
 
   <main>
     <!-- ===== HERO (video backdrop + dissolving tablet) ===== -->
-    <h1 class="sr-only">Talmind — bringing authentic Talmud study to Korean classrooms</h1>
+    <h1 class="sr-only">Talmind: bringing authentic Talmud study to Korean classrooms</h1>
     <section class="tl-hero tl-wrap">
       <div class="tl-hero__bg" aria-hidden="true">
         <video class="tl-hero__video" autoplay muted loop playsinline preload="none" poster="talmind-hero-poster.jpg">
@@ -706,7 +706,7 @@
 
       <div class="tl-hero__head" data-hero-head>
         <p class="tl-hero__lead reveal"><strong>The Koreans believe that studying the Talmud is the main reason for the
-          success and wisdom of the Jews</strong> — as is evident from the fact that they account for
+          success and wisdom of the Jews</strong>, pointing to the fact that they account for
           <span class="hl">25% of Nobel Prize winners,</span> despite making up only
           <span class="hl">0.2% of the world's population.</span></p>
         <a class="tl-hero__src reveal" href="https://www.timesofisrael.com/talmud-inspired-learning-craze-sweeps-south-korea/">Source: The Times of Israel <span aria-hidden="true">↗</span></a>
@@ -714,10 +714,10 @@
 
       <div class="tl-tablet" data-tablet>
         <!-- WebP, sized for the 1120px box it actually renders in. The source export is a
-             4476px, 2.5 MB PNG — it has to keep its alpha (56% of it is transparent), so a
+             4476px, 2.5 MB PNG - it has to keep its alpha (56% of it is transparent), so a
              256-colour PNG was the obvious shrink and it banded the hand badly. WebP keeps
              the alpha at full colour. talmind-tablet-only.png stays on disk as the master. -->
-        <img class="tl-tablet__img" src="talmind-tablet.webp?v=51" width="2240" height="967"
+        <img class="tl-tablet__img" src="talmind-tablet.webp?v=52" width="2240" height="967"
              fetchpriority="high" decoding="async"
              alt="Tablet running the Talmind home screen" />
       </div>
@@ -732,7 +732,7 @@
         <div><dt>Platform</dt><dd>Classroom tablet app</dd></div>
         <div><dt>Role</dt><dd>UX/UI · Branding</dd></div>
         <div><dt>Timeline</dt><dd>One month, end to end</dd></div>
-        <div><dt>Tools</dt><dd>Figma · Claude · AI</dd></div>
+        <div><dt>Tools</dt><dd>Figma</dd></div>
       </dl>
     </section>
 
@@ -761,7 +761,7 @@
       </div>
     </section>
 
-    <!-- ===== THE JOURNEY — numbered list ===== -->
+    <!-- ===== THE JOURNEY - numbered list ===== -->
     <section class="tl-section tl-wrap" id="journey">
       <span class="tl-eyebrow reveal">The journey to defining the problem - <span class="tl-eyebrow__gem">Gemini Deep Research</span></span>
       <h2 class="tl-h2 reveal">What began as mere curiosity turned out to be surprising</h2>
@@ -783,7 +783,7 @@
 
     <!-- ===== WHAT IS TALMUD (dry vs alive) ===== -->
     <section class="tl-section tl-wrap" id="gemara">
-      <h2 class="tl-h2 reveal">What Is Talmud?</h2>
+      <h2 class="tl-h2 reveal">What is Talmud?</h2>
       <div class="tl-diptych">
         <div class="tl-side tl-side--dry reveal">
           <span class="tl-mini">Starts with a dry and boring part</span>
@@ -807,11 +807,11 @@
         <div class="tl-col tl-col--problem reveal">
           <h2 class="tl-h2">The Problem</h2>
           <div class="tl-block"><span class="tl-block__label">Teachers</span>
-            <p>Knowledge gaps and limited cultural context lead to an approach that overlooks fundamental
-              principles, making it difficult to apply effective teaching methodologies.</p></div>
+            <p>Knowledge gaps and limited cultural context lead to an approach that overlooks the fundamental
+              principles, and that makes the material hard to teach well.</p></div>
           <div class="tl-block"><span class="tl-block__label">Students</span>
-            <p>Hesitate to ask questions in front of their peers due to cultural norms, causing them to miss
-              opportunities for deeper learning.</p></div>
+            <p>Cultural norms make students hesitate to ask questions in front of their peers, so they miss the
+              deeper learning that asking would open up.</p></div>
           <div class="tl-block"><span class="tl-block__label">Parents</span>
             <p>Struggle to determine whether their children truly understand the material, develop critical
               thinking, and actively ask questions.</p></div>
@@ -846,10 +846,10 @@
             be active partners in the learning process.</p>
         </div>
         <div class="tl-col reveal">
-          <p class="tl-challenge__q">How can the same game structure work for both Grades 4–6 and Grades 7–12?</p>
+          <p class="tl-challenge__q">How can the same game structure work for both Grades 4-6 and Grades 7-12?</p>
           <p class="tl-challenge__sub">The proposed solution:</p>
           <p class="tl-challenge__body">I trained an AI agent to analyze any Talmudic passage and automatically adapt
-            its content to each grade level, allowing the game structure to remain unchanged.</p>
+            its content to each grade level, so the game structure itself never has to change.</p>
         </div>
       </div>
     </section>
@@ -858,7 +858,7 @@
     <section class="tl-section tl-wrap" id="sketch">
       <span class="tl-eyebrow reveal">From paper to product</span>
       <h2 class="tl-h2 reveal">Sketch</h2>
-      <p class="tl-lead reveal">Before a single pixel — the three-step flow, the daily quiz, and the drag-and-match
+      <p class="tl-lead reveal">Before a single pixel: the three-step flow, the daily quiz and the drag-and-match
         game, first worked out by hand.</p>
       <div class="tl-sketch__stage reveal">
         <img src="sketches-all.png" width="2640" height="1338"
@@ -885,7 +885,7 @@
         <div class="tl-scrolly__pin">
           <article class="tl-scard tl-scard--before-flat">
             <div class="tl-scard__fig">
-              <img src="talmind-home-before.jpg" width="2526" height="1579" alt="Talmind home screen — before redesign" loading="lazy" />
+              <img src="talmind-home-before.jpg" width="2526" height="1579" alt="Talmind home screen before the redesign" loading="lazy" />
               <svg class="tl-pencil" viewBox="0 0 1600 1000" fill="none" aria-hidden="true">
                 <path class="tl-pencil__p" data-mark="top" d="M 506.4 144.0 L 851.2 144.0 A 24.0 24.0 0 0 1 875.2 168.0 L 875.2 456.0 A 24.0 24.0 0 0 1 851.2 480.0 L 161.6 480.0 A 24.0 24.0 0 0 1 137.6 456.0 L 137.6 168.0 A 24.0 24.0 0 0 1 161.6 144.0 L 506.4 144.0" />
                 <path class="tl-pencil__p" data-mark="bottom" d="M 688.8 485.0 L 1214.0 485.0 A 26.0 26.0 0 0 1 1240.0 511.0 L 1240.0 943.0 A 26.0 26.0 0 0 1 1214.0 969.0 L 163.6 969.0 A 26.0 26.0 0 0 1 137.6 943.0 L 137.6 511.0 A 26.0 26.0 0 0 1 163.6 485.0 L 688.8 485.0" />
@@ -897,8 +897,8 @@
               <div class="tl-hint" data-hint>
                 <div class="tl-hint__box">
                   <p class="tl-hint__t">Three things were wrong with this screen</p>
-                  <p class="tl-hint__p tl-hint__p--touch">Tap the <b>right</b> side of the image to see the next one — tap the <b>left</b> side to go back.</p>
-                  <p class="tl-hint__p tl-hint__p--fine">Click the <b>right</b> side of the image to see the next one — click the <b>left</b> side to go back.</p>
+                  <p class="tl-hint__p tl-hint__p--touch">Tap the <b>right</b> side of the image to see the next one, the <b>left</b> side to go back.</p>
+                  <p class="tl-hint__p tl-hint__p--fine">Click the <b>right</b> side of the image to see the next one, the <b>left</b> side to go back.</p>
                   <div class="tl-hint__row"><span class="tl-hint__k">← Back</span><span class="tl-hint__k">Next →</span></div>
                 </div>
               </div>
@@ -919,14 +919,14 @@
       <div class="tl-wrap tl-frameshow" data-frameshow>
         <div class="tl-fsstage" data-fsstage>
           <nav class="tl-dots" data-dots aria-label="Jump between screens">
-            <button class="tl-dots__d is-active" type="button" data-goto="0" aria-label="Screen 1 — Home"></button>
-            <button class="tl-dots__d" type="button" data-goto="1" aria-label="Screen 2 — Quiz"></button>
-            <button class="tl-dots__d" type="button" data-goto="2" aria-label="Screen 3 — Game"></button>
-            <button class="tl-dots__d" type="button" data-goto="3" aria-label="Screen 4 — Lesson"></button>
+            <button class="tl-dots__d is-active" type="button" data-goto="0" aria-label="Screen 1: Home"></button>
+            <button class="tl-dots__d" type="button" data-goto="1" aria-label="Screen 2: Quiz"></button>
+            <button class="tl-dots__d" type="button" data-goto="2" aria-label="Screen 3: Game"></button>
+            <button class="tl-dots__d" type="button" data-goto="3" aria-label="Screen 4: Lesson"></button>
           </nav>
           <div class="tl-fsviews" data-fsviews>
 
-            <!-- VIEW 1 — HOME: empty dashboard + the liftable "prepare" component -->
+            <!-- VIEW 1 - HOME: empty dashboard + the liftable "prepare" component -->
             <div class="tl-fsview" data-view="0">
               <div class="tl-frame">
                 <div class="tl-frame__stage">
@@ -934,7 +934,7 @@
                     <img class="tl-frame__bg" src="talmind-home-empty.jpg" width="2400" height="1500" alt="Talmind home dashboard" loading="lazy" />
                     <div class="tl-frame__scrim" aria-hidden="true"></div>
                     <div class="tl-comp" data-comp style="--comp-l:10.2%;--comp-t:14.2%;--comp-w:87.6%;">
-                      <img class="tl-comp__img" src="talmind-steps.png" width="3432" height="1258" alt="Prepare for today's lesson — video, quiz and game steps" />
+                      <img class="tl-comp__img" src="talmind-steps.png" width="3432" height="1258" alt="Prepare for today's lesson: video, quiz and game steps" />
                       <img class="tl-comp__badge" data-badge src="talmind-badge-done.png"     alt="" aria-hidden="true" style="--x:29.20%;--y:31.92%;--w:2.46%;--i:0" />
                       <img class="tl-comp__badge" data-badge src="talmind-badge-progress.png" alt="" aria-hidden="true" style="--x:59.97%;--y:31.92%;--w:2.46%;--i:1" />
                       <img class="tl-comp__badge" data-badge src="talmind-badge-locked.png"   alt="" aria-hidden="true" style="--x:90.73%;--y:31.92%;--w:2.46%;--i:2" />
@@ -945,9 +945,9 @@
                   <button class="tl-zone tl-zone--next" type="button" data-step="1" aria-label="Next note"><span class="tl-zone__i" aria-hidden="true">→</span></button>
                   <div class="tl-hint" data-hint>
                     <div class="tl-hint__box">
-                      <p class="tl-hint__t">Four screens — each with a few notes of its own</p>
-                      <p class="tl-hint__p tl-hint__p--touch">Swipe sideways for the other screens. Tap the <b>right</b> side of a screen for its next note — the <b>left</b> side goes back.</p>
-                      <p class="tl-hint__p tl-hint__p--fine">Click the <b>right</b> side of the screen for its next note — click the <b>left</b> side to go back. To bring the next screen up, click the next dot.</p>
+                      <p class="tl-hint__t">Four screens, each with a few notes of its own</p>
+                      <p class="tl-hint__p tl-hint__p--touch">Swipe sideways for the other screens. Tap the <b>right</b> side of a screen for its next note, the <b>left</b> side goes back.</p>
+                      <p class="tl-hint__p tl-hint__p--fine">Click the <b>right</b> side of the screen for its next note, the <b>left</b> side to go back. To bring the next screen up, click the next dot.</p>
                       <div class="tl-hint__row"><span class="tl-hint__k">← Back</span><span class="tl-hint__k">Next →</span></div>
                     </div>
                   </div>
@@ -956,7 +956,7 @@
               <p class="tl-frame__cap"><b>Home.</b> <span class="tl-scard__type" data-fs-type></span><span class="tl-caret" data-fs-caret aria-hidden="true"></span></p>
             </div>
 
-            <!-- VIEW 2 — QUIZ: empty quiz + the points panel (with a waving monster) lifting to the front -->
+            <!-- VIEW 2 - QUIZ: empty quiz + the points panel (with a waving monster) lifting to the front -->
             <div class="tl-fsview is-below" data-view="1">
               <div class="tl-frame">
                 <div class="tl-frame__stage">
@@ -975,7 +975,7 @@
               <p class="tl-frame__cap"><b>The quiz.</b> <span class="tl-scard__type" data-fs-type></span><span class="tl-caret" data-fs-caret aria-hidden="true"></span></p>
             </div>
 
-            <!-- VIEW 3 — GAME: empty board + a drag card and a category box lifting to the front -->
+            <!-- VIEW 3 - GAME: empty board + a drag card and a category box lifting to the front -->
             <div class="tl-fsview is-below" data-view="2">
               <div class="tl-frame">
                 <div class="tl-frame__stage">
@@ -983,7 +983,7 @@
                     <img class="tl-frame__bg" src="talmind-game-empty.jpg" width="2400" height="1500" alt="Talmind drag-and-match game board" loading="lazy" />
                     <div class="tl-frame__scrim" aria-hidden="true"></div>
                     <!-- These two overlays fill the two holes in the empty board, so at rest they must be
-                         EXACTLY the size of the cards around them — they were ~13% small, which read as
+                         EXACTLY the size of the cards around them - they were ~13% small, which read as
                          "the odd one out". The PNGs carry their own shadow padding, so --w sizes the whole
                          PNG and the card body inside it comes out at the sibling's width:
                          drag card   body 379 of 428 wide → 352/2400 of the board  → --w 16.56%
@@ -999,7 +999,7 @@
               <p class="tl-frame__cap"><b>The game.</b> <span class="tl-scard__type" data-fs-type></span><span class="tl-caret" data-fs-caret aria-hidden="true"></span></p>
             </div>
 
-            <!-- VIEW 4 — LESSON: the 3 skill cards on the right lift to the front -->
+            <!-- VIEW 4 - LESSON: the 3 skill cards on the right lift to the front -->
             <div class="tl-fsview is-below" data-view="3">
               <div class="tl-frame">
                 <div class="tl-frame__stage">
@@ -1022,7 +1022,7 @@
       </div>
     </section>
 
-    <!-- ===== NEXT PROJECT — the loop, handed over before the contact ask ===== -->
+    <!-- ===== NEXT PROJECT - the loop, handed over before the contact ask ===== -->
     <section class="nxt nxt--bianca" aria-label="Next project">
       <div class="nxt__inner reveal">
         <a class="nxt__link" href="bianca.html">
@@ -1049,12 +1049,12 @@
 
   <footer class="foot">
     <div class="wrap foot__inner">
-      <span>© 2026 Yehuda Amitzur — built with Claude</span>
+      <span>© 2026 Yehuda Amitzur</span>
       <a href="#top">Back to top ↑</a>
     </div>
   </footer>
 
-  <script src="script.js?v=51"></script>
+  <script src="script.js?v=52"></script>
   <script>
     /* ---- Talmind case-study interactions (page-scoped) ---- */
     (function () {
@@ -1073,7 +1073,7 @@
       const pgbar = document.querySelector('.pgbar');
       const pgfill = pgbar && pgbar.firstElementChild;
       function railUpdate() {
-        // Progress starts at ZERO the moment the rail reveals — it must never appear already
+        // Progress starts at ZERO the moment the rail reveals - it must never appear already
         // part-filled. Stops = [reveal point, ...section anchors, end of page], and dot i sits at
         // ((i+1)/segments)*100, so nothing is lit at p=0 and the end cap closes it out at 100.
         const doc = document.documentElement;
@@ -1105,17 +1105,17 @@
         if (railCap) railCap.classList.toggle('is-done', p >= 99.5);   // the line lands on a dot, not a bare edge
       }
 
-      // Hero lead — dissolves as you scroll while the video band stays pinned
+      // Hero lead - dissolves as you scroll while the video band stays pinned
       const heroHead = document.querySelector('[data-hero-head]');
       function heroFade() {
         if (!heroHead || reduce) return;
-        // dissolve almost immediately — done within ~90px of scroll
+        // dissolve almost immediately - done within ~90px of scroll
         const o = clamp(1 - window.scrollY / 90, 0, 1);
         heroHead.style.opacity = o.toFixed(3);
         heroHead.style.pointerEvents = o < 0.05 ? 'none' : '';
       }
 
-      // Journey — vertical scroll drives horizontal movement (pinned)
+      // Journey - vertical scroll drives horizontal movement (pinned)
       const journey = document.querySelector('.tl-journey');
       const track = document.querySelector('.tl-journey__track');
       let jmax = 0;
@@ -1134,7 +1134,7 @@
       }
 
 
-      // Two-screen showcase — vertical scroll slides the tablets in and draws the thread L→R
+      // Two-screen showcase - vertical scroll slides the tablets in and draws the thread L→R
       const duo = document.querySelector('[data-duo]');
       const duoLeft = duo && duo.querySelector('.tl-duo__screen--left');
       const duoRight = duo && duo.querySelector('.tl-duo__screen--right');
@@ -1147,8 +1147,8 @@
         // The screens have to have ARRIVED by the time you are actually looking at them. Keyed off
         // the section's TOP this used to finish only once the block had climbed to the middle of
         // the screen (its centre at 58% of the viewport), so you watched it still assembling as it
-        // passed you. Keyed off its MIDDLE instead — which also adapts when the block restacks on
-        // a phone — it runs from just below the fold (115%) to just fully entered (70%), and is
+        // passed you. Keyed off its MIDDLE instead - which also adapts when the block restacks on
+        // a phone - it runs from just below the fold (115%) to just fully entered (70%), and is
         // settled while the block is still low on the screen.
         const mid = r.top + r.height / 2;
         const p = clamp((vh * 1.15 - mid) / (vh * 0.45), 0, 1);
@@ -1159,7 +1159,7 @@
         if (thread) thread.style.strokeDashoffset = (threadLen * (1 - e)).toFixed(1);
       }
 
-      // Single quiz screen — rotates up from below in 3D as it enters
+      // Single quiz screen - rotates up from below in 3D as it enters
       const solo = document.querySelector('[data-solo]');
       const soloImg = solo && solo.querySelector('.tl-solo__screen');
       function soloUpdate() {
@@ -1171,32 +1171,32 @@
         soloImg.style.setProperty('--o3d', clamp(p * 1.6, 0, 1).toFixed(3));
       }
 
-      // ===== Inside the project — 4 SEPARATE views; the page just scrolls past them =====
+      // ===== Inside the project - 4 SEPARATE views; the page just scrolls past them =====
       //  No scroll driving anything. Each view owns a short list of "acts" (a CSS state + a caption);
       //  the right half of a screen steps forward, the left half back, and the caption erases and
-      //  retypes itself in between. Desktop changes view by dot — the new one rises with its frame
+      //  retypes itself in between. Desktop changes view by dot - the new one rises with its frame
       //  card, going back drops the old one out of frame. Mobile swipes the views sideways instead.
       const fshow   = document.querySelector('[data-frameshow]');
       const fsTrack = fshow && fshow.querySelector('[data-fsviews]');
       const fsDots  = fshow ? Array.from(fshow.querySelectorAll('.tl-dots__d')) : [];
       const T = (t) => ({ t }), B = (t) => ({ t, b: 1 });   // plain / bold caption run
       const VIEW_ACTS = [
-        [ // 1 — Home
+        [ // 1 - Home
           { fx: 'rest',   seg: [] },
           { fx: 'lift',   seg: [T('Includes 3 main steps. '), B('Learning video → Quiz practice → Game practice.')] },
-          { fx: 'badges', seg: [T('Status icons clearly indicate completed steps and the user’s current progress. '), B('To maintain focus and build anticipation —'), T(' access to the next step is locked until the current one is completed.')] },
-          { fx: 'prog',   seg: [T('Progress within each stage — to increase motivation.')] },
+          { fx: 'badges', seg: [T('Status icons clearly indicate completed steps and the user\'s current progress. '), B('To maintain focus and build anticipation,'), T(' access to the next step is locked until the current one is completed.')] },
+          { fx: 'prog',   seg: [T('Progress within each stage, to increase motivation.')] },
         ],
-        [ // 2 — Quiz
+        [ // 2 - Quiz
           { fx: 'rest',   seg: [T('Includes 8 questions about the material taught in the video.')] },
           { fx: 'emph',   seg: [T('To increase engagement, a points system and an immersive character animation were added to create a more rewarding and enjoyable experience.')] },
         ],
-        [ // 3 — Game
+        [ // 3 - Game
           { fx: 'rest',   seg: [] },
-          { fx: 'emph',   seg: [T('Dragging concepts into the correct category ensures that the rules stick — and varies from 4th grade to 12th grade.')] },
+          { fx: 'emph',   seg: [T('Dragging concepts into the correct category ensures that the rules stick, and it varies from 4th grade to 12th grade.')] },
         ],
-        [ // 4 — Lesson
-          { fx: 'rest',   seg: [T('Lessons are organized by topic, while an AI assistant clearly highlights what’s left to complete — to make it easier for the student and keep them focused.')] },
+        [ // 4 - Lesson
+          { fx: 'rest',   seg: [T('Lessons are organized by topic, while an AI assistant clearly highlights what\'s left to complete, so the student can stay focused.')] },
           { fx: 'emph',   seg: [T('These 3 skills accompany the student in every lesson '), B('to encourage and adopt Talmudic thinking.')] },
         ],
       ];
@@ -1261,7 +1261,7 @@
       }
       function fsStep(v, d) {
         const to = v.want + d;
-        // past the last note of a screen — keep going, into the next screen (and the same backwards).
+        // past the last note of a screen - keep going, into the next screen (and the same backwards).
         // On desktop it rises from below; on a phone the track swipes across to it.
         if (to < 0 || to >= v.acts.length) {
           const n = v.i + d;
@@ -1279,11 +1279,11 @@
       }
 
       // ---- keep the four screenshots warm ----
-      // Views 1–3 wait 116% BELOW their cell, i.e. far outside the viewport, so `loading="lazy"`
+      // Views 1-3 wait 116% BELOW their cell, i.e. far outside the viewport, so `loading="lazy"`
       // left their 2400×1500 backgrounds unfetched until the moment a dot was clicked: the card
       // rose empty and grey, and the fetch + decode landed in the middle of the .82s transition.
       // That was most of what read as "the new view doesn't come up smoothly". So the moment the
-      // section is anywhere near the screen we take all four off lazy and decode them up front —
+      // section is anywhere near the screen we take all four off lazy and decode them up front -
       // a reader who never reaches "Inside the project" still downloads nothing.
       let fsWarmed = false;
       function fsWarm() {
@@ -1350,7 +1350,7 @@
       function fsHintOff() { fsHintDone = true; if (fsHint) fsHint.classList.remove('is-on'); }
       fsGoView(0, false);
 
-      // "Before" card — a three-act mark-up of the home screen, stepped by tapping the image:
+      // "Before" card - a three-act mark-up of the home screen, stepped by tapping the image:
       //  the red pencil lassos the component in question, the verdict grows out from under the card,
       //  and each further tap erases that line and writes the next one while the pencil jumps across.
       const scrolly = document.querySelector('[data-scrolly]');
@@ -1360,7 +1360,7 @@
       const suffixEl = scrolly && scrolly.querySelector('[data-suffix]');
       const caretEl  = scrolly && scrolly.querySelector('[data-caret]');
       const ACTS = {
-        1: { marks: ['top', 'bottom'], text: 'The flow was incorrect — students should prepare for the lesson before entering it.' },
+        1: { marks: ['top', 'bottom'], text: 'The flow was incorrect. Students should prepare for the lesson before entering it.' },
         2: { marks: ['quiz'],          text: 'The weekly quiz lacked motivation and clear incentives for participation.' },
         3: { marks: ['prog'],          text: 'The progress bar tracked completion, but never showed students what they were working toward.' },
       };
@@ -1428,7 +1428,7 @@
         anim = null; caret(false); displayAct = 0; wantAct = 0;
         Object.keys(marks).forEach((n) => setMark(n, 0, 0));
         suffixEl.textContent = '';
-        reveal.style.opacity = 0;      // the box keeps its reserved height — only the ink fades out
+        reveal.style.opacity = 0;      // the box keeps its reserved height - only the ink fades out
         scZones();
       }
       function scStep(d) {
@@ -1437,7 +1437,7 @@
         if (to === 0) { scReset(); return; }
         wantAct = to; scZones();
         reveal.style.opacity = 1;
-        if (reduce) {                             // no drawing, no typing — just the finished note
+        if (reduce) {                             // no drawing, no typing - just the finished note
           if (engineRAF) { cancelAnimationFrame(engineRAF); engineRAF = null; }
           anim = null; displayAct = to; caret(false);
           showActMarks(to, 1);
@@ -1450,8 +1450,8 @@
 
       // ---- reserve the caption space up front ----
       // Both captions type themselves out, so their height changes while you read them. Left to
-      // grow they would shove whatever sits underneath — the four dots, and the whole next section
-      // — down the page and back up again. So each caption box is measured against the tallest
+      // grow they would shove whatever sits underneath - the four dots, and the whole next section
+      // - down the page and back up again. So each caption box is measured against the tallest
       // thing it will ever hold and boxed at that height from the first paint; nothing below one
       // ever moves. Re-measured on resize, because the tallest line depends on the column width.
       function capReserve() {
@@ -1496,7 +1496,7 @@
         requestAnimationFrame(() => { railUpdate(); journeyUpdate(); duoUpdate(); soloUpdate(); hintUpdate(); heroFade(); ticking = false; });
       }
       window.addEventListener('scroll', onScroll, { passive: true });
-      // crossing the mobile/desktop line swaps the views between a swipe row and a rising stack —
+      // crossing the mobile/desktop line swaps the views between a swipe row and a rising stack -
       // re-seat whichever one is showing so neither mode inherits the other's leftovers
       window.addEventListener('resize', () => { journeyLayout(); scrollyLayout(); capReserve(); fsGoView(fsActive, false); onScroll(); });
 
@@ -1515,12 +1515,12 @@
         nums.forEach((n) => io.observe(n));
       } else { nums.forEach((n) => (n.textContent = n.dataset.count)); }
 
-      // ---- Hero tablet: cursor parallax — starts only after the timed load-in entrance ----
+      // ---- Hero tablet: cursor parallax - starts only after the timed load-in entrance ----
       const tablet = document.querySelector('[data-tablet]');
       if (tablet && !reduce && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
         const hero = tablet.closest('.tl-hero');
         let raf = null, tx = 0, ty = 0, cx = 0, cy = 0, ready = false;
-        // clear the CSS entrance animation — its fill state would override the inline cursor-parallax transform
+        // clear the CSS entrance animation - its fill state would override the inline cursor-parallax transform
         setTimeout(() => { tablet.style.animation = 'none'; ready = true; }, 4300);   // wait out the 3s delay + ~1.15s entrance
         const apply = () => {
           cx += (tx - cx) * 0.12; cy += (ty - cy) * 0.12;
@@ -1538,7 +1538,7 @@
       }
 
       journeyLayout(); scrollyLayout(); capReserve(); onScroll();
-      // fonts land after first paint and change how the captions wrap — re-measure once they have
+      // fonts land after first paint and change how the captions wrap - re-measure once they have
       window.addEventListener('load', () => { journeyLayout(); scrollyLayout(); capReserve(); onScroll(); });
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(capReserve);
       window.addEventListener('resize', () => {
