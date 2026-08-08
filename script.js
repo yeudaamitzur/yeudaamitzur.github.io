@@ -1028,6 +1028,13 @@ document.querySelectorAll('a[href="#top"]').forEach((a) => {
 // top is HELD rather than jumped to, and the first real scroll input from the reader releases it.
 (function () {
   if (location.hash !== '#top') return;
+  // The hash has done its whole job the moment we know it was there, so drop it from the address
+  // bar right away: the reader gets a plain "/" while the pin below still holds the top. Safe
+  // because nothing past this line reads location.hash again, and replaceState adds no history
+  // entry, so Back still returns to the case study. #work / #about / #contact are left alone -
+  // those name a real section and are worth sharing; "#top" only ever meant "the top", which is
+  // what "/" already says.
+  history.replaceState(history.state, '', location.pathname + location.search);
   const hadRestore = 'scrollRestoration' in history;
   if (hadRestore) history.scrollRestoration = 'manual';
   let live = true;
