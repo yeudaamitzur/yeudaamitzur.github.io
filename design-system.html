@@ -13,7 +13,7 @@
   <meta property="og:url" content="https://yehudaamitzur.com/design-system" />
   <meta property="og:title" content="Design System case study · Yehuda Amitzur" />
   <meta property="og:description" content="The Talmind Design System: building a scalable design system from 72 base tokens: variables, semantic tokens, a component library and a developer handoff. A UX/UI case study by Yehuda Amitzur." />
-  <meta property="og:image" content="https://yehudaamitzur.com/tile-ds.jpg?v=103" />
+  <meta property="og:image" content="https://yehudaamitzur.com/tile-ds.jpg?v=1" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="750" />
@@ -21,7 +21,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Design System case study · Yehuda Amitzur" />
   <meta name="twitter:description" content="The Talmind Design System: building a scalable design system from 72 base tokens: variables, semantic tokens, a component library and a developer handoff. A UX/UI case study by Yehuda Amitzur." />
-  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-ds.jpg?v=103" />
+  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-ds.jpg?v=1" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -29,7 +29,7 @@
   <!-- favicon: the same ring as the site cursor - purple stroke, lighter purple fill -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
   <link rel="canonical" href="https://yehudaamitzur.com/design-system" />
-  <link rel="stylesheet" href="styles.css?v=103" />
+  <link rel="stylesheet" href="styles.css?v=55" />
 
   <style>
     /* =========================================================
@@ -255,14 +255,22 @@
   <a class="skip-link" href="#color">Skip to content</a>
 
   <!-- ===== HEADER (shared floating pill) ===== -->
-  <header class="hdr" id="top">
-    <a class="hdr__cta" href="/#contact">Contact</a>
-    <nav class="hdr__nav" aria-label="Primary">
-      <a href="/#top">Home</a>
-      <a href="/#work">Work</a>
-      <a href="cv-yehuda-amitzur.pdf?v=103" target="_blank" rel="noopener">CV</a>
-    </nav>
-    <button class="hdr__menu" aria-label="Open menu" aria-expanded="false" aria-controls="hdr-drawer"><span></span><span></span></button>
+  <header class="hdr hdr--float" id="top">
+    <div class="hdr__pill">
+      <a class="hdr__logo" href="/#top" aria-label="Yehuda Amitzur, home">
+        <span class="hdr__avatar"><img class="hdr__avatar-img" src="profile.png" alt="Yehuda Amitzur" width="46" height="46" /></span>
+      </a>
+      <div class="hdr__expand">
+        <nav class="hdr__nav" aria-label="Primary">
+          <a href="/#top">Home</a>
+          <a href="/#work">Work</a>
+          <a href="cv-yehuda-amitzur.pdf?v=55" target="_blank" rel="noopener">CV</a>
+        </nav>
+        <a class="hdr__cta" href="/#contact">Contact</a>
+        <button class="hdr__menu" aria-label="Open menu" aria-expanded="false" aria-controls="hdr-drawer"><span></span><span></span></button>
+      </div>
+      <span class="hdr__status" aria-hidden="true"><span>Available for work</span><i class="hdr__dot"></i></span>
+    </div>
     <div class="hdr__drawer" id="hdr-drawer" hidden>
       <div class="hdr__drawer-top">
         <span class="hdr__drawer-ava"><img src="profile.png" alt="" width="46" height="46" /></span>
@@ -270,7 +278,7 @@
       </div>
       <a href="/#top">Home</a>
       <a href="/#work">Projects</a>
-      <a href="cv-yehuda-amitzur.pdf?v=103" target="_blank" rel="noopener">My cv</a>
+      <a href="cv-yehuda-amitzur.pdf?v=55" target="_blank" rel="noopener">My cv</a>
       <a class="hdr__drawer-contact" href="/#contact">Contact</a>
     </div>
   </header>
@@ -300,7 +308,7 @@
       <!-- no .reveal here: the timed entrance owns this element's opacity and transform, the way
            Bianca's .bn-tablet does. Two of them would fight over the same two properties. -->
       <figure class="ds-hero__shot" data-hero-art>
-        <img src="ds-hero.jpg?v=103" width="1938" height="1374" alt="Talmind Design System &amp; Handoff: colours, typography and components" />
+        <img src="ds-hero.jpg?v=25" width="1938" height="1374" alt="Talmind Design System &amp; Handoff: colours, typography and components" />
       </figure>
     </section>
 
@@ -466,7 +474,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=103"></script>
+  <script src="script.js?v=55"></script>
   <script>
     /* ---- Hero backdrop: a drifting field of settings cogs ----
        This is a page about a system, so the marks behind the title are the settings glyph:
