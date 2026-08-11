@@ -102,630 +102,401 @@ if (statVals.length) {
 
 const hero = document.querySelector('.hero');
 const line1 = document.querySelector('.hero__line--1');
-const line2 = document.querySelector('.hero__line--2');
 const heroSub = document.querySelector('.hero__sub');
 const cases = Array.from(document.querySelectorAll('.case'));
 const canvas = document.querySelector('.hero__dots');
-const cursorEl = document.querySelector('.hero__cursor');
-const hdrAvatar = document.querySelector('.hdr__avatar');
-const hdrAvatarImg = document.querySelector('.hdr__avatar-img');
 
-// Both hero loops (the wordmark dots and the drifting halos) pause the moment the hero leaves the
-// viewport and resume when it comes back. There is nothing to look at while it is off screen, and
-// the frames they were spending are frames the browser can hand to the pointer instead.
-// They park for a second reason too: while the phone's project row is being dragged sideways.
-// See the .hero-work block near the end of this file.
-let heroOnScreen = true, heroBusy = false, dotsRaf = null, driftRaf = null;
-// heroBusy parks the HALOS only. It used to park the wordmark canvas too, and that was wrong:
-// the letters were still colouring themselves in when the row was dragged, so the animation
-// visibly froze mid-sequence and picked up again afterwards. Nothing the reader is watching may
-// be stopped to buy frames - the halos drift behind everything and nobody can tell.
-const heroLive = () => heroOnScreen && !heroBusy;
-let resumeDrift = () => {};   // assigned below, once the halos exist
 
-// ---- Two drifting halos that roam the whole hero ----
-const orbA = document.querySelector('.hero__orb--a');
-const orbB = document.querySelector('.hero__orb--b');
-if ((orbA || orbB) && !reduced) {
-  // A translate in % is a share of the ORB, not of the screen. On a phone the orbs take a far
-  // bigger share of the hero (see the max-width:700px block in the CSS), so the same percentages
-  // would fling them clean off the screen and leave long dead stretches with nothing in view.
-  // These factors bring the swept distance back to roughly the share of the hero it covers on
-  // desktop - a bit less sideways, nearly all of the vertical, since a phone hero is tall.
-  const phone = window.matchMedia('(max-width: 700px)');
-  let ax = 1, ay = 1;
-  const setAmp = () => { ax = phone.matches ? 0.52 : 1; ay = phone.matches ? 0.85 : 1; };
-  setAmp();
-  phone.addEventListener('change', setAmp);
-
-  let t = Math.random() * 100;
-  const drift = () => {
-    t += 0.005;
-    if (orbA) orbA.style.transform =
-      `translate(${((Math.sin(t) * 70 + Math.sin(t * 0.6) * 22) * ax).toFixed(1)}%, ${(Math.cos(t * 0.8) * 42 * ay).toFixed(1)}%) scale(${(1 + Math.sin(t * 0.5) * 0.12).toFixed(3)})`;
-    if (orbB) orbB.style.transform =
-      `translate(${((Math.cos(t * 0.7) * 66 - 12) * ax).toFixed(1)}%, ${(Math.sin(t * 0.9) * 40 * ay).toFixed(1)}%) scale(${(1 + Math.cos(t * 0.6) * 0.14).toFixed(3)})`;
-    driftRaf = heroLive() ? requestAnimationFrame(drift) : null;
-  };
-  driftRaf = requestAnimationFrame(drift);
-  resumeDrift = () => { if (driftRaf === null) driftRaf = requestAnimationFrame(drift); };
+// ---- The aside types itself out ----
+// The string lives in data-type, so the markup still carries it for search engines and for anyone
+// who never sees the animation; the span starts empty and fills up. The clock is real time, not a
+// per-character timer, so a dropped frame costs nothing - the next frame simply catches up.
+const typed = document.querySelector('.hero__typed');
+if (typed) {
+  const full = typed.dataset.type || '';
+  const out = typed.querySelector('span');
+  if (reduced || !out) {
+    if (out) out.textContent = full;
+    typed.classList.add('is-done');
+  } else {
+    // START is measured from page load, and it is deliberately late: the purple line above finishes
+    // settling at 2.5s (1.35s delay + 1.15s rise) and this waits one second after that, so the
+    // reader has taken in the line above before anything moves down here. CPS is the pace, and
+    // it is a slow hand on purpose. Nothing is visible in the meantime - not even the caret, which
+    // only appears with the first character (see .is-typing).
+    const START = 3500, CPS = 26, LEAD = 750;
+    // A constant rate reads like a machine. Every character gets a little jitter, and the ones
+    // AFTER a comma or a full stop get a real pause - which is where a person actually stops.
+    const at = []; let t = 0;
+    for (let i = 0; i < full.length; i++) {
+      t += 1000 / CPS + Math.random() * 24 + (/[,.]/.test(full[i - 1] || '') ? 230 : 0);
+      at.push(t);
+    }
+    let i = 0, t0 = 0;
+    const step = (now) => {
+      if (!t0) { t0 = now; typed.classList.add('is-typing'); }
+      const el = now - t0;
+      while (i < at.length && at[i] <= el) i++;
+      out.textContent = full.slice(0, i);
+      if (i < full.length) requestAnimationFrame(step);
+      else typed.classList.add('is-done');
+    };
+    setTimeout(() => requestAnimationFrame(step), START);
+    // The tools set off a beat BEFORE the first character rather than on it. Tied to the same
+    // instant they read as one event fired twice; with a lead the wave is already moving when the
+    // writing starts, which is what makes the two feel like one sequence instead of a collision.
+    setTimeout(startTools, Math.max(0, START - LEAD));
+  }
 }
 
-// ---- "UX/UI Designer" as living particles across the whole hero ----
-const TEXT = canvas ? (canvas.dataset.dots || 'UX/UI Designer') : '';
+// ---- The tools, riding a wave in from the right ----
+// One path, and every tile is a point along it. It runs from off the right edge to off the left,
+// and its vertical shape is a cosine that starts high, drops into a trough under the portrait,
+// lifts once more and then falls away - the amplitude shrinking as it goes, so the far end decays
+// rather than stopping. The whole thing is anchored to the BOTTOM OF THE PORTRAIT CIRCLE, which is
+// why it is written here and not as a CSS keyframe: that anchor moves with the layout, and the
+// wave has to keep meeting it at every window size.
+//
+// Arrival is the other half of it. A tile does not appear at full size - over the first stretch of
+// the path it grows from a third of its size and lifts out of near-transparency, so it reads as
+// surfacing rather than as being switched on. The same happens in reverse at the far end.
+const stream = document.querySelector('.hero__stream');
+let toolsRunning = false;
+function startTools() {
+  if (!stream || toolsRunning || !hero) return;
+  toolsRunning = true;
+  const tiles = Array.from(stream.querySelectorAll('.tool'));
+  if (!tiles.length) return;
+
+  const LOOP = 26000;          // ms for one tile to cross the whole path
+  const IN = 0.16, OUT = 0.14; // the share of the path spent arriving and leaving
+  // 1.6 cycles across the width, and that number is not arbitrary: it is what puts the FIRST trough
+  // directly under the middle of the portrait. From there the shape falls out exactly as described -
+  // in high from the right, down into the hollow beneath the circle, up over a crest, and down into
+  // a second, shallower trough that carries it off the left.
+  const FREQ = 1.6;
+  const BLINKS = 2;            // times a tile fades out and back on one crossing
+  const ENTER_MS = 520, STEP_MS = 105;   // the opening fade, and the gap between tiles
+  // an irrational-ish step so the beats never line up into a visible pattern
+  const phase = Array.from({ length: 32 }, (_, i) => (i * 0.618) % 1);
+  const TROUGH_P = 1 / (2 * FREQ);   // where that first low point lands
+  let W = 0, H = 0, baseY = 0, amp0 = 0, drift = 0, lift = 0;
+  const ampAt = (p) => amp0 * (1 - 0.5 * p);          // the wave decays as it crosses
+  const measure = () => {
+    const hr = hero.getBoundingClientRect();
+    W = hr.width; H = hr.height;
+    amp0 = Math.min(W * 0.26, 265);
+    drift = Math.min(H * 0.2, 165);
+    const pb = portraitBox ? portraitBox.getBoundingClientRect() : null;
+    // The trough is placed FIRST - just under the circle, so the wave picks up its underside - and
+    // the rest of the path is then hung off it. Anchoring the mid-line instead left the whole thing
+    // floating below the picture with no relationship to it.
+    const trough = pb ? (pb.bottom - hr.top) + 20 : H * 0.78;
+    baseY = trough - ampAt(TROUGH_P) * 0.5 - drift * TROUGH_P * TROUGH_P;
+
+    // ...and then the whole path is pushed down until it clears everything it would otherwise run
+    // through. A tile is a box, not a point, so the clearance is measured from its EDGE: half its
+    // height plus a margin. The shift is global rather than a per-point clamp, because clamping
+    // flattens the wave into a shelf wherever an obstacle sits under it and you can see the tiles
+    // stop following the curve.
+    const half = (stream.querySelector('.tool') || { offsetHeight: 46 }).offsetHeight / 2;
+    const pad = 18;
+    const blockers = [];
+    if (pb) blockers.push({ l: pb.left - hr.left, r: pb.right - hr.left, b: pb.bottom - hr.top });
+    const col = document.querySelector('.hero__col');
+    if (col) { const c = col.getBoundingClientRect(); blockers.push({ l: c.left - hr.left, r: c.right - hr.left, b: c.bottom - hr.top }); }
+    let push = 0;
+    for (let q = 0; q <= 1; q += 0.004) {
+      const [x, y] = raw(q);
+      for (const bl of blockers) {
+        if (x < bl.l - half || x > bl.r + half) continue;
+        push = Math.max(push, (bl.b + half + pad) - y);
+      }
+    }
+    lift = push;
+  };
+
+
+  // p = 0 at the right-hand edge, 1 off the left. `raw` is the wave on its own; `at` is that wave
+  // pushed clear of everything it would otherwise cross.
+  const raw = (p) => {
+    const x = (W + 80) + (-(W + 160)) * p;
+    const wave = -Math.cos(2 * Math.PI * FREQ * p);   // +1 high at p = 0, trough at TROUGH_P
+    return [x, baseY + ampAt(p) * 0.5 * wave + drift * p * p];
+  };
+  const at = (p) => { const r = raw(p); return [r[0], r[1] + lift]; };
+
+  measure();
+  window.addEventListener('resize', measure);
+
+  const t0 = performance.now();
+  const frame = (now) => {
+    const t = (now - t0) / LOOP;
+    const age = now - t0;
+    for (let i = 0; i < tiles.length; i++) {
+      // Evenly spaced along the path, each one a fixed distance behind the last - all of them in
+      // their places from the first frame. An earlier version let them on ONE AT A TIME from the
+      // right-hand end, which spread the arrival over most of a 26-second loop and left the wave
+      // looking half-built for far too long. The staggering lives in the fade below instead.
+      const p = (t + i / tiles.length) % 1;
+      const tile = tiles[i];
+      const [x, y] = at(p);
+      // in at the start, out at the end; flat all the way between
+      const k = p < IN ? p / IN : (p > 1 - OUT ? (1 - p) / OUT : 1);
+      const e = k * k * (3 - 2 * k);                     // smoothstep, so neither end has a corner
+      // ...and on top of that, each tile breathes right out of existence and back BLINKS times on
+      // its way across, on its own offset beat so they never do it together. This is the reason the
+      // opacity floor is gone: it has to actually reach nothing, or it reads as a dimming rather
+      // than as a disappearance.
+      const beat = 0.5 - 0.5 * Math.cos(2 * Math.PI * (p * BLINKS + phase[i]));
+      // The stagger, and it is only this: each tile fades up a fraction of a second after the one
+      // before it. Half a second each, a tenth of a second apart, so the whole set is in within
+      // about a second and a half - a graded arrival rather than a switch, and nothing waits.
+      const b0 = clamp((age - i * STEP_MS) / ENTER_MS, 0, 1);
+      const born = b0 * b0 * (3 - 2 * b0);
+      const v = e * Math.pow(beat, 0.65) * born;
+      tile.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${(0.28 + 0.72 * v).toFixed(3)})`;
+      tile.style.opacity = v.toFixed(3);
+    }
+    // Unconditional. It used to stop whenever the hero left the viewport and never start again,
+    // so scrolling down and coming back up left the wave frozen in place. Eleven elements is not a
+    // frame budget worth protecting.
+    requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+}
+if (stream && reduced) {
+  // no travel: lay them out along the same path, once, and leave them there
+  toolsRunning = true;
+  const tiles = Array.from(stream.querySelectorAll('.tool'));
+  const hr = hero ? hero.getBoundingClientRect() : { width: 0, height: 0 };
+  tiles.forEach((tile, i) => {
+    const p = 0.08 + 0.84 * (i / Math.max(1, tiles.length - 1));
+    const x = (hr.width + 80) - (hr.width + 160) * p;
+    const y = hr.height * 0.62 + 60 * -Math.cos(2 * Math.PI * 1.15 * p);
+    tile.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    tile.style.opacity = '1';
+  });
+}
+
+// ---- The portrait ----
+//
+// This used to be a particle system: a few hundred thousand dots sampled off the photograph, which
+// the cursor could push, a press could lift a layer off, and a scroll would blow apart. All three
+// were asked for and then, one at a time, asked away again - the scatter last - so what is left is
+// simply the picture. The dots, their typed arrays, the spatial index, the colour buckets and the
+// frame loop that drove them are all gone; no rAF runs here at all now.
+//
+// What survives is the part that was never about dots: WHERE the picture goes. It is fitted to the
+// subject's own bounds rather than to its file's frame, mirrored or not by one switch, cropped to a
+// circle, and - the fiddly bit - pushed down far enough that the arc of that circle cannot cut the
+// top of his head at any window size.
 const ctx = canvas ? canvas.getContext('2d') : null;
 const offc = document.createElement('canvas');
-const offx = offc.getContext('2d');
-let dots = [], letters = [], letterHot = [], letterOn = [], letterLift = [], cw = 0, ch = 0, dotR = 3;
-// The three timestamp/value pairs below all follow the same shape: the timestamp is the input the
-// scheduler writes, the value is what the frame loop derives from it through a curve.
-// letterBlink = when the hint started dimming this letter, 0 when idle  → letterDim  (0..1, ink)
-// letterPop   = when the tap that is swelling this letter landed, 0 when idle → letterSwell (0..1)
-// letterInk   = does this index actually carry dots (false for the space)
-let letterDim = [], letterBlink = [], letterPop = [], letterSwell = [], letterInk = [];
-// letterTaps  = how many times this letter has been tapped, ever (not necessarily in a row)
-// letterBurst = when it shattered, 0 when intact  → letterGone once the debris has flown off
-// burstDrawn  = how many of its dots the last frame actually painted; 0 means the debris is gone
-let letterTaps = [], letterBurst = [], letterGone = [], burstDrawn = [];
-let forceDraw = true;   // set whenever something changes outside the frame loop
-let lastScatter = -1;   // so the first frame always counts as a change
-// BURST_MS is the SHAPE of the throw, not its end: the kick is spent inside it and the drift
-// carries on at a steady speed afterwards until the dot is off the canvas or the tail fade has
-// taken it. It is not a deadline - see burstDrawn in drawDots. BURST_STAGGER is the spread of
-// per-dot start times; without it the letter leaves as one rigid slab.
-// BTAIL/BEND are the fade at the END of the flight, both measured in throws: full ink up to BTAIL,
-// gone by BEND. BEND sits past 1 so the fade outlives the throw and the slow dots ease out rather
-// than being cut off. BFADE is unrelated - it is the canvas FOOT, not the flight.
-const BURST_MS = 1600, BURST_STAGGER = 140, BFADE = 48, BTAIL = 0.7, BEND = 1.5;
-let textRight = 0, textMidY = 0, textH = 0, entryStart = 0, hoverLetter = -1, entryDone = false;
-let inkSprite = null, purpleSprite = null, hotSprite = null, spriteSize = 0;
-let mouseHX = -9999, mouseHY = -9999;   // cursor in hero coords (for the letter "push")
+const offx = offc.getContext('2d', { willReadFrequently: true });
+const portraitBox = document.querySelector('.hero__portrait');
 
-// Pre-render the dot + glowing-dot once, then blit with drawImage (fast, no per-frame blur)
-function makeSprites() {
-  const S = 2;
-  spriteSize = Math.ceil(dotR * 2 + 2);
-  inkSprite = document.createElement('canvas');
-  inkSprite.width = inkSprite.height = spriteSize * S;
-  const ic = inkSprite.getContext('2d'); ic.scale(S, S);
-  ic.fillStyle = 'rgba(24,22,15,1)';      // a touch more contrast than before
-  ic.beginPath(); ic.arc(spriteSize / 2, spriteSize / 2, dotR, 0, 6.283); ic.fill();
+// Which way round he faces. One line, because it has been asked for in both directions and will be
+// again; the flip is done to the raster, so everything measured afterwards sees it as drawn.
+const MIRROR = false;
 
-  // crisp purple dot for the hovered letter - same tiny footprint, no halo/blur
-  purpleSprite = document.createElement('canvas');
-  purpleSprite.width = purpleSprite.height = spriteSize * S;
-  const pc = purpleSprite.getContext('2d'); pc.scale(S, S);
-  pc.fillStyle = '#B575DF';
-  pc.beginPath(); pc.arc(spriteSize / 2, spriteSize / 2, dotR, 0, 6.283); pc.fill();
+const portraitImg = new Image();
+let portraitReady = false;
+let subject = null;   // where HE is inside the source frame, in source pixels
+let cw = 0, ch = 0, dpr = 1, px_ = 0, py_ = 0;
 
-  // A fully purple dot is drawn as ink first and purple over it at alpha 1 - two draws per dot,
-  // for every dot, in the state the phone sits in permanently once the wordmark has coloured
-  // itself in. This bakes that pair into one sprite. It is the same composite the runtime does,
-  // antialiased rim included, so it is pixel for pixel what was there before at half the calls.
-  hotSprite = document.createElement('canvas');
-  hotSprite.width = hotSprite.height = spriteSize * S;
-  const hc = hotSprite.getContext('2d'); hc.scale(S, S);
-  hc.drawImage(inkSprite, 0, 0, spriteSize, spriteSize);
-  hc.drawImage(purpleSprite, 0, 0, spriteSize, spriteSize);
+// A cut-out PNG carries whatever empty margin the person exporting it happened to leave. Fitting
+// the FRAME would therefore spend part of the circle on nothing, so the subject's own bounds are
+// measured once, off a small downscaled copy (200px wide is ample for a bounding box).
+function measureSubject(im) {
+  const W = 200, H = Math.max(1, Math.round(200 * im.naturalHeight / im.naturalWidth));
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d', { willReadFrequently: true });
+  g.drawImage(im, 0, 0, W, H);
+  const d = g.getImageData(0, 0, W, H).data;
+  let x0 = W, y0 = H, x1 = -1, y1 = -1;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    if (d[(y * W + x) * 4 + 3] < 16) continue;
+    if (x < x0) x0 = x; if (x > x1) x1 = x;
+    if (y < y0) y0 = y; if (y > y1) y1 = y;
+  }
+  if (x1 < 0) return { x: 0, y: 0, w: im.naturalWidth, h: im.naturalHeight };
+  const kx = im.naturalWidth / W, ky = im.naturalHeight / H;
+  return { x: x0 * kx, y: y0 * ky, w: (x1 - x0 + 1) * kx, h: (y1 - y0 + 1) * ky };
 }
 
-function buildDots() {
-  if (!canvas || !ctx || !hero || !line2) return;
+function buildPortrait() {
+  if (!canvas || !ctx || !hero || !portraitBox || !portraitReady || !subject) return;
   const heroRect = hero.getBoundingClientRect();
-  cw = Math.round(heroRect.width);
-  // extend the canvas below the hero so scattered dots can drift down to the stats divider
-  // a fixed bleed past the hero; the dots self-fade over the last stretch of the canvas
-  // (see FADE in drawDots), so they dissolve on their own instead of needing a veil below
-  const extraBelow = 240;
-  ch = Math.round(heroRect.height) + extraBelow;
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  canvas.width = Math.round(cw * dpr); canvas.height = Math.round(ch * dpr);   // render at device pixels → crisp 2px dots on retina / mobile
+  cw = Math.round(heroRect.width); ch = Math.round(heroRect.height);
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  px_ = Math.round(cw * dpr); py_ = Math.round(ch * dpr);
+  canvas.width = px_; canvas.height = py_;
   canvas.style.width = cw + 'px'; canvas.style.height = ch + 'px';
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  offc.width = cw; offc.height = ch;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);       // device pixels, so the picture lands 1:1 on the screen
+  offc.width = px_; offc.height = py_;
 
-  const vw = window.innerWidth;
-  let fs = clamp(vw * 0.16, 52, 200);
-  const setFont = (c) => { c.font = `700 ${fs}px 'Hanken Grotesk', system-ui, sans-serif`; };
-  setFont(offx);
-  const maxW = (line2.clientWidth || cw) - 6;
-  let tw = offx.measureText(TEXT).width;
-  if (tw > maxW) { fs = fs * (maxW / tw); setFont(offx); tw = offx.measureText(TEXT).width; }
-  textH = Math.round(fs * 1.28);
-  line2.style.height = textH + 'px';
+  const box = portraitBox.getBoundingClientRect();
+  const size = Math.min(box.width, box.height) * dpr;
+  const bx = (box.left - heroRect.left) * dpr + ((box.width * dpr) - size) / 2;
+  const by = (box.top - heroRect.top) * dpr + ((box.height * dpr) - size) / 2;
+  const circle = { x: bx + size / 2, y: by + size / 2, r: size / 2 };
 
-  const wrapRect = line2.getBoundingClientRect();
-  textRight = Math.round(wrapRect.right - heroRect.left) - 2;
-  textMidY = Math.round(wrapRect.top + wrapRect.height / 2 - heroRect.top);
+  const sc = Math.min(size / subject.w, size / subject.h);
+  const dw = Math.round(portraitImg.naturalWidth * sc), dh = Math.round(portraitImg.naturalHeight * sc);
+  const dx = Math.round(bx + size / 2 - (subject.x + subject.w / 2) * sc);
+  const dy0 = Math.round(by + size / 2 - (subject.y + subject.h / 2) * sc);
 
-  offx.setTransform(1, 0, 0, 1, 0, 0);
-  offx.clearRect(0, 0, cw, ch);
-  offx.fillStyle = '#000';
-  setFont(offx);
-  offx.textBaseline = 'middle'; offx.textAlign = 'left';
-
-  // The "/" in Hanken Grotesk hangs a long way below the baseline - measured at a 200px font its
-  // ink box runs -85.9 to +95.8 around the draw point while the capitals either side run -85.9 to
-  // +56.6, so its centre sits ~10% of the font size BELOW theirs and it reads as a slash that has
-  // slipped down the line. This puts its ink box back on the centre of the cap band. Measured off
-  // the font rather than typed in as a number, so it stays right at every size the hero picks.
-  const inkMid = (m) => (m.actualBoundingBoxDescent - m.actualBoundingBoxAscent) / 2;
-  const capMid = inkMid(offx.measureText(TEXT.replace(/[^A-Z]/g, '') || 'H'));
-  const slashDY = capMid - inkMid(offx.measureText('/'));
-
-  // Each character is placed on its own, not handed to one fillText of the whole string. Two things
-  // need that: the "/" cannot be nudged inside a single fillText, and every dot has to know which
-  // GLYPH painted it (see `owner` below). Checked against the single-fillText version at 200px:
-  // 900 pixels out of 77,456 differ and not one of them by more than a fraction of an alpha step -
-  // there is no kerning in this line for a per-character layout to lose.
-  letters = [];
-  const leftEdge = textRight - tw;
-  const charX = [];
-  for (let i = 0; i < TEXT.length; i++) {
-    const x0 = leftEdge + offx.measureText(TEXT.slice(0, i)).width;
-    charX.push(x0);
-    // y0/y1 are this glyph's OWN ink top and bottom, filled in by the ownership pass below. They
-    // start as an empty range, so a letter that never receives ink can never be hovered.
-    letters.push({ x0, x1: leftEdge + offx.measureText(TEXT.slice(0, i + 1)).width, y0: 0, y1: -1, cx: 0, cy: textMidY });
-  }
-  const bandTop = clamp(Math.round(textMidY - textH), 0, ch);
-  const bandH = clamp(Math.round(textH * 2), 1, ch - bandTop);
-
-  const drawGlyph = (i, dx, dy) => offx.fillText(TEXT[i], charX[i] + dx, textMidY + dy);
-  // the slice of canvas a glyph's ink actually lands on - its advance box is not it, the "/" alone
-  // hangs a good 12px to the left of where it is placed
-  const glyphBox = (i, dx) => {
-    const gm = offx.measureText(TEXT[i]);
-    return { x0: clamp(Math.floor(charX[i] + dx - gm.actualBoundingBoxLeft) - 3, 0, cw),
-             x1: clamp(Math.ceil(charX[i] + dx + gm.actualBoundingBoxRight) + 3, 0, cw) };
-  };
-  // draw one glyph on its own and report, for every row, its leftmost and rightmost inked column
-  const scanRows = (i, dx, dy) => {
-    const L = new Int32Array(bandH).fill(-1), R = new Int32Array(bandH).fill(-1);
-    const b = glyphBox(i, dx), w = b.x1 - b.x0;
-    if (w <= 0) return { L, R };
-    offx.clearRect(b.x0, bandTop, w, bandH);
-    drawGlyph(i, dx, dy);
-    const gd = offx.getImageData(b.x0, bandTop, w, bandH).data;
-    for (let gy = 0; gy < bandH; gy++) {
-      for (let gx = 0; gx < w; gx++) {
-        if (gd[(gy * w + gx) * 4 + 3] > 120) { if (L[gy] < 0) L[gy] = b.x0 + gx; R[gy] = b.x0 + gx; }
-      }
+  const drawSource = (atY) => {
+    offx.setTransform(1, 0, 0, 1, 0, 0);
+    offx.clearRect(0, 0, px_, py_);
+    if (MIRROR) {
+      offx.save();
+      offx.translate(dx + dw, atY); offx.scale(-1, 1);
+      offx.drawImage(portraitImg, 0, 0, dw, dh);
+      offx.restore();
+    } else {
+      offx.drawImage(portraitImg, dx, atY, dw, dh);
     }
-    return { L, R };
   };
 
-  // The "/" also sits hard against the X on its left while leaving a hole on its right - measured
-  // at a 200px font the X side is 0px of clearance and the U side is 25px, which is why it looks
-  // stuck to the X. "How close do these two shapes actually come" is a question about outlines,
-  // not about metrics - both glyphs lean, so their closest approach is nowhere near their bounding
-  // boxes - so it is measured row by row off the pixels. Moving the slash by half the difference
-  // makes the two gaps equal without changing the total space the pair occupies.
-  let slashDX = 0;
-  const si = TEXT.indexOf('/');
-  if (si > 0 && si < TEXT.length - 1) {
-    const before = scanRows(si - 1, 0, 0), slash = scanRows(si, 0, slashDY), after = scanRows(si + 1, 0, 0);
-    const minGap = (p, q) => {
-      let g = Infinity;
-      for (let y = 0; y < bandH; y++) if (p.R[y] >= 0 && q.L[y] >= 0) g = Math.min(g, q.L[y] - p.R[y]);
-      return g;
-    };
-    const gl = minGap(before, slash), gr = minGap(slash, after);
-    if (isFinite(gl) && isFinite(gr)) slashDX = (gr - gl) / 2;
-  }
-  const charDX = [], charDY = [];
-  for (let i = 0; i < TEXT.length; i++) {
-    charDX.push(TEXT[i] === '/' ? slashDX : 0);
-    charDY.push(TEXT[i] === '/' ? slashDY : 0);
-  }
-  const paintChar = (i) => drawGlyph(i, charDX[i], charDY[i]);
-
-  // Which glyph painted which pixel. The old code answered this with the letters' advance columns,
-  // and for a leaning glyph that is simply wrong: the whole lower half of the "/" sits inside the
-  // X's advance box, so those dots belonged to the X - the slash's tail lit up, swelled and flew
-  // away with the X instead of with itself. Ownership is taken from the glyphs themselves, one
-  // draw at a time, and only over the band the type occupies.
-  const owner = new Int8Array(cw * bandH).fill(-1);
-  const ownerA = new Uint8Array(cw * bandH);
-  for (let i = 0; i < TEXT.length; i++) {
-    if (TEXT[i] === ' ') continue;
-    // read back only this glyph's own bounding box, not the whole band - on a wide monitor the
-    // difference is 18M pixel reads versus about one text width's worth
-    const b = glyphBox(i, charDX[i]);
-    const gw = b.x1 - b.x0;
-    if (gw <= 0) continue;
-    // clearing exactly what is about to be drawn and read is what keeps the previous glyph - which
-    // overlaps this one's box - from being counted as ink here
-    offx.clearRect(b.x0, bandTop, gw, bandH);
-    paintChar(i);
-    const gd = offx.getImageData(b.x0, bandTop, gw, bandH).data;
-    // ...and while the pixels are in hand, the glyph's own ink top and bottom. The threshold is the
-    // same 130 the dot grid uses further down, so the box is exactly the span the dots occupy - not
-    // a hair more.
-    let yMin = bandH, yMax = -1;
-    for (let gy = 0; gy < bandH; gy++) {
-      for (let gx = 0; gx < gw; gx++) {
-        const a = gd[(gy * gw + gx) * 4 + 3];
-        if (!a) continue;
-        const p = gy * cw + (b.x0 + gx);
-        if (a > ownerA[p]) { ownerA[p] = a; owner[p] = i; }   // where two glyphs overlap, the more solid one owns the pixel
-        if (a > 130) { if (gy < yMin) yMin = gy; if (gy > yMax) yMax = gy; }
-      }
+  // A circle is only as wide as its diameter across its MIDDLE; by the top of the box the arc has
+  // closed almost to a point, so a picture merely centred in it loses the crown of the head. This
+  // measures rather than guesses: rasterise once, read how wide the subject is on every row, then
+  // take the smallest downward shift at which every row above the circle's centre fits inside the
+  // arc at its own depth. The bottom stays free to be cut - that is what a round crop is for.
+  drawSource(dy0);
+  const probe = offx.getImageData(0, 0, px_, py_).data;
+  const reach = new Float32Array(py_);
+  const xa = clamp(dx, 0, px_ - 1), xb = clamp(dx + dw, 0, px_);
+  for (let y = 0; y < py_; y++) {
+    let m = -1;
+    for (let x = xa; x < xb; x++) {
+      if (probe[(y * px_ + x) * 4 + 3] < 16) continue;
+      const e = Math.abs(x - circle.x); if (e > m) m = e;
     }
-    if (yMax >= 0) { letters[i].y0 = bandTop + yMin; letters[i].y1 = bandTop + yMax; }
+    reach[y] = m;
   }
-
-  // The space carries no ink of its own, so it would end up unhoverable and the photo would drop
-  // every time the cursor crossed between "UI" and "Designer". It is a gap IN the line, not a hole
-  // where a letter should be, so it is given the line's full ink band and keeps the photo.
-  {
-    let t = Infinity, b = -Infinity;
-    letters.forEach((L) => { if (L.y1 >= L.y0) { t = Math.min(t, L.y0); b = Math.max(b, L.y1); } });
-    if (isFinite(t)) letters.forEach((L, i) => { if (TEXT[i] === ' ') { L.y0 = t; L.y1 = b; } });
-  }
-
-  offx.clearRect(0, 0, cw, ch);
-  for (let i = 0; i < TEXT.length; i++) { if (TEXT[i] !== ' ') paintChar(i); }
-  // letterHot = eased COLOUR (sticky: stays purple until the letter is touched again)
-  // letterLift = eased MOTION (only while the cursor is actually on the letter)
-  // letterOn   = the toggled purple state itself, preserved across rebuilds where possible
-  const prevOn = letterOn;
-  letterHot = new Array(letters.length).fill(0);
-  letterLift = new Array(letters.length).fill(0);
-  letterDim = new Array(letters.length).fill(0);
-  letterBlink = new Array(letters.length).fill(0);
-  letterPop = new Array(letters.length).fill(0);
-  letterSwell = new Array(letters.length).fill(0);
-  letterBurst = new Array(letters.length).fill(0);
-  burstDrawn = new Array(letters.length).fill(0);
-  // a shattered letter stays shattered - a width change rebuilds the dots, it does not undo
-  // something the reader deliberately did
-  const prevGone = letterGone, prevTaps = letterTaps;
-  letterGone = new Array(letters.length).fill(false).map((v, i) => (prevGone && prevGone[i]) || false);
-  letterTaps = new Array(letters.length).fill(0).map((v, i) => (prevTaps && prevTaps[i]) || 0);
-  letterOn = new Array(letters.length).fill(0).map((v, i) => (prevOn && prevOn[i]) || 0);
-
-  const data = offx.getImageData(0, 0, cw, ch).data;
-  const stepPx = fs >= 130 ? 3 : 2;   // denser grid → ~1.8× more dots on desktop; tightest on mobile so the small type stays clear
-  dotR = 1;                            // 2px dots, capped - small & crisp
-  const maxDist = Math.max(ch * 0.55, 280);
-
-  dots = [];
-  for (let y = 0; y < ch; y += stepPx) {
-    for (let x = 0; x < cw; x += stepPx) {
-      if (data[(y * cw + x) * 4 + 3] > 130) {
-        const bandY = y - bandTop;
-        const li = (bandY >= 0 && bandY < bandH) ? owner[bandY * cw + x] : -1;
-        const ang = Math.random() * 6.283, dist = 120 + Math.random() * maxDist;
-        const bang = Math.random() * 6.283, bspd = 300 + Math.random() * 800;
-        // bias the scatter downward so the dots gather behind the project tiles as you scroll
-        const oyBias = dist * 0.55;
-        dots.push({ hx: x, hy: y, li, ox: Math.cos(ang) * dist, oy: Math.sin(ang) * dist * 0.85 + oyBias, ph: Math.random() * 6.28, sp: 0.6 + Math.random() * 1.2, delay: Math.random() * 420, lx: 0, ly: 0,
-          // where this dot goes when its letter is shattered: its own direction, its own speed and
-          // its own moment of letting go, fixed at build time so the burst is the same explosion
-          // every frame it is drawn
-          bx: Math.cos(bang) * bspd, by: Math.sin(bang) * bspd, bd: Math.random() * BURST_STAGGER });
-      }
+  const topFits = (shift) => {
+    for (let y = 0; y < py_; y++) {
+      if (reach[y] < 0) continue;
+      const yy = y + shift;
+      if (yy > circle.y) break;                    // below the centre the arc only widens
+      const dyc = yy - circle.y;
+      if (reach[y] > Math.sqrt(Math.max(0, circle.r * circle.r - dyc * dyc))) return false;
     }
-  }
-  const sums = {};
-  dots.forEach((d) => { if (d.li < 0) return; const s = sums[d.li] || (sums[d.li] = { x: 0, y: 0, n: 0 }); s.x += d.hx; s.y += d.hy; s.n++; });
-  letters.forEach((L, i) => { const s = sums[i]; if (s) { L.cx = s.x / s.n; L.cy = s.y / s.n; } });
-  // "UX/UI Designer" has a space in it, and a space owns a slice of the line with no dots in it.
-  // The phone's blink walks this list, not the raw string, so the hint never spends a beat on
-  // nothing - and a tap that lands in the gap doesn't silently toggle an invisible letter.
-  letterInk = letters.map((L, i) => !!sums[i]);
-  dots.forEach((d) => { if (d.li >= 0) { const L = letters[d.li]; let vx = d.hx - L.cx, vy = d.hy - L.cy; const m = Math.hypot(vx, vy) || 1; d.lx = vx / m; d.ly = vy / m; } });
+    return true;
+  };
+  let shift = 0;
+  const maxShift = Math.round(size * 0.55);
+  while (shift < maxShift && !topFits(shift)) shift += 2;
+  if (shift) drawSource(dy0 + shift);
 
-  makeSprites();
-  // Only the FIRST build plays the fly-in. A later rebuild (a real width change) re-seats the
-  // dots already assembled, so scrolling never replays the assembly animation.
-  entryStart = entryDone ? performance.now() - 3000 : performance.now();
-  // A rebuild resizes the canvas, and resizing a canvas wipes it. Without this the next frame
-  // sees a settled wordmark that has not moved, takes the skip-identical-frames path, and never
-  // repaints - so a width change left the hero blank until something else happened to mark the
-  // frame busy. Nothing outside the loop may change the dots without saying so.
-  forceDraw = true;
-}
-
-function drawDots() {
-  if (!ctx) return;
-  // NOTE: the canvas is cleared further down, only once this frame has decided it is going to
-  // draw. Clearing up here would wipe the wordmark on every skipped frame and leave it blank.
-  const now = performance.now(), nowS = now / 1000;
-  if (!entryDone && now - entryStart > 1980) entryDone = true;   // the fly-in is a one-time event
-  // disperse across the FULL height the canvas occupies (hero + its bleed under the stats bar),
-  // so the dots are still visibly drifting for as long as any of them is on screen
-  const scatter = clamp(window.scrollY / Math.max(1, ch * 0.9), 0, 1);
-  // scatter > 0 means the dots are dispersing AND wobbling; hoverLetter / mouseHX mean a cursor
-  // is working the letters. Any of those and the frame is live no matter what the letters say.
-  // `scatter !== lastScatter` is the one that matters on the way back up: the frame where scatter
-  // finally reaches 0 is the frame that puts every dot exactly on its letter. Testing only
-  // `scatter > 0` would skip it and leave the wordmark holding its last smeared frame.
-  let busy = !entryDone || scatter > 0.0005 || scatter !== lastScatter || hoverLetter >= 0 || mouseHX > -9000;
-  lastScatter = scatter;
-  for (let i = 0; i < letterHot.length; i++) {
-    // Both of these are eased at 0.2/frame ON PURPOSE - Yehuda wants the wordmark to answer the
-    // cursor slowly, so the dots swell and settle rather than snap. They were once sped up to
-    // 0.5/instant to kill "lag"; that was the wrong call here and was put back. The no-lag rule
-    // applies to the pointer follower (the photo), not to this.
-    // The swell and the blink are properties of the LETTER, so both are resolved once a frame here
-    // rather than per dot - there are a few thousand dots and only fourteen letters. They are
-    // resolved BEFORE letterHot below, which consumes letterDim in the same pass; computing them
-    // after would feed it last frame's value.
-    letterSwell[i] = letterPop[i] ? popCurve((now - letterPop[i]) / POP_MS) : 0;
-    if (letterPop[i] && now - letterPop[i] > POP_MS) letterPop[i] = 0;
-    letterDim[i] = letterBlink[i] ? blinkCurve((now - letterBlink[i]) / BLINK_MS) : 0;
-    if (letterBlink[i] && now - letterBlink[i] > BLINK_MS) letterBlink[i] = 0;
-    // letterDim multiplies the TARGET rather than flipping letterOn, so the blink can never
-    // overwrite a letter the reader has toggled themselves.
-    letterHot[i]  += ((letterOn[i] ? 1 : 0) * (1 - letterDim[i]) - letterHot[i]) * 0.2;   // colour - sticky
-    letterLift[i] += ((i === hoverLetter ? 1 : 0) - letterLift[i]) * 0.2;   // motion - hover only
-    if (letterBurst[i]) burstDrawn[i] = 0;   // recounted by the dot loop below
-    if (letterBlink[i] || letterPop[i] || letterBurst[i] || letterLift[i] > 0.002) busy = true;
-    if (Math.abs(letterHot[i] - (letterOn[i] ? 1 : 0) * (1 - letterDim[i])) > 0.002) busy = true;
-  }
-
-  // Nothing is moving: every letter has reached its colour, none is blinking, swelling or
-  // shattering, the fly-in is over and the page has not scrolled - so `wob` is zero and this frame
-  // would be pixel-for-pixel the last one. Re-queue without touching the canvas.
-  //
-  // This replaces parking the loop during a sideways drag on the row, which is what used to buy
-  // those frames and cost the wordmark its animation. Skipping identical frames costs nothing
-  // visible and saves far more: the canvas used to repaint ~2700 sprites every frame for as long
-  // as the hero was on screen, including when it was completely still.
-  if (!busy && !forceDraw) { if (!reduced && heroOnScreen) dotsRaf = requestAnimationFrame(drawDots); else dotsRaf = null; return; }
-  forceDraw = false;
-  ctx.clearRect(0, 0, cw, ch);
-
-  const half = spriteSize / 2, FADE = 190;   // px of self-fade at the canvas foot
-  const hotDots = [];
-  for (let i = 0; i < dots.length; i++) {
-    const d = dots[i];
-    const entry = easeOutCubic(clamp((now - entryStart - d.delay) / 1500, 0, 1));
-    const disperse = Math.max(1 - entry, scatter);
-    const wob = 1.5 * disperse;   // ambient jitter only while flying in / scattering → dots sit perfectly still & crisp once settled
-    // settled is the common case: no disperse means no offset and no jitter, so skip the two trig
-    // calls per dot rather than computing a wobble that gets multiplied by zero
-    const x = wob ? d.hx + d.ox * disperse + Math.sin(nowS * d.sp + d.ph) * wob : d.hx;
-    const y = wob ? d.hy + d.oy * disperse + Math.cos(nowS * d.sp * 0.9 + d.ph) * wob : d.hy;
-    const hot = d.li >= 0 ? letterHot[d.li] : 0;
-    const lift = d.li >= 0 ? letterLift[d.li] : 0;
-    const swell = d.li >= 0 ? letterSwell[d.li] : 0;
-    const fade = y > ch - FADE ? clamp((ch - y) / FADE, 0, 1) : 1;
-    if (fade <= 0.01) continue;
-    if (d.li >= 0 && letterGone[d.li]) continue;                    // shattered - this dot is not coming back
-    // Mid-shatter: the dot runs off along its own vector until it is out of the frame. Handled here
-    // rather than in the hot pass below because it must ignore the swell and the hover lift
-    // entirely - it is no longer part of a letter, it is debris.
-    if (d.li >= 0 && letterBurst[d.li]) {
-      const el = now - letterBurst[d.li] - d.bd;   // this dot's own clock - see BURST_STAGGER
-      if (el > 0) {
-        const bt = el / BURST_MS;               // NOT clamped - see `glide` below
-        const kt = bt < 1 ? bt : 1;
-        // Two motions, added. `kick` spends almost all of itself in the first ~200ms: that is the
-        // answer to the click, and it has to be over before the reader can register it as a delay.
-        // `glide` is linear and never decays, so once the kick has spent itself the debris is still
-        // travelling - it drifts out of the canvas instead of parking mid-air the way a lone
-        // easeOutCubic did, which is what made the old burst read as "stopped" halfway. Letting bt
-        // run past 1 is what carries the slow dots off the edge: they keep the SAME steady speed
-        // they already had, for as long as it takes. Speeding them up instead is what made this
-        // read as nervous rather than calm, and it is not to be done again.
-        const kick = 1 - Math.pow(1 - kt, 6);
-        const travel = 0.42 * kick + 0.58 * bt;
-        // ...and on top of that a slow sway plus a little lift, so the flight is a float rather
-        // than fourteen hundred dots on rails. Both grow with kt: nothing sways at the instant of
-        // the hit, everything is drifting by the end - and both stop growing once the throw is
-        // over, so a long straggler drifts straight instead of wandering further and further.
-        const sway = Math.sin(nowS * d.sp * 1.4 + d.ph) * 16 * kt;
-        const rise = -34 * kt * kt;
-        const bxp = x + d.bx * travel + sway, byp = y + d.by * travel + rise;
-        if (bxp < -half || bxp > cw + half || byp < -half) continue;
-        // Full ink for the whole throw, then out on a fade at the very END of it. The distinction
-        // matters and was learned the hard way: an earlier version started fading at the halfway
-        // mark, and dots dimming while they were still crossing open screen read as the letter
-        // evaporating rather than being thrown. BTAIL holds them at full strength until the kick is
-        // long spent and they are far out, and BEND is past 1 on purpose - the fade outlasts the
-        // throw, so the slow stragglers ease away instead of being cut off at a fixed moment.
-        const tail = bt <= BTAIL ? 1 : Math.pow(Math.max(0, 1 - (bt - BTAIL) / (BEND - BTAIL)), 1.5);
-        // The foot is the one edge that sits mid-page rather than off it, so a hard cut there would
-        // be a visible line under the project tiles. BFADE is deliberately short - a couple of dot
-        // widths, a dot slipping under the page rather than a dot fading out.
-        const a = tail * (byp > ch - BFADE ? (ch - byp) / BFADE : 1);
-        if (a <= 0.01) continue;
-        burstDrawn[d.li]++;                     // this letter still has debris on screen
-        ctx.globalAlpha = a;
-        ctx.drawImage(inkSprite, bxp - half, byp - half, spriteSize, spriteSize);
-        if (hot > 0.03) { ctx.globalAlpha = a * hot; ctx.drawImage(purpleSprite, bxp - half, byp - half, spriteSize, spriteSize); }
-        continue;
-      }
-      // still waiting its turn - falls through and is drawn in place, part of the letter
-    }
-    // `swell` is in this test on purpose: a letter tapped back to ink has hot ≈ 0, and without it
-    // that letter would take the flat branch below and never animate.
-    if (hot > 0.03 || lift > 0.03 || swell > 0.002) {
-      d._x = x + d.lx * 11 * lift; d._y = y - 20 * lift + d.ly * 11 * lift;
-      d._hot = hot; d._lift = lift; d._swell = swell; d._fade = fade; hotDots.push(d);
-    } else {
-      ctx.globalAlpha = fade;
-      ctx.drawImage(inkSprite, x - half, y - half, spriteSize, spriteSize);
-    }
-  }
-  const cursorOn = mouseHX > -9000;   // there is no cursor on a phone: skip the push maths entirely
-  for (const d of hotDots) {
-    let x = d._x, y = d._y;
-    // A tapped letter swells around its OWN centre. Scaling the offset from L.cx/L.cy is what
-    // makes it a letter getting bigger; nudging every dot the same distance outward (which is what
-    // the hover lift does, on purpose) only puffs the outline and leaves the letter the same size.
-    if (d._swell > 0) {
-      const L = letters[d.li], sc = 1 + 0.17 * d._swell;
-      x = L.cx + (x - L.cx) * sc;
-      y = L.cy + (y - L.cy) * sc;
-    }
-    if (cursorOn) {
-      const dx = x - mouseHX, dy = y - mouseHY, dd = Math.hypot(dx, dy) || 1;   // cursor pushes the dots outward
-      if (dd < 90) { const push = (1 - dd / 90) * 24 * d._lift; x += dx / dd * push; y += dy / dd * push; }
-    }
-    if (d._hot > 0.995) {                 // fully purple - one baked sprite instead of ink + purple
-      ctx.globalAlpha = d._fade;          ctx.drawImage(hotSprite, x - half, y - half, spriteSize, spriteSize);
-    } else {
-      ctx.globalAlpha = d._fade;          ctx.drawImage(inkSprite,    x - half, y - half, spriteSize, spriteSize);   // crisp base
-      ctx.globalAlpha = d._hot * d._fade; ctx.drawImage(purpleSprite, x - half, y - half, spriteSize, spriteSize);   // crisp purple - no blur/halo
-    }
-  }
-  ctx.globalAlpha = 1;
-  // A shattered letter is written off once its last dot has actually left the canvas - counted,
-  // not timed. A timer has to guess how long the slowest dot needs, and guessing short deletes
-  // debris that is still on screen at full ink. That pop is exactly what the opacity fade used to
-  // hide, so with the fade gone the count is the only honest way to decide it is over.
-  for (let i = 0; i < letterBurst.length; i++) {
-    if (letterBurst[i] && now - letterBurst[i] > BURST_STAGGER && !burstDrawn[i]) {
-      letterBurst[i] = 0; letterGone[i] = true; forceDraw = true;
-    }
-  }
-  // Only keep painting while the hero is actually on screen. This used to re-queue itself
-  // unconditionally, so the wordmark canvas repainted every single frame for the whole session -
-  // still burning the main thread while the reader was down at the footer, which is main-thread
-  // time that is not going to their mouse. The footer particles already gate themselves this way.
-  if (!reduced && heroOnScreen) dotsRaf = requestAnimationFrame(drawDots); else dotsRaf = null;
+  ctx.clearRect(0, 0, px_, py_);
+  ctx.save();
+  ctx.beginPath(); ctx.arc(circle.x, circle.y, circle.r, 0, 6.283); ctx.clip();
+  ctx.drawImage(offc, 0, 0);
+  ctx.restore();
 }
 
 if (canvas && ctx) {
-  const startDots = () => { buildDots(); drawDots(); };
-  if (document.fonts && document.fonts.load) {
-    document.fonts.load("700 100px 'Hanken Grotesk'").then(startDots).catch(startDots);
-  } else { startDots(); }
+  portraitImg.onload = () => { subject = measureSubject(portraitImg); portraitReady = true; buildPortrait(); };
+  portraitImg.src = canvas.dataset.portrait || 'portrait.png';
   // Rebuild on a real WIDTH change only. On phones the address bar collapsing while you scroll
-  // fires `resize` with a new height - rebuilding there was what made the dots re-assemble
-  // mid-scroll instead of just dispersing.
+  // fires `resize` with a new height, and redrawing there would be work for nothing.
   let rt, lastVW = window.innerWidth;
   window.addEventListener('resize', () => {
     if (window.innerWidth === lastVW) return;
     lastVW = window.innerWidth;
-    clearTimeout(rt); rt = setTimeout(() => { buildDots(); if (reduced) drawDots(); }, 160);
+    clearTimeout(rt); rt = setTimeout(buildPortrait, 160);
   });
 }
 
-// ---- Park the hero's two animation loops whenever the hero is off screen ----
-if (hero && !reduced && 'IntersectionObserver' in window) {
-  new IntersectionObserver((entries) => {
-    heroOnScreen = entries[0].isIntersecting;
-    if (!heroOnScreen) return;
-    if (canvas && ctx && dotsRaf === null) dotsRaf = requestAnimationFrame(drawDots);
-    resumeDrift();
-  }, { threshold: 0 }).observe(hero);
-}
-
-// ---- Phones: hand the whole frame budget to the finger while the project row is being dragged ----
-// The tile strip sits INSIDE the hero, so a sideways drag happens while the wordmark canvas and the
-// two halos are both painting every frame and all three tiles are mid-breath - main-thread and
-// compositor work competing with the gesture itself, which is what made the row feel stiff under the
-// thumb. Same trade the observer above makes: no ambient motion is worth a frame the finger needs.
-// It parks the moment a finger lands on the row and comes back 400 ms after it settles.
-const workRow = document.querySelector('.hero-work');
-if (workRow && !reduced) {
-  let settle = null;
-  // touchstart, not scroll. Waiting for the first scroll event meant the canvas and the halos were
-  // still painting through the opening milliseconds of the drag - the part the hand actually
-  // judges. This clears the frame budget the moment the finger lands, before anything has moved.
-  const park = () => {
-    heroBusy = true;
-    clearTimeout(settle);
-    settle = setTimeout(() => { heroBusy = false; resumeDrift(); },
-      400);   // long enough to cover the coast after the finger has already left
-  };
-  workRow.addEventListener('touchstart', park, { passive: true });
-  workRow.addEventListener('scroll', park, { passive: true });
-}
-
-// ---- Phones: the wordmark colours itself in, hints that it is tappable, then answers your finger ----
-// There is no cursor to run across the letters, so the letters take the brand purple one after
-// another, left to right, and after that a tap on any letter toggles it back to ink - and back to
-// purple - for as long as you like.
+// ---- Selected work: the scroll-driven card stack ----
+// Every card rides the SAME arc, just at a different point along it. `p` is the stack's position in
+// card units: p = 1.0 means card 1 is dead centre, p = 0.5 means cards 0 and 1 are halfway between
+// the centre and their parked positions either side of it. Each card's own phase is f = p - i, so
+// f = 0 is centred, f < 0 is still waiting on the right, f > 0 has been read and sits on the left.
 //
-// PAINT_AT is the moment the project row finishes, not a round number: the third tile starts at
-// 2.26s and rises for 1.5s, so 3.76s is exactly when it lands. The wordmark takes over on that beat.
-if (canvas && ctx && !reduced && hero && !window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-  const PAINT_AT = 2260 + 1500, PER_LETTER = 105;
-  const LETTER_SETTLE = 600;   // the last letter's colour easing still has to finish after its turn
-  const HINT_WAIT = 1500;      // ...and then the line is simply left alone for a beat
-  const STEP_MS = 260, PASS_GAP = 3000;
-  let hintTimers = [], tapped = false;
-  const stopHint = () => { hintTimers.forEach(clearTimeout); hintTimers = []; };
+// The arc is a circle: x = -R·sin(a), y = Rv·(1 - cos(a)) with a = f·SWING. At a = 0 that is exactly
+// (0, 0) - the centre - and either side of it the card swings out AND drops, which is what makes
+// the move read as one turn of a wheel rather than a slide plus a fade. The x is negated so the
+// wheel turns the right way round: a card still waiting (f < 0) sits on the RIGHT and climbs in
+// from there, and a card already read (f > 0) carries on down to the left.
+//
+// f is clamped, not cut off: a card that is two steps away parks a little further out than one that
+// is a single step away, so the queue fans instead of stacking three cards on one spot.
+const pstack = document.querySelector('.pstack');
+if (pstack) {
+  const pin = pstack.querySelector('.pstack__pin');
+  const cards = Array.from(pstack.querySelectorAll('.pcard'));
+  const vids = cards.map((c) => c.querySelector('.pcard__video'));
 
-  // The hint. Every other letter drops back to ink and returns, left to right - the skip is what
-  // makes it read as a deliberate signal rather than the wordmark misbehaving. Each pass starts on
-  // the opposite letter to the last one, so over two passes the whole line has flickered; a fixed
-  // parity would mark the same half for ever and leave the rest looking dead.
-  //
-  // STEP_MS is deliberately shorter than BLINK_MS: each letter is still easing back up as the next
-  // one starts down, so the hint travels as one soft wave instead of a row of separate flicks.
-  function runHint(parity) {
-    const ids = [];
-    for (let i = parity; i < letters.length; i += 2) if (letterInk[i]) ids.push(i);
-    if (!ids.length) return;
-    // every id is kept, not just the last one: a tap has to be able to cancel the whole pass, and
-    // a single `hintTimer` variable only ever remembers the timer scheduled most recently
-    hintTimers = ids.map((li, n) =>
-      setTimeout(() => { letterBlink[li] = performance.now(); }, n * STEP_MS));
-    // the gap is measured from the end of the wave, tail included, not from the last letter's start
-    hintTimers.push(setTimeout(() => {
-      runHint(parity ? 0 : 1);
-    }, (ids.length - 1) * STEP_MS + BLINK_MS + PASS_GAP));
-  }
+  if (cards.length && !reduced) {
+    const SWING = 62;      // degrees between "centred" and "one step away"
+    // How far past one step a card may park. Past ~90° the arc has stopped moving sideways and is
+    // only still dropping, so the card two steps out lands BELOW the one step out rather than
+    // beside it - which is the whole point: at 1.22 the two queued cards sat almost on the same
+    // spot and their headlines read as one garbled block.
+    const FAR = 1.5;
+    const TAIL = 3.4;      // steps of scroll: one per card + 0.4 holding the last one centred
+    const D2R = Math.PI / 180;
+    pstack.classList.add('is-driven');
 
-  setTimeout(function paintIn() {
-    if (!letters.length) { setTimeout(paintIn, 200); return; }        // wait for the font/build
-    letters.forEach((L, i) => setTimeout(() => { letterOn[i] = 1; }, i * PER_LETTER));
-    // the hint waits for the last letter to finish taking its colour, and then waits again - the
-    // line has to be allowed to just sit there fully purple before anything starts moving in it
-    setTimeout(() => { if (!tapped) runHint(0); },
-      (letters.length - 1) * PER_LETTER + LETTER_SETTLE + HINT_WAIT);
-  }, PAINT_AT);
+    let active = -1, pRaf = null;
+    const place = () => {
+      pRaf = null;
+      const range = pstack.offsetHeight - pin.offsetHeight;
+      if (range <= 0) return;
+      const q = clamp(-pstack.getBoundingClientRect().top / range, 0, 1);
+      const p = clamp(-1 + q * TAIL, -1, cards.length - 1);
+      // measured off the card itself, so the arc scales with the card at every breakpoint
+      const R = cards[0].offsetWidth * 0.92, RV = cards[0].offsetHeight * 0.62;
 
-  hero.addEventListener('pointerdown', (e) => {
-    if (e.pointerType === 'mouse' || !letters.length) return;
-    const r = hero.getBoundingClientRect();
-    const x = e.clientX - r.left, y = e.clientY - r.top;
-    if (Math.abs(y - textMidY) > textH * 0.55) return;                // only taps on the wordmark itself
-    for (let k = 0; k < letters.length; k++) {
-      if (!letterInk[k]) continue;                                    // the space is not a letter
-      if (x >= letters[k].x0 && x < letters[k].x1) {
-        // The hint has done its job the moment it is answered. Leaving it running would keep
-        // flickering letters the reader has just set on purpose, which reads as a bug, not a cue.
-        if (!tapped) {
-          tapped = true;
-          stopHint();
-          for (let j = 0; j < letterBlink.length; j++) { letterBlink[j] = 0; letterDim[j] = 0; }
-        }
-        if (letterGone[k]) break;                                     // nothing left there to press
-        letterTaps[k] = (letterTaps[k] || 0) + 1;
-        forceDraw = true;
-        if (letterTaps[k] >= 2) {
-          // Second press on this letter - whenever it comes, not necessarily the next tap - and it
-          // blows apart: every dot leaves on its own heading and the letter does not come back.
-          letterBurst[k] = performance.now();
-        } else {
-          letterOn[k] = letterOn[k] ? 0 : 1;
-          letterPop[k] = performance.now();                           // and it swells under the thumb
-        }
-        break;
+      let nearest = 0, nearestD = Infinity;
+      cards.forEach((card, i) => {
+        const f = clamp(p - i, -FAR, FAR);
+        const a = f * SWING * D2R, s = Math.sin(a);
+        const d = Math.abs(f);
+        if (d < nearestD) { nearestD = d; nearest = i; }
+        // |sin| alone stops separating the cards once the arc passes 90°, so anything parked beyond
+        // one step keeps shrinking on |f| - that extra taper is what reads as "further back".
+        const sc = 1 - 0.26 * Math.abs(s) - 0.09 * Math.max(0, d - 1);
+        card.style.transform =
+          `translate3d(${(-R * s).toFixed(1)}px, ${(RV * (1 - Math.cos(a))).toFixed(1)}px, 0)` +
+          ` rotate(${(-f * SWING * 0.22).toFixed(2)}deg) scale(${sc.toFixed(3)})`;
+        card.style.opacity = (1 - 0.34 * Math.abs(s)).toFixed(3);
+        card.style.zIndex = String(20 - Math.round(d * 10));
+      });
+
+      // only the centred card is interactive, and only its video runs - three hero videos playing
+      // at once behind a page that is also drawing a particle canvas is not a trade worth making
+      if (nearest !== active) {
+        active = nearest;
+        cards.forEach((card, i) => card.classList.toggle('is-active', i === active));
+        vids.forEach((v, i) => {
+          if (!v) return;
+          if (i === active) { if (v.preload === 'none') v.preload = 'auto'; v.play().catch(() => {}); }
+          else v.pause();
+        });
       }
-    }
-  }, { passive: true });
+    };
+    const onPStack = () => { if (pRaf === null) pRaf = requestAnimationFrame(place); };
+    window.addEventListener('scroll', onPStack, { passive: true });
+    window.addEventListener('resize', onPStack);
+    place();
+  } else {
+    // reduced motion: the section is a plain column (no .is-driven), so every card is simply there
+    cards.forEach((c) => c.classList.add('is-active'));
+  }
 }
 
 // ---- Hero scroll parallax + card grow/fade + shadow-fade ----
 function onFrame() {
   const vh = window.innerHeight;
   const y = window.scrollY;
-  if (line1) {
-    // dissolves fast on scroll - the same move the Bianca / Talmind hero titles make,
-    // instead of sliding sideways and staying fully legible the whole way down
-    const o = clamp(1 - y / 90, 0, 1);
-    line1.style.opacity = o.toFixed(3);
-    if (heroSub) heroSub.style.opacity = o.toFixed(3);
-  }
+  // The greeting used to dissolve within 90px of scroll, the way the case-study hero titles do.
+  // It does not any more - Yehuda wants it readable the whole way down.
   cases.forEach((card) => {
     const rect = card.getBoundingClientRect();
     const enter = clamp((vh - rect.top) / (vh - vh * 0.18), 0, 1);
@@ -751,169 +522,6 @@ if (!reduced) {
   onFrame();
 } else {
   cases.forEach((c) => { c.style.setProperty('--card-scale', '1'); c.style.setProperty('--card-opacity', '1'); });
-}
-
-// ---- Only the header PHOTO flies to the cursor; per-letter glow; Instagram-style return ----
-if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
-  const SIZE = 80, HOME_S = 46 / 80, RET = 760, FLY = RET;   // out and back take exactly as long
-  let tx = 0, ty = 0, cx = 0, cy = 0, cs = HOME_S;
-  let active = false, returning = false, raf = null, homeX = 0, homeY = 0;
-  let retStart = 0, rfx = 0, rfy = 0, rfs = HOME_S;
-  // The photo flies from the header to the cursor - that hand-off is the effect and stays eased.
-  // But once it has ARRIVED it becomes the cursor, and a thing that IS the cursor may not trail it.
-  // From that moment it is locked to the pointer and drawn from the pointermove event itself.
-  let locked = false, flyStart = 0, ffx = 0, ffy = 0, ffs = HOME_S;   // where the flight launched from
-
-  const render = () => {
-    cursorEl.style.transform = `translate(${(cx - SIZE / 2).toFixed(1)}px, ${(cy - SIZE / 2).toFixed(1)}px) scale(${cs.toFixed(3)})`;
-  };
-  const loop = () => {
-    if (returning) {
-      const t = clamp((performance.now() - retStart) / RET, 0, 1);
-      const e = easeInOutCubic(t);
-      cx = rfx + (homeX - rfx) * e;
-      const baseY = rfy + (homeY - rfy) * e;
-      const arc = -Math.sin(t * Math.PI) * 60;                  // soft rounded hop over the top
-      const bounce = Math.sin(t * Math.PI * 3) * (1 - t) * 12;  // two gentle, damped bounces
-      cy = baseY + arc + bounce;
-      cs = rfs + (HOME_S - rfs) * e;
-      render();
-      if (t >= 1) { returning = false; cursorEl.style.opacity = '0'; hdrAvatarImg.style.opacity = ''; raf = null; return; }
-      raf = requestAnimationFrame(loop); return;
-    }
-    if (locked) { cx = tx; cy = ty; cs = ts(); } else if (active) {
-      // The flight OUT is the mirror image of the flight home: same clock, same easeInOutCubic,
-      // the same rounded hop and the same damped settle. It used to be a 300ms follow-ease that
-      // ramped 0.26 → 1, which arrived correctly but felt like a snatch; this reads as the photo
-      // being lifted out of the header and carried across.
-      // The hand-off is still time-boxed, NOT distance-based - keyed off distance it could never
-      // finish while the pointer kept moving, and the photo would trail forever. The eased
-      // progress runs between the LAUNCH point and wherever the pointer is NOW, so it still lands
-      // exactly on the pointer at t = 1; from there it locks and pointermove draws it.
-      const t = clamp((performance.now() - flyStart) / FLY, 0, 1);
-      const e = easeInOutCubic(t);
-      cx = ffx + (tx - ffx) * e;
-      const baseY = ffy + (ty - ffy) * e;
-      const arc = -Math.sin(t * Math.PI) * 60;                  // soft rounded hop over the top
-      const bounce = Math.sin(t * Math.PI * 3) * (1 - t) * 12;  // two gentle, damped bounces
-      cy = baseY + arc + bounce;
-      cs = ffs + (1 - ffs) * e;
-      if (t >= 1) { cx = tx; cy = ty; cs = 1; locked = true; }
-    } else {
-      cx += (tx - cx) * 0.26; cy += (ty - cy) * 0.26; cs += (ts() - cs) * 0.26;
-    }
-    render();
-    // Once it is locked AND done growing there is nothing left to animate: the loop stands down and
-    // pointermove draws it, so there is no rAF hop between the mouse and the photo.
-    const scaling = Math.abs(ts() - cs) > 0.002;
-    if ((active && (!locked || scaling)) || (!active && Math.hypot(tx - cx, ty - cy) > 0.6)) {
-      raf = requestAnimationFrame(loop);
-    } else { raf = null; }
-  };
-  const ts = () => (active ? 1 : HOME_S);
-  const kick = () => { if (!raf) raf = requestAnimationFrame(loop); };
-
-  const flyOut = (x, y) => {
-    const r = hdrAvatar.getBoundingClientRect();
-    homeX = r.left + r.width / 2; homeY = r.top + r.height / 2;
-    if (!active && !returning) { cx = homeX; cy = homeY; cs = HOME_S; render(); }
-    active = true; returning = false; locked = false; flyStart = performance.now();   // flies across first
-    // launch from wherever it actually is - the header, or mid-flight home if you came straight back
-    ffx = cx; ffy = cy; ffs = cs;
-    document.documentElement.classList.add('hero-ava-on');
-    cursorEl.style.opacity = '1';
-    hdrAvatarImg.style.opacity = '0';    // only the photo lifts off; the ring stays
-    tx = x; ty = y; kick();
-  };
-  const flyHome = () => {
-    if (!active) return;
-    active = false; returning = true; locked = false;
-    document.documentElement.classList.remove('hero-ava-on');   // round cursor comes back immediately
-    retStart = performance.now(); rfx = cx; rfy = cy; rfs = cs;
-    kick();
-  };
-
-  // The hero rect used to be read on EVERY pointermove. Reading layout inside an input handler
-  // forces a synchronous style+layout flush, and the halo loop dirties style every frame, so it was
-  // never free - it put a measurable stall between the mouse moving and anything drawing. It is
-  // cached and only re-read when something can actually have moved it.
-  // (line2's rect used to be cached here too, for a box test that the per-letter ink bounds have
-  // replaced - the letters now answer the "is the cursor on me" question themselves.)
-  let rh = null;
-  const dropRects = () => { rh = null; };
-  addEventListener('scroll', dropRects, { passive: true });
-  addEventListener('resize', dropRects, { passive: true });
-  const heroRect = () => (rh || (rh = hero.getBoundingClientRect()));
-
-  document.addEventListener('pointermove', (e) => {
-    if (e.pointerType === 'touch') return;
-    // which letter is under the cursor (+ feed the cursor position to the dots)
-    const hr = heroRect();
-    const lx = e.clientX - hr.left, ly = e.clientY - hr.top;
-    // Sideways this was always exact - the letter's own column. Vertically it used to be the whole
-    // of line2's box, which is 1.28× the font size tall and the same height for every letter, so
-    // coming at an "e" from above or below handed the photo over while the cursor was still a long
-    // way off the glyph. Each letter now carries its OWN ink top and bottom (see buildDots), so the
-    // test is the same tightness from every direction: a lowercase letter answers across its
-    // x-height, a "g" answers down into its descender, the "/" answers over its full height.
-    let col = -1;
-    for (let k = 0; k < letters.length; k++) {
-      if (lx >= letters[k].x0 && lx < letters[k].x1) { col = (ly >= letters[k].y0 && ly <= letters[k].y1) ? k : -1; break; }
-    }
-    // The photo answers the WORDMARK, so it may only come out where there is wordmark left to
-    // answer. Being inside the line's box is not enough: a shattered letter leaves a hole, and the
-    // line box also runs on past where the right-aligned text starts. Handing the photo to either
-    // of those is what looked broken - it sat over blank canvas as if a letter were still there.
-    // The space between the two words is NOT a hole: it is part of the line and keeps the photo,
-    // so crossing between "UI" and "Designer" does not send it home and back.
-    //
-    // letterBurst is in this test alongside letterGone, and that is the whole point: a letter is
-    // not "there" from the moment it is HIT, but letterGone is only written two seconds later when
-    // the last of the debris has left the canvas. Testing letterGone alone meant the photo went on
-    // treating an empty slot as a letter for the entire length of the flight.
-    if (col >= 0 && !letterGone[col] && !letterBurst[col]) {
-      if (!active) flyOut(e.clientX, e.clientY);
-      else {
-        tx = e.clientX; ty = e.clientY;
-        // locked = it IS the cursor now, so draw it in this event, not on the next frame
-        if (locked) { cx = tx; cy = ty; render(); } else kick();
-      }
-      mouseHX = lx; mouseHY = e.clientY - hr.top;
-      // toggle on ENTER only: a touched letter turns purple and stays purple until touched again
-      if (col !== hoverLetter) {
-        if (letterOn.length > col) letterOn[col] = letterOn[col] ? 0 : 1;
-        hoverLetter = col;
-      }
-    } else {
-      if (active) flyHome();
-      hoverLetter = -1; mouseHX = -9999; mouseHY = -9999;
-    }
-  }, { passive: true });   // never calls preventDefault - let the browser composite without waiting on it
-
-  // ---- Click a letter and it comes apart ----
-  // The phone gets there on the second tap, because the first one is how you colour a letter in.
-  // With a mouse the colour is already handled by running across the letters, so a click has nothing
-  // else to mean and shatters straight away.
-  //
-  // `pointerdown`, not `click`: the letter has to start leaving on the way DOWN. Waiting for the
-  // release puts the length of the press between the reader and the response, and that is the whole
-  // of the effect - press, and it is already flying.
-  document.addEventListener('pointerdown', (e) => {
-    if (e.pointerType === 'touch' || e.button !== 0) return;
-    const k = hoverLetter;   // kept up to date by the pointermove above; only ever set over line2
-    if (k < 0 || !letterInk[k] || letterGone[k] || letterBurst[k]) return;
-    letterBurst[k] = performance.now();
-    letterTaps[k] = (letterTaps[k] || 0) + 1;
-    forceDraw = true;
-    // The letter the photo is sitting on has just left, and the reader's hand is still - no further
-    // pointermove is coming to re-run the check above. So let go right here, in the same event as
-    // the click. This used to poll for letterGone instead, which put the whole flight plus a poll
-    // interval between the letter leaving and the photo admitting it.
-    hoverLetter = -1; mouseHX = -9999; mouseHY = -9999;
-    if (active) flyHome();
-  }, { passive: true });
-
-  window.addEventListener('blur', () => { if (active) flyHome(); hoverLetter = -1; mouseHX = -9999; mouseHY = -9999; });
 }
 
 // ---- Glimpse: 3D mouse parallax on the photos ----
@@ -979,8 +587,9 @@ if (reduced || !('IntersectionObserver' in window)) {
   const targetS = () => (hover ? 1.7 : 1) * (down ? 0.82 : 1);
 
   const render = () => {
-    const heroActive = document.documentElement.classList.contains('hero-ava-on');   // only while actually over the name
-    dot.style.opacity = (shown && inside && !heroActive) ? '1' : '0';
+    // this used to stand down behind `html.hero-ava-on`, while the header photo was out over the
+    // portrait standing in for it. Nothing sets that class any more.
+    dot.style.opacity = (shown && inside) ? '1' : '0';
     dot.classList.toggle('is-hover', hover);
     dot.style.transform = `translate3d(${(mx - 12.5).toFixed(2)}px, ${(my - 12.5).toFixed(2)}px, 0) scale(${cs.toFixed(3)})`;
   };
@@ -1387,4 +996,95 @@ document.querySelectorAll('a[href="#top"]').forEach((a) => {
   if (!p.endsWith('.html')) return;
   const clean = p === '/index.html' ? '/' : p.slice(0, -5);
   history.replaceState(history.state, '', clean + location.search + location.hash);
+})();
+
+// ---- Opening confetti: coloured paper, cut and dropped ----
+// Vector shapes on a canvas, not images: rectangles, triangles and thin ribbons, each turning on
+// its own axis. The `scale(1, cos t)` is the whole trick - it squashes the shape to nothing and
+// back as it falls, which is a flat scrap of paper turning edge-on to you.
+//
+// The random numbers come from a SEEDED generator, so the drop is identical on every load rather
+// than a different shower each time. Same reason the halo starts on a fixed point: the opening of
+// the page is a composition, and a composition that re-rolls itself cannot be judged or tuned.
+(function () {
+  if (reduced) return;
+  const COUNT = 280, LIFE = 2200, FADE = 400;
+  // Brighter and warmer than the first set, and no longer anchored to the site's purple: a party
+  // palette - coral, tangerine, marigold, mint, jade, sky, violet, magenta.
+  const COLORS = ['#FF6B57', '#FF9A3C', '#FFC93C', '#FFE66D', '#3FD6A0',
+                  '#17B890', '#3FA9F5', '#7B5CFF', '#B575DF', '#FF5E9C'];
+  // mulberry32 - small, fast, and the same sequence every time
+  let seed = 0x9E3779B9;
+  const rnd = () => {
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+
+  const cv = document.createElement('canvas');
+  cv.className = 'confetti'; cv.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(cv);
+  const c = cv.getContext('2d');
+  let W = 0, H = 0;
+  const size = () => {
+    const dp = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    cv.width = Math.round(W * dp); cv.height = Math.round(H * dp);
+    c.setTransform(dp, 0, 0, dp, 0, 0);
+  };
+  size();
+  window.addEventListener('resize', size);
+
+  const bits = [];
+  for (let i = 0; i < COUNT; i++) {
+    const kind = rnd();
+    bits.push({
+      // Spread over a band that STARTS on screen and reaches one and a half screens above it. The
+      // first version began entirely above the fold, so the opening half second was a thin trickle
+      // before the shower arrived; this way the screen is populated from the first frame.
+      x: rnd() * W,
+      y: H * 0.25 - rnd() * H * 1.75,
+      w: 6 + rnd() * 9, h: 10 + rnd() * 16,
+      col: COLORS[(rnd() * COLORS.length) | 0],
+      vy: 210 + rnd() * 240, vx: (rnd() - 0.5) * 60,
+      sway: 14 + rnd() * 40, swayR: 0.6 + rnd() * 1.5, ph: rnd() * 6.283,
+      rot: rnd() * 6.283, vr: (rnd() - 0.5) * 4.4,
+      flip: 0.7 + rnd() * 2.1,
+      kind: kind < 0.2 ? 2 : (kind < 0.46 ? 1 : 0)   // 0 rectangle, 1 triangle, 2 ribbon
+    });
+  }
+
+  const t0 = performance.now();
+  const frame = (now) => {
+    const t = (now - t0) / 1000, life = now - t0;
+    c.clearRect(0, 0, W, H);
+    let alive = 0;
+    const fade = life > LIFE - FADE ? clamp(1 - (life - (LIFE - FADE)) / FADE, 0, 1) : 1;
+    for (let i = 0; i < bits.length; i++) {
+      const b = bits[i];
+      const y = b.y + b.vy * t + 95 * t * t;
+      if (y > H + 40) continue;
+      alive++;
+      const x = b.x + b.vx * t + Math.sin(t * b.swayR + b.ph) * b.sway;
+      c.save();
+      c.translate(x, y);
+      c.rotate(b.rot + b.vr * t);
+      c.scale(1, Math.cos(t * b.flip + b.ph));
+      c.globalAlpha = fade;
+      c.fillStyle = b.col;
+      if (b.kind === 1) {
+        c.beginPath(); c.moveTo(0, -b.h / 2); c.lineTo(b.w / 2, b.h / 2); c.lineTo(-b.w / 2, b.h / 2);
+        c.closePath(); c.fill();
+      } else if (b.kind === 2) {
+        c.fillRect(-b.w / 6, -b.h * 0.8, b.w / 3, b.h * 1.6);   // a long thin streamer
+      } else {
+        c.fillRect(-b.w / 2, -b.h / 2, b.w, b.h);
+      }
+      c.restore();
+    }
+    if (alive && life < LIFE) requestAnimationFrame(frame);
+    else cv.remove();
+  };
+  requestAnimationFrame(frame);
 })();

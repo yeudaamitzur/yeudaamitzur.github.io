@@ -36,6 +36,8 @@
   /* ---- Type ---- */
   --f-display: 'Hanken Grotesk', system-ui, sans-serif;
   --f-serif:   'Instrument Serif', Georgia, serif;
+  --f-title:   'Playfair Display', 'Instrument Serif', Georgia, serif;   /* the hero greeting */
+  --f-note:    'Metal', 'Instrument Serif', Georgia, serif;              /* the hero aside */
   --f-body:    'Inter', system-ui, sans-serif;
 
   /* ---- Layout ---- */
@@ -43,7 +45,7 @@
   --pad:  clamp(1.25rem, 5vw, 3rem);
   --sec-y: clamp(4.5rem, 11vw, 9rem);
   --radius: 18px;
-  --hdr-h: 90px;
+  --hdr-h: 68px;   /* measured, not guessed: 12px padding x2 + the outlined Contact button */
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -117,7 +119,12 @@ ul, ol { list-style: none; padding: 0; }
 .hdr {
   position: fixed; top: 0; left: 0; right: 0; z-index: 60;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 22px clamp(20px, 4vw, 44px);
+  /* The bar spans the window, but its CONTENTS line up with the page's grid: the inline padding is
+     whichever is larger, the page gutter or the space left over beside a --wrap-wide column. So
+     Contact sits exactly on the left edge of the hero copy and the nav on the right edge of the
+     portrait, instead of hugging the window. */
+  padding-block: 12px;
+  padding-inline: max(var(--pad), calc((100vw - var(--wrap)) / 2));
   background-color: rgba(243, 242, 237, 0.10);
   background-image: linear-gradient(
     rgba(119, 63, 156, 0.11) 0%,
@@ -193,7 +200,11 @@ ul, ol { list-style: none; padding: 0; }
 
 @keyframes hdrIn { from { opacity: 0; transform: translateY(-18px); } to { opacity: 1; transform: none; } }
 
-/* ---- Floating pill header (shared by home + case study) ---- */
+/* The full-width bar is the site's original header and, since 11.08.2026, its header again. The
+   pill that sat between is kept whole below and in header-pill.html.bak - nothing was deleted, so
+   going back is a matter of re-wrapping the markup and putting `hdr--float` back on the <header>. */
+
+/* ---- Floating pill header (kept, unused while the full-width bar is in place) ---- */
 .hdr--float { justify-content: center; padding: 16px 20px;
   background: none; background-image: none; -webkit-backdrop-filter: none; backdrop-filter: none; pointer-events: none; }
 .hdr--float > * { pointer-events: auto; }
@@ -224,10 +235,16 @@ ul, ol { list-style: none; padding: 0; }
   transition: max-width .55s cubic-bezier(.2,.7,.2,1), opacity .35s ease, padding .5s cubic-bezier(.2,.7,.2,1); }
 .hdr--float .hdr__nav { display: flex; gap: clamp(1.4rem, 2.2vw, 1.75rem); }
 .hdr--float .hdr__nav a { font-size: 1rem; white-space: nowrap; }
+/* Outline only - no fill. It sits at the far left of the bar, where the avatar used to be, so a
+   solid black lozenge in that corner read as a much heavier thing than a secondary link should be.
+   The stroke takes the brand purple on hover rather than filling. */
 .hdr__cta { display: inline-flex; align-items: center; white-space: nowrap;
-  background: var(--ink); color: var(--bg); font-family: var(--f-display); font-weight: 600; font-size: .98rem;
-  padding: .68em 1.35em; border-radius: 999px; transition: transform .25s ease, background .25s ease; }
-.hdr__cta:hover { transform: translateY(-1px); background: var(--brand); }
+  background: none; color: var(--ink);
+  border: 1.5px solid rgba(40, 37, 30, 0.32);
+  font-family: var(--f-display); font-weight: 600; font-size: .92rem;
+  padding: .58em 1.3em; border-radius: 999px;
+  transition: transform .25s ease, border-color .25s ease, color .25s ease; }
+.hdr__cta:hover { transform: translateY(-1px); border-color: var(--brand); color: var(--brand); }
 .hdr__status { display: inline-flex; align-items: center; gap: .65rem; white-space: nowrap; overflow: hidden;
   max-width: 0; opacity: 0; padding: 0;
   font-family: var(--f-display); font-weight: 500; font-size: 1rem; color: var(--ink);
@@ -263,6 +280,10 @@ ul, ol { list-style: none; padding: 0; }
    side, so the padding is now 12px (right) and 7px (top/bottom) with matching negative margins:
    the clip box opens far enough for the ring to finish, and the pill's own box is untouched. */
 .hdr--float.is-scrolled .hdr__status { max-width: 260px; opacity: 1; padding: 7px 12px 7px 12px; margin: -7px -12px -7px 0; }
+/* The case studies carry no "Available for work" pill, so on scroll there is nothing left inside
+   the header at all - it closes right down onto the avatar. Without this it kept the extra 20px of
+   right padding that only exists to give the status label room, and shrank to a lopsided oval. */
+.hdr--float.hdr--bare.is-scrolled .hdr__pill { padding: 8px 10px; }
 /* ---- Mobile + tablet: the floating pill expands into ONE connected menu card ---- */
 @media (max-width: 1024px) {
   .hdr--float .hdr__nav, .hdr--float .hdr__cta { display: none; }
@@ -339,9 +360,13 @@ ul, ol { list-style: none; padding: 0; }
    ========================================================= */
 .hero {
   position: relative; min-height: 100svh;
-  /* column so the project tiles can sit under the wordmark, still inside the first screen */
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: calc(var(--hdr-h) + 2rem) var(--pad) 3rem;
+  /* Top and bottom padding MATCH. `justify-content: center` centres the content inside the padding
+     box, not the border box, so the old 122px / 48px pair quietly pushed the whole block 37px below
+     the middle of the first screen - measured. Equal padding is what makes "centred" actually mean
+     the centre of the frame. (The asymmetric pair dates from when the project tiles lived down here
+     and needed the extra room underneath; they are their own section now.) */
+  padding: calc(var(--hdr-h) + 2rem) var(--pad);
   overflow: clip; overflow-clip-margin: 480px;   /* let the dots fly on past the hero, down through the stats bar */
 }
 .hero__glow {
@@ -353,43 +378,50 @@ ul, ol { list-style: none; padding: 0; }
   animation: glowIn 1.6s ease .1s both;
 }
 
-/* Two drifting blurred halos that roam the whole hero (JS-driven).
-   The blur is a FRACTION of the orb, never a fixed 64px: a fixed blur that leaves a
-   readable core on a 560px desktop orb is a third of the width of the same orb on a
-   phone, and smears it into a flat wash you can't see moving. */
-.hero__orb {
-  position: absolute; z-index: 0; pointer-events: none;
-  width: var(--orb); aspect-ratio: 1; border-radius: 50%;
-  filter: blur(calc(var(--orb) * var(--orb-blur))); will-change: transform;
-}
-.hero__orb--a {
-  --orb: min(46vw, 560px); --orb-blur: .115;
-  top: 6%; left: 6%;
-  background: radial-gradient(circle at 50% 50%, rgba(150,148,158,0.55) 0%, rgba(150,148,158,0.26) 38%, rgba(150,148,158,0) 70%);
-}
-.hero__orb--b {
-  --orb: min(40vw, 480px); --orb-blur: .133;
-  top: 26%; left: 52%;
-  background: radial-gradient(circle at 50% 50%, rgba(181,117,223,0.30) 0%, rgba(181,117,223,0.14) 40%, rgba(181,117,223,0) 70%);
-}
-/* phones: the orbs take a much bigger share of the (narrow, short) hero, so the drift
-   sweeps a real distance across the screen instead of jiggling in one corner */
-@media (max-width: 700px) {
-  .hero__orb--a { --orb: 86vw; top: 1%;  left: -16%; }
-  .hero__orb--b { --orb: 72vw; top: 20%; left: 34%;
-    background: radial-gradient(circle at 50% 50%, rgba(181,117,223,0.38) 0%, rgba(181,117,223,0.18) 40%, rgba(181,117,223,0) 70%); }
+/* The case-study heroes all wear the same veil over their pinned video: a grey top that gives way
+   to white and lands on the page colour. The homepage has no video behind it, so it wears the veil
+   on its own - same three stops, same proportions, at a weight that reads as depth over a flat
+   background rather than as a grey panel.
+   It is scoped to the HERO and ends with it. A `position: fixed` page-wide version was tried on
+   11.08.2026 and reverted - pinning it to the viewport put a grey band across the top of every
+   screen for the whole scroll, not just the first one.
+   No entrance animation: it used to fade in over 1.6s after a 0.1s delay, which meant the page
+   opened for a beat with no background at all and then acquired one. */
+.hero__veil {
+  /* FIXED, and a child of <body> rather than of .hero: it stays with the reader for the whole
+     scroll instead of ending at the hero's bottom edge. z-index: -1 puts it above the body's own
+     background but under every scrap of content, so nothing else needs a z-index to clear it. */
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  /* White at the top, warming into the page's own off-white by the bottom. The page colour is
+     #F0EFE9, so this still reads as a gradient even though both ends are near-white - the top is
+     brighter and cooler than the paper the rest of the site is printed on. */
+  background: linear-gradient(180deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.60) 47.12%,
+    rgba(240, 239, 233, 1) 100%);
 }
 
-/* Particle "UX/UI Designer" - the canvas covers the whole hero so dots can fly across it */
-.hero__line--2 { position: relative; width: 100%; }
+/* The particle portrait. The canvas covers the WHOLE hero so the dots can scatter across it;
+   .hero__portrait is only the box the picture is drawn into, and carries no paint of its own.
+   (This replaced the particle wordmark on 11.08.2026. The header avatar that used to fly to the
+   cursor over the letters, and the per-letter hover tint, went with it - both were interactions
+   with type, and there is no type here to interact with.) */
 .hero__dots {
   position: absolute; top: 0; left: 0;   /* width/height set by JS so the canvas can extend below the hero */
   z-index: 2; pointer-events: none;
   animation: dotsIn .6s ease both;
+  /* The canvas runs 240px past the hero so the scattering dots have somewhere to go. This feathers
+     its last stretch so they slip under the page instead of being cut off on the canvas edge - in
+     CSS rather than per dot, because the scattering frame batches its fills and cannot afford a
+     different alpha for every dot. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 190px), transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 190px), transparent 100%);
 }
 @keyframes dotsIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes glowIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* The header avatar "flies" here to the cursor; JS drives the transform (no CSS transform transition) */
+/* The header avatar "flies" here to the cursor while the pointer is over the portrait; JS drives
+   the transform (no CSS transform transition - it has to be able to lock onto the pointer). */
 .hero__cursor {
   position: fixed; top: 0; left: 0; z-index: 80;
   width: 80px; height: 80px; margin: 0;
@@ -402,17 +434,115 @@ ul, ol { list-style: none; padding: 0; }
 }
 .hero__cursor img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
 
-/* Per-letter hover for "UX Designer" - vivid tint + external glow */
-.hero__letter { display: inline-block; transition: color .3s ease, text-shadow .35s ease, transform .3s cubic-bezier(.2,.9,.3,1.4); will-change: color, transform; }
-.hero__letter.is-lit { transform: translateY(-0.09em) scale(1.09); }
-@keyframes glowIn { from { opacity: 0; } to { opacity: 1; } }
+/* Confetti: one canvas over the whole page for the opening drop, removed when it has finished. */
+.confetti {
+  position: fixed; inset: 0; z-index: 90; pointer-events: none;
+}
 
-.hero__stage { position: relative; z-index: 1; width: 100%; max-width: var(--wrap); margin-inline: auto; display: flex; flex-direction: column; }
-.hero__line { display: block; font-family: var(--f-display); line-height: 1.0; letter-spacing: -0.02em; will-change: transform; }
+/* Two columns: everything you read on the left, the particle portrait on the right. */
+.hero__stage {
+  position: relative; z-index: 1; width: 100%; max-width: var(--wrap); margin-inline: auto;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr);
+  align-items: center; gap: clamp(1.5rem, 5vw, 5rem);
+}
+.hero__col { min-width: 0; }
+.hero__line { display: block; line-height: 1.05; will-change: transform; }
 .hero__rev { display: inline-block; animation: heroRev .95s cubic-bezier(.2,.7,.2,1) both; }
-.hero__line--1 { font-weight: 250; font-size: clamp(2.35rem, 7.2vw, 5.4rem); align-self: center; margin-left: -4%; }
+/* The greeting carries the hero now: Playfair Display, brand purple, set big. */
+.hero__line--1 {
+  font-family: var(--f-title); font-weight: 700; letter-spacing: -0.015em;
+  font-size: clamp(2.6rem, 4.5vw, 4rem); color: var(--brand);
+}
 .hero__line--1 .hero__rev { animation-delay: .15s; }
-.hero__line--2 { align-self: stretch; width: 100%; margin: .06em 0 0; }
+
+/* The box the portrait is drawn into. Nothing here paints - the pixels come from the canvas above,
+   which sits at z-index 2, over this. JS contain-fits the picture inside the box, so whatever this
+   box measures, the whole of him is inside it and nothing is ever cropped. */
+/* Square, because the crop inside it is a CIRCLE inscribed in this box - the same shape and the
+   same framing rule as the header avatar. --ring is where the tool tiles sit: half the box plus a
+   gap, so the ring always clears the picture whatever the box measures. The right margin buys the
+   room the ring needs beyond the box, which is why the box no longer sits flush to the wrap. */
+.hero__portrait {
+  --pw: min(42vw, 468px);
+  --ring: calc(var(--pw) / 2 + clamp(26px, 3.6vw, 44px));
+  position: relative;
+  /* flush to the wrap's right edge, so the nav in the bar above lines up with it */
+  justify-self: end;
+  width: var(--pw); aspect-ratio: 1; height: auto;
+}
+
+/* ---- The tools, riding a wave ----
+   The tiles are laid on a path that runs in from the right of the screen, dips under the portrait,
+   lifts once and falls away to the left, and they travel along it in a loop. Every position is
+   written by JS (see the .hero__stream block in script.js) because the path is anchored to the
+   bottom of the portrait circle, which moves with the layout - a CSS keyframe could not follow it.
+   The tile is centred on its point with negative margins rather than a translate, because its
+   transform belongs to the scale-up it arrives with. */
+.hero__stream { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.tool {
+  position: absolute; left: 0; top: 0;
+  width: 46px; height: 46px; margin: -23px 0 0 -23px;
+  display: grid; place-items: center;
+  border-radius: 14px;
+  /* stroke only - no fill of any kind, so the page shows straight through */
+  background: none;
+  border: 1px solid rgba(40, 37, 30, 0.17);
+  opacity: 0;                      /* JS owns this from the first frame it places them */
+  will-change: transform, opacity;
+}
+.tool img { width: 26px; height: 26px; object-fit: contain; display: block; }
+@media (max-width: 900px) {
+  .tool { width: 38px; height: 38px; margin: -19px 0 0 -19px; border-radius: 12px; }
+  .tool img { width: 20px; height: 20px; }
+}
+
+/* The purple line under the greeting: the role and the one-sentence pitch, as one paragraph. */
+/* It used to ride the same 34px jump the greeting does, on a 1.4s delay - a long wait and then a
+   lurch, which is what read as fidgety. It now comes up 10px through a blur, close behind the
+   greeting, over nearly twice as long. Nothing about it is sudden. */
+.hero__tag {
+  margin-top: clamp(.9rem, 1.8vh, 1.35rem); max-width: 39rem;
+  font-family: var(--f-display); font-weight: 400;
+  font-size: clamp(1.16rem, 1.45vw, 1.3rem); line-height: 1.5;
+  color: var(--brand);
+  animation: tagIn 1.15s cubic-bezier(.22,.68,.24,1) 1.35s both;
+}
+@keyframes tagIn {
+  from { opacity: 0; transform: translateY(10px); filter: blur(6px); }
+  to   { opacity: 1; transform: none;             filter: blur(0); }
+}
+
+/* The aside types itself out. The caret is a pseudo-element on the span, so it sits on the end of
+   whatever has been typed so far and needs no element of its own.
+   It is shown ONLY while the line is actually being written: `.is-typing` is added the moment the
+   first character lands and `.is-done` takes it away again at the last one. It used to blink from
+   page load, several seconds before anything arrived, which read as a stalled field rather than as
+   something about to be written. */
+.hero__typed span::after {
+  content: ""; display: none; vertical-align: -0.12em;
+  width: 2px; height: 1em; margin-left: .06em;
+  background: var(--brand);
+  animation: caret 1s steps(1) infinite;
+}
+.hero__typed.is-typing span::after { display: inline-block; }
+.hero__typed.is-done span::after { display: none; }
+@keyframes caret { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+/* the block is sized by the full string from the first frame, so typing into it never reflows the
+   page - the text below simply appears inside a box that was already the right height */
+.hero__typed { min-height: 4.3em; }
+@media (prefers-reduced-motion: reduce) {
+  .hero__tag { animation: none; }
+  .hero__typed span::after { display: none; }
+}
+
+/* The aside, and the two rings behind it. */
+.hero__note { position: relative; margin-top: clamp(3rem, 8.5vh, 6rem); max-width: 41rem; }
+.hero__note p, .hero__typed {
+  position: relative; z-index: 1;
+  font-family: var(--f-note); font-weight: 400;
+  font-size: clamp(1.32rem, 1.9vw, 1.72rem); line-height: 1.42; color: var(--ink);
+}
+
 .hero__sub {
   align-self: flex-start; margin-top: 2rem; max-width: 30rem;
   font-family: var(--f-display); font-weight: 400;
@@ -438,132 +568,107 @@ ul, ol { list-style: none; padding: 0; }
    part-way down: transparent at its top edge, fully on --bg by the time the numbers begin.
    Same "sheet fades in over the hero" move as .tl-cover / .bn-cover on the case studies. */
 /* =========================================================
-   Hero project tiles - the work index, sitting in the first screen.
-   Each tile is a button: project-tinted frame, cover, name + one line.
-   (The previous sticky-stacking .case concept is kept below, unused -
-    the full original page is also saved as index-cards-backup.html)
+   Selected work - the scroll-driven card stack.
+
+   Three cards share one centre point. Scrolling swings each one along the SAME arc: it starts low
+   and off to the right, rises up and inward to the middle of the page, then carries on and down to
+   the left as the next card takes the centre. So at any moment there is a card being read, one
+   waiting on the right, and one already read waiting on the left - the two side cards sit small,
+   tilted and at ~0.7 opacity, which is what makes the middle one read as the subject.
+
+   The arc itself is written by JS (one transform per card per frame; see the .pstack block in
+   script.js). Everything here is the card, plus the fallback: with no JS - or with reduced motion -
+   .is-driven never lands and the section is a plain centred column of the same three cards.
+
+   The two concepts this replaced are kept in work-tiles-concept.html.bak (hero tiles) and
+   work-cards-concept.html.bak (sticky-stacking cards).
    ========================================================= */
-.hero-work {
-  /* Three equal tiles, centred on the page. --frame-pad is the grey mat inside each tile and is
-     restated in the phone block below, where the row turns into a swipe strip. */
-  --row-gap: clamp(.9rem, 2.2vw, 2rem);
-  --frame-pad: clamp(5px, .7vw, 9px);
-  position: relative; z-index: 3;              /* above the dot canvas (z-index 2) */
-  width: 100%; max-width: 1000px; margin-inline: auto;
-  margin-top: clamp(1.75rem, 4.5vh, 3.25rem);
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: var(--row-gap);
-  scroll-margin-top: calc(var(--hdr-h) + 1rem);
-}
-/* the dots finish assembling at ~1.9s, so the tiles ease up into place just after that:
-   a long, soft rise + fade (no scale pop), each one close behind the last - then they breathe
-   continuously, the same gentle float the Glimpse photos use. */
-@keyframes wtIn { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes wtBreathe { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-9px) scale(1.008); } }
+.pstack { --pstep: 82vh; position: relative; }
+.pstack__pin { display: flex; flex-direction: column; align-items: center;
+  gap: clamp(1.5rem, 4vw, 3rem); padding-block: clamp(3rem, 8vw, 6rem); }
 
-.wtile { display: flex; flex-direction: column; align-items: center; text-align: center; gap: .8rem; min-width: 0;
-  animation: wtIn 1.5s cubic-bezier(.22,.61,.36,1) both, wtBreathe 7s ease-in-out infinite; }
-/* two delays per rule: [entrance, breath]. The breath starts once that tile's entrance has landed. */
-.wtile:nth-child(1) { animation-delay: 2.00s, 3.60s; animation-duration: 1.5s, 7.0s; }
-.wtile:nth-child(2) { animation-delay: 2.13s, 3.73s; animation-duration: 1.5s, 8.2s; }
-.wtile:nth-child(3) { animation-delay: 2.26s, 3.86s; animation-duration: 1.5s, 7.6s; }
-/* The frame does NOT set its own ratio. It is a mat that wraps the screenshot, and the
-   screenshot keeps its intrinsic proportions (height: auto, no object-fit) - so there is
-   nothing left in the box that can crop it, on any engine, whatever box-sizing does to
-   aspect-ratio. All three tiles are 1200x750, so they still come out exactly equal height. */
-.wtile__frame {
-  display: block; width: 100%; flex: none;
-  padding: var(--frame-pad);
-  border-radius: clamp(14px, 1.7vw, 22px);
-  background: var(--wt-tint);
-  box-shadow: 0 2px 6px var(--wt-sh1), 0 18px 34px -16px var(--wt-sh2);
-  transition: transform .38s cubic-bezier(.2,.7,.2,1), box-shadow .38s ease;
+/* 3.4 steps: one per card, plus a 0.4 tail so the last card is held centred for a beat before the
+   section releases and the page moves on. */
+.pstack.is-driven { height: calc(100vh + 3.4 * var(--pstep)); }
+.pstack.is-driven .pstack__pin {
+  position: sticky; top: 0; height: 100vh; padding-block: 0;
+  display: grid; place-items: center;
+  /* the parked cards hang past both edges of the screen on purpose - this is what stops them
+     widening the document instead of being cut by the viewport */
+  overflow: clip;
 }
-.wtile__img { display: block; width: 100%; height: auto; border-radius: clamp(7px, .8vw, 10px); }
-.wtile__name { font-family: var(--f-display); font-weight: 700; letter-spacing: -0.01em;
-  font-size: clamp(1rem, 1.35vw, 1.18rem); color: var(--ink); transition: color .25s ease; }
-.wtile__desc { font-size: clamp(.78rem, .95vw, .88rem); line-height: 1.4; color: var(--ink-mute); max-width: 24ch; }
+.pstack.is-driven .pcard { grid-area: 1 / 1; opacity: 0; will-change: transform, opacity; }
 
+.pcard {
+  width: min(46vw, 600px); max-width: calc(100vw - 2 * var(--pad));
+  aspect-ratio: 647 / 511;
+  border-radius: clamp(20px, 2.6vw, 34px);
+  /* the arc is drawn around the card's own centre, and the shadow travels with it */
+  box-shadow: 0 6px 18px rgba(40, 37, 30, .07), 0 34px 64px -26px rgba(40, 37, 30, .30);
+}
+.pcard__inner { position: absolute; inset: 0; display: block; border-radius: inherit; overflow: hidden; }
+.pstack:not(.is-driven) .pcard { position: relative; }
+
+/* the project's own hero video, playing behind everything - only the centred card's video runs */
+.pcard__media { position: absolute; inset: 0; }
+.pcard__video { width: 100%; height: 100%; object-fit: cover; object-position: center 34%; }
+/* Project colour at the top, the card's own colour from two thirds down - the bottom of the veil
+   IS the card, which is what gives the copy a solid surface to sit on without a second box. */
+.pcard__veil { position: absolute; inset: 0;
+  background: linear-gradient(180deg,
+    var(--pc-top) 0%,
+    var(--pc-mid) 42%,
+    var(--pc-body) 66%,
+    var(--pc-body) 100%); }
+
+.pcard__body { position: absolute; inset: auto 0 0 0;
+  display: flex; flex-direction: column; align-items: flex-start;
+  padding: clamp(1.1rem, 2.4vw, 1.9rem) clamp(1.2rem, 2.6vw, 2.1rem) clamp(1.2rem, 2.6vw, 2rem);
+  color: var(--ink); }
+.pcard__chip { display: inline-flex; align-items: center; gap: .45em;
+  font-family: var(--f-display); font-weight: 600; font-size: clamp(.66rem, .78vw, .74rem);
+  letter-spacing: .09em; text-transform: uppercase;
+  padding: .42em .82em; border-radius: 999px;
+  color: rgba(40, 37, 30, .78); background: rgba(255, 255, 255, .62);
+  border: 1px solid rgba(255, 255, 255, .8); }
+.pcard__chip::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--brand); }
+.pcard__name { margin-top: clamp(.7rem, 1.5vw, 1.05rem);
+  font-family: var(--f-display); font-weight: 700; letter-spacing: -0.01em;
+  font-size: clamp(.95rem, 1.25vw, 1.12rem); color: var(--brand); }
+.pcard__value { margin-top: .25rem; max-width: 22ch;
+  font-family: var(--f-display); font-weight: 700; letter-spacing: -0.022em; line-height: 1.14;
+  font-size: clamp(1.15rem, 2.05vw, 1.72rem); }
+.pcard__kind { margin-top: clamp(.4rem, .9vw, .65rem);
+  font-size: clamp(.8rem, .95vw, .9rem); color: var(--ink-mute); }
+
+/* per-project veil. --pc-top is the case study's own hero-veil colour; --pc-body is that hue taken
+   to a light tint and used as the card surface; --pc-mid is --pc-body at half strength, the stop
+   where the video gives way to the card. */
+.pcard--talmind { --pc-top: rgba(173, 179, 197, .88); --pc-mid: rgba(228, 231, 240, .55); --pc-body: #E4E7F0; }
+.pcard--bianca  { --pc-top: rgba(243, 178, 112, .82); --pc-mid: rgba(247, 234, 219, .55); --pc-body: #F7EADB; }
+.pcard--ds      { --pc-top: rgba(179, 236, 202, .70); --pc-mid: rgba(226, 243, 233, .55); --pc-body: #E2F3E9; }
+
+/* Only the card in the middle answers a pointer - the two parked ones are scenery, and a hover
+   state on a card at 0.7 opacity, tilted and half off screen, reads as a bug. */
+.pcard__inner { transition: transform .4s cubic-bezier(.2,.7,.2,1); }
 @media (hover: hover) and (pointer: fine) {
-  .wtile:hover .wtile__frame { transform: translateY(-8px);
-    box-shadow: 0 4px 10px var(--wt-sh1), 0 30px 52px -18px var(--wt-sh2); }
-  .wtile:hover .wtile__name { color: var(--brand); }
+  .pcard.is-active:hover .pcard__inner { transform: scale(1.012); }
+  .pcard.is-active:hover .pcard__name { text-decoration: underline; text-underline-offset: .22em; }
 }
-.wtile:active .wtile__frame { transform: translateY(-2px) scale(.988); transition-duration: .12s; }
-.wtile:focus-visible { outline: none; }
-.wtile:focus-visible .wtile__frame { outline: 2px solid var(--brand); outline-offset: 4px; }
+.pstack.is-driven .pcard:not(.is-active) { pointer-events: none; }
+.pcard__inner:focus-visible { outline: 2px solid var(--brand); outline-offset: 4px; }
 
-/* per-project tint + shadow hue, taken from each case study's own palette */
-.wtile--talmind { --wt-tint: linear-gradient(155deg, #D9DFF1, #F2F4FE); --wt-sh1: rgba(74,86,150,.16);  --wt-sh2: rgba(74,86,150,.42); }
-.wtile--bianca  { --wt-tint: linear-gradient(155deg, #F3E4D1, #F8F3EC); --wt-sh1: rgba(178,110,38,.16); --wt-sh2: rgba(178,110,38,.40); }
-/* Design System sits at hue 100 - the green of its own hero artwork. Same saturation and
-   lightness as the lilac it replaced, so it reads as one of the family, just a different hue. */
-/* DS: #B3ECCA is Yehuda's own pick for the mat - the same colour the case study's hero veil uses;
-   the other two values are derived from it the way the tiles above are built - the light stop is
-   the same hue taken to near-white, and the shadow is the same hue again at L~43%, where
-   talmind's and bianca's shadows both sit. */
-.wtile--ds      { --wt-tint: linear-gradient(155deg, #B3ECCA, #EFFBF4); --wt-sh1: rgba(49,170,98,.16); --wt-sh2: rgba(49,170,98,.40); }
-
-/* short viewports: keep the row inside the first screen */
-@media (max-height: 760px) and (min-width: 701px) {
-  .hero-work { max-width: 810px; }
-}
-
-/* phones: swipeable row instead of three cramped columns */
-@media (max-width: 700px) {
-  .hero-work {
-    /* Explicit 62vw tracks rather than auto-columns, so the strip ends right after the third
-       tile instead of scrolling on through dead space. */
-    --frame-pad: 10px;
-    grid-template-columns: repeat(3, 62vw);
-    /* No scroll-snap. Snapping is what made this row feel like it was fighting the thumb: a flick
-       builds momentum and the snap immediately arrests it and drags the nearest tile to centre,
-       so the strip could never coast. Even `proximity` caught nearly every flick, because 62vw
-       tiles mean you always land near a snap point. Free momentum is the whole point of a strip
-       you push.
-       overflow-y is pinned to hidden ON PURPOSE: `overflow-x: auto` alone computes overflow-y to
-       auto as well, which makes this a two-axis scroller - and a two-axis scroller has to watch
-       the first few pixels of every touch to decide which way you meant. That wait is felt as
-       stickiness at the start of the drag, and it also let the row swallow vertical drags that
-       belonged to the page. Locked to one axis, the browser commits to the pan immediately. */
-    overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch;
-    /* edge to edge: the row runs the full width of the phone with no side gutter, so the
-       tiles are cut by the screen edges and read as a strip you can push. The hero is a
-       centred flex column, so the row has to stretch out of that centring, not just take
-       negative margins - a centred item just re-centres itself inside them. */
-    align-self: stretch; width: auto; max-width: none;
-    /* the TRACK is full-bleed (tiles run off both screen edges as you push it) but the row still
-       opens and closes on a gutter - the first tile never sits flush against the left bezel, and
-       there is air after the last one. align-self matters: .hero is a centred flex column, and a
-       centred item just re-centres itself inside negative margins. */
-    padding-inline: var(--pad); margin-inline: calc(var(--pad) * -1);
-    scroll-padding-inline: var(--pad);
-    gap: 1.6rem;                                 /* more air between the three than the desktop row */
-    /* overflow-x: auto also makes the Y axis scrollable, which would CLIP the frames:
-       the breathing float lifts each tile 9px and the frame casts a 34px shadow, so the
-       row keeps headroom top and bottom instead of shaving the top edge off every card. */
-    padding-block: 26px 14px;                    /* clears the 9px breathing lift + its shadow */
-    scrollbar-width: none;                       /* no scrollbar under the tiles */
-    /* Without this, a drag that runs out of row keeps going into the page's own scroll - and on
-       iOS a drag that starts rightwards arms the back-swipe. Both read as the row resisting you. */
-    overscroll-behavior-x: contain;
-  }
-  .hero-work::-webkit-scrollbar { display: none; }
-  /* Phones drop the breathing float entirely. Pausing it once the drag had already started was
-     always a beat late - the first touch still landed on three transform-animating images, and
-     that first beat is exactly what the hand judges. A strip you push should be still until you
-     push it; the float stays on desktop, where nothing is competing with it. */
-  .wtile { animation-name: wtIn; animation-duration: 1.5s; }
-  /* the grey mat around each screenshot is the frame you actually see on a phone - at 5px it
-     read as a hairline, so it gets real width here (the width itself is --frame-pad, above) */
-  .wtile__frame { border-radius: 20px; }
-  .wtile__img { border-radius: 8px; }
+@media (max-width: 900px) {
+  /* a phone has one card's worth of width and a whole screen of height, so the card takes nearly
+     all of it - the arc still has room to swing because the parked cards are simply cut by the
+     bezels, which is the same thing that happens to them on a desktop */
+  .pcard { width: min(90vw, 460px); }
+  .pstack { --pstep: 76vh; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wtile { animation: none; }
-  .wtile__frame, .wtile__name { transition: none; }
-  .wtile:hover .wtile__frame, .wtile:active .wtile__frame { transform: none; }
+  .pcard__inner { transition: none; }
+  .pcard.is-active:hover .pcard__inner { transform: none; }
 }
 
 /* =========================================================
@@ -957,18 +1062,27 @@ a.case__inner:hover .case__open span { transform: translateX(3px); }
 @media (max-width: 760px) {
   .hdr__nav { display: none; }
   .hdr__menu { display: flex; }
+  /* Contact goes with the nav - the drawer carries it below this width, and leaving the button in
+     the bar next to the burger read as two competing calls to action in 40px of space. */
+  .hdr:not(.hdr--float) .hdr__cta { display: none; }
   /* the "EdTech · 2026" / "SaaS · 2025" eyebrow is dropped on phones to save vertical room */
   .case__year { display: none; }
   .hero { min-height: auto; padding-top: calc(var(--hdr-h) + 3rem); padding-bottom: 3.5rem; }
   .hero__stage { align-items: flex-start; }
-  .hero__line { align-self: flex-start !important; margin: 0 !important; text-align: left; }
-  .hero__line--2 { margin-top: .05em !important; }
+  /* one column: the words, then the portrait under them */
+  .hero__stage { grid-template-columns: minmax(0, 1fr); gap: clamp(1.5rem, 6vw, 2.5rem); }
+  .hero__portrait { justify-self: center; margin-right: 0; --pw: min(74vw, 348px); }
+  .hero__note { margin-top: 3rem; }
   .hero__sub { position: static; margin-top: 1.75rem; max-width: 32rem; transform: none !important; }
-  .hero__line--1, .hero__line--2 { transform: none !important; }
 }
 
 @media (max-width: 520px) {
   .stats { gap: 1.5rem 2.5rem; }
+}
+/* 44px is the greeting's size everywhere it fits; below ~400px "Hey! I'm Yehuda" would run past
+   the gutter, so it scales with the screen instead of overflowing it. */
+@media (max-width: 400px) {
+  .hero__line--1 { font-size: 11vw; }
 }
 /* four contact links don't fit on one line on a phone, so they sit as a balanced 2 x 2 block
    rather than 3 + 1 with a lone link underneath */
@@ -985,8 +1099,6 @@ a.case__inner:hover .case__open span { transform: translateX(3px); }
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
   .hero__rev, .hdr, .hero__glow { animation: none !important; opacity: 1 !important; transform: none !important; }
-  .hero__orb { animation: none !important; }
-  .hero__cursor { display: none !important; }
   .hero__line, .hero__sub { transform: none !important; }
   .pill::before { animation: none !important; }
   .hdr__drawer:not([hidden]) { animation: none !important; clip-path: none !important; opacity: 1 !important; }
