@@ -241,11 +241,13 @@ ul, ol { list-style: none; padding: 0; }
 /* Outline only - no fill. It sits at the far left of the bar, where the avatar used to be, so a
    solid black lozenge in that corner read as a much heavier thing than a secondary link should be.
    The stroke takes the brand purple on hover rather than filling. */
-/* The word and the stroke are ONE value, so they can never drift apart: at rest the label is the
-   same colour as the outline around it. Hover is untouched - both go brand purple together. */
-.hdr__cta { --cta-line: rgba(40, 37, 30, 0.68);
+/* Two values on purpose: the outline stays as light as it always was, and only the word inside it
+   is carried far enough up to be read (1.92:1 -> 5.01:1 against the page). Hover is untouched -
+   both still go brand purple together. */
+.hdr__cta { --cta-line: rgba(40, 37, 30, 0.32);   /* the stroke */
+  --cta-ink: rgba(40, 37, 30, 0.68);              /* the label */
   display: inline-flex; align-items: center; white-space: nowrap;
-  background: none; color: var(--cta-line);
+  background: none; color: var(--cta-ink);
   border: 1.5px solid var(--cta-line);
   font-family: var(--f-display); font-weight: 600; font-size: .92rem;
   padding: .58em 1.3em; border-radius: 999px;
