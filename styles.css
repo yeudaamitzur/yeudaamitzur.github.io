@@ -243,7 +243,7 @@ ul, ol { list-style: none; padding: 0; }
    The stroke takes the brand purple on hover rather than filling. */
 /* The word and the stroke are ONE value, so they can never drift apart: at rest the label is the
    same colour as the outline around it. Hover is untouched - both go brand purple together. */
-.hdr__cta { --cta-line: rgba(40, 37, 30, 0.32);
+.hdr__cta { --cta-line: rgba(40, 37, 30, 0.68);
   display: inline-flex; align-items: center; white-space: nowrap;
   background: none; color: var(--cta-line);
   border: 1.5px solid var(--cta-line);
