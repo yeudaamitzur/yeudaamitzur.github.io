@@ -18,7 +18,7 @@
   <meta property="og:url" content="https://yehudaamitzur.com/" />
   <meta property="og:title" content="Yehuda Amitzur · UX/UI Designer" />
   <meta property="og:description" content="A UX/UI designer specializing in B2B systems, complex workflows, and conversion-driven experiences." />
-  <meta property="og:image" content="https://yehudaamitzur.com/og-cover.jpg?v=1" />
+  <meta property="og:image" content="https://yehudaamitzur.com/og-cover.jpg?v=131" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -26,23 +26,23 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Yehuda Amitzur · UX/UI Designer" />
   <meta name="twitter:description" content="A UX/UI designer specializing in B2B systems, complex workflows, and conversion-driven experiences." />
-  <meta name="twitter:image" content="https://yehudaamitzur.com/og-cover.jpg?v=1" />
+  <meta name="twitter:image" content="https://yehudaamitzur.com/og-cover.jpg?v=131" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <!-- Hanken Grotesk as a variable range so the hero line can sit at 250 (lighter than the 300 static) -->
-  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200..800&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200..800&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Metal&display=swap" rel="stylesheet" />
 
   <!-- favicon: the same ring as the site cursor - purple stroke, lighter purple fill -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
   <link rel="canonical" href="https://yehudaamitzur.com/" />
-  <link rel="stylesheet" href="styles.css?v=55" />
+  <link rel="stylesheet" href="styles.css?v=131" />
+  <link rel="stylesheet" href="hero-dots.css?v=131" />
 </head>
 <body>
   <a class="skip-link" href="#work">Skip to work</a>
 
-  <!-- ===== HEADER (floating pill → collapses to a status badge on scroll) ===== -->
-  <header class="hdr hdr--float" id="top">
+  <header class="hdr hdr--float hdr--bare" id="top">
     <div class="hdr__pill">
       <a class="hdr__logo" href="#top" aria-label="Yehuda Amitzur, home">
         <span class="hdr__avatar"><img class="hdr__avatar-img" src="profile.png" alt="Yehuda Amitzur" width="46" height="46" /></span>
@@ -51,12 +51,11 @@
         <nav class="hdr__nav" aria-label="Primary">
           <a href="#work">Work</a>
           <a href="#about">About</a>
-          <a href="cv-yehuda-amitzur.pdf?v=55" target="_blank" rel="noopener">CV</a>
+          <a href="cv-yehuda-amitzur.pdf?v=131" target="_blank" rel="noopener">CV</a>
         </nav>
         <a class="hdr__cta" href="#contact">Contact</a>
         <button class="hdr__menu" aria-label="Open menu" aria-expanded="false" aria-controls="hdr-drawer"><span></span><span></span></button>
       </div>
-      <span class="hdr__status" aria-hidden="true"><span>Available for work</span><i class="hdr__dot"></i></span>
     </div>
     <div class="hdr__drawer" id="hdr-drawer" hidden>
       <div class="hdr__drawer-top">
@@ -66,78 +65,125 @@
       <a href="#top">Home</a>
       <a href="#work">Projects</a>
       <a href="#about">About</a>
-      <a href="cv-yehuda-amitzur.pdf?v=55" target="_blank" rel="noopener">My cv</a>
+      <a href="cv-yehuda-amitzur.pdf?v=131" target="_blank" rel="noopener">My cv</a>
       <a class="hdr__drawer-contact" href="#contact">Contact</a>
     </div>
   </header>
 
   <main>
-    <!-- ===== HERO ===== -->
-    <section class="hero">
+    <!-- ===== HERO - the dot variant =====
+         The middle line is not text in the DOM. It is drawn on the canvas: sampled into dots that
+         arrive from every corner of the screen, assemble into the sentence, and then dissolve into
+         crisp type. The pink halo is pinned behind THAT line and never moves, and the grey veil the
+         main homepage wears is not here at all. -->
+    <section class="hero hero--dots">
       <div class="hero__glow" aria-hidden="true"></div>
-      <div class="hero__orb hero__orb--a" aria-hidden="true"></div>
-      <div class="hero__orb hero__orb--b" aria-hidden="true"></div>
-      <canvas class="hero__dots" data-dots="UX/UI Designer" aria-hidden="true"></canvas>
+      <!-- The pink halo is not an element any more: it is drawn by the greeting's own ::before, so
+           "exactly behind Hey! I'm Yehuda" is true by construction rather than by measurement, at
+           every window size and with no JS. -->
+      <canvas class="hero__dots" data-dots="UX/UI &amp; Product Designer" aria-hidden="true"></canvas>
+      <!-- The header photo flies down into this and becomes the cursor while you are over the line -->
       <figure class="hero__cursor" aria-hidden="true">
         <img src="profile.png" alt="" width="120" height="120" />
       </figure>
       <div class="hero__stage">
-        <span class="hero__line hero__line--1"><span class="hero__rev">Hey, I'm Yehuda Amitzur</span></span>
-        <div class="hero__line hero__line--2" role="img" aria-label="UX/UI Designer"></div>
-      </div>
+        <h1 class="hero__line hero__line--1"><span class="hero__rev">Hey! I'm Yehuda</span></h1>
+        <!-- the BOX the dot line is drawn into; every pixel of it comes from the canvas above, and
+             its height is set by JS from the type size it solves for -->
+        <div class="hero__line--2" role="img" aria-label="UX/UI &amp; Product Designer"></div>
+        <p class="hero__sub"><span class="hero__rev">Specializing in breaking down complex problems
+          into organized and clear information.</span></p>
 
-      <!-- ===== SELECTED WORK - tiles live in the first screen (no scrolling needed) ===== -->
-      <nav class="hero-work" id="work" aria-label="Selected work">
-        <a class="wtile wtile--talmind" href="/talmind">
-          <span class="wtile__frame">
-            <img class="wtile__img" src="tile-talmind.jpg" width="1200" height="750"
-                 alt="Talmind, the learning dashboard" fetchpriority="high" />
-          </span>
-          <span class="wtile__name">Talmind</span>
-          <span class="wtile__desc">A tablet learning app for Korean classrooms</span>
-        </a>
-        <a class="wtile wtile--bianca" href="/bianca">
-          <span class="wtile__frame">
-            <img class="wtile__img" src="tile-bianca.jpg" width="1200" height="750"
-                 alt="Bianca, the restaurant management dashboard" fetchpriority="high" />
-          </span>
-          <span class="wtile__name">Bianca</span>
-          <span class="wtile__desc">A restaurant management dashboard</span>
-        </a>
-        <a class="wtile wtile--ds" href="/design-system">
-          <span class="wtile__frame">
-            <img class="wtile__img" src="tile-ds.jpg?v=25" width="1200" height="750"
-                 alt="Design System: colours, typography and components" fetchpriority="high" />
-          </span>
-          <span class="wtile__name">Design System</span>
-          <span class="wtile__desc">Tokens, components and a developer handoff</span>
-        </a>
-      </nav>
-    </section>
-
-    <!-- The previous work concept (sticky-stacking case cards) that used to sit here has moved
-         into the hero as .hero-work tiles. The old markup is preserved in
-         work-cards-concept.html.bak, and the whole original page in index-cards-backup.html;
-         its CSS (.work / .cases / .case*) is still present in styles.css. -->
-
-    <!-- ===== EXPERIENCE (title + bio) ===== -->
-    <section class="section experience" id="experience">
-      <div class="wrap experience__grid">
-        <h2 class="experience__title">Experience</h2>
-        <div class="experience__body">
-          <p>Hi, I'm a UX/UI Designer with several years of experience in B2B systems, complex
-            workflows, and conversion-driven experiences. My background is in visual communication,
-            and I use it alongside strategic UX thinking to build products that stay clear and
-            usable as they grow.</p>
-          <p>I've led design processes end to end, from research and information architecture
-            through to high-fidelity UI and design systems, with the focus on usability, clarity
-            and CRO.</p>
-          <p>I came into tech after leaving a strict Haredi background, and I got here mostly by
-            teaching myself. I work in Figma, and day to day with Claude, Midjourney, Gemini and
-            AI-driven workflows. I'm still learning, and I'd rather do it on products that matter.</p>
+        <!-- Typed out a character at a time by JS. The text lives in data-type so the markup still
+             carries it for search engines and for anyone who never sees the animation, while the
+             <span> starts empty and fills up. -->
+        <div class="hero__note">
+          <p class="hero__typed"
+             data-type="This may have something to do with the fact that until a few years ago I was a Haredi yeshiva student, breaking, and I analyzed complicated texts"><span></span></p>
         </div>
       </div>
     </section>
+
+    <!-- ===== SELECTED WORK - a scroll-driven stack =====
+         One card sits centred, the next waits low and to the right, the one already read waits low
+         and to the left. Scrolling swings each card in along the same arc: up from the right, into
+         the middle, then on and down to the left as the next one takes the centre. JS writes the
+         transform per card (see the .pstack block in script.js); everything here is just content.
+
+         Two earlier concepts are kept as backups: work-tiles-concept.html.bak (the three tiles that
+         lived in the hero) and work-cards-concept.html.bak (the sticky-stacking cards before that). -->
+    <section class="pstack" id="work" aria-label="Selected work">
+      <div class="pstack__pin">
+        <article class="pcard pcard--talmind">
+          <a class="pcard__inner" href="/talmind" aria-label="Talmind - open the case study">
+            <div class="pcard__media" aria-hidden="true">
+              <span class="pcard__veil"></span>
+            </div>
+            
+            <!-- The project's own screens, side by side, arriving one after another -->
+            <div class="pcard__strip" aria-hidden="true">
+                <figure class="shot"><img src="talmind-lesson.jpg?v=131" alt="" width="1280" height="800" loading="lazy" /></figure>
+                <figure class="shot"><img src="talmind-quiz.jpg?v=131" alt="" width="1280" height="800" loading="lazy" /></figure>
+                <figure class="shot"><img src="talmind-game.jpg?v=131" alt="" width="3840" height="2400" loading="lazy" /></figure>
+            </div>
+            <div class="pcard__body">
+              <span class="pcard__chip">Case study</span>
+              <span class="pcard__name">Talmind</span>
+              <h3 class="pcard__value">Built a real pilot that answers a huge need in Korean classrooms</h3>
+              <p class="pcard__kind">Learning app</p>
+            </div>
+            <span class="pcard__view">View</span>
+          </a>
+        </article>
+
+        <article class="pcard pcard--bianca">
+          <a class="pcard__inner" href="/bianca" aria-label="Bianca - open the case study">
+            <div class="pcard__media" aria-hidden="true">
+              <span class="pcard__veil"></span>
+            </div>
+            
+            <!-- The project's own screens, side by side, arriving one after another -->
+            <div class="pcard__strip" aria-hidden="true">
+                <figure class="shot"><img src="bianca-staff-1.jpg?v=131" alt="" width="2724" height="1937" loading="lazy" /></figure>
+                <figure class="shot"><img src="bianca-operations.jpg?v=131" alt="" width="2783" height="1978" loading="lazy" /></figure>
+                <figure class="shot"><img src="bianca-staff-2.jpg?v=131" alt="" width="2724" height="1937" loading="lazy" /></figure>
+            </div>
+            <div class="pcard__body">
+              <span class="pcard__chip">Case study</span>
+              <span class="pcard__name">Bianca</span>
+              <h3 class="pcard__value">Saved restaurant managers hours of work and frustration every week</h3>
+              <p class="pcard__kind">Management dashboard</p>
+            </div>
+            <span class="pcard__view">View</span>
+          </a>
+        </article>
+
+        <article class="pcard pcard--ds">
+          <a class="pcard__inner" href="/design-system" aria-label="Design System - open the case study">
+            <div class="pcard__media" aria-hidden="true">
+              <span class="pcard__veil"></span>
+            </div>
+            
+            <!-- The project's own screens, side by side, arriving one after another -->
+            <div class="pcard__strip" aria-hidden="true">
+                <figure class="shot"><img src="ds-components.jpg?v=131" alt="" width="2520" height="1694" loading="lazy" /></figure>
+                <figure class="shot"><img src="ds-colors.jpg?v=131" alt="" width="1468" height="1710" loading="lazy" /></figure>
+                <figure class="shot"><img src="ds-typography.jpg?v=131" alt="" width="1670" height="1544" loading="lazy" /></figure>
+            </div>
+            <div class="pcard__body">
+              <span class="pcard__chip">Case study</span>
+              <span class="pcard__name">Design System</span>
+              <h3 class="pcard__value">Turned 72 base tokens into a system a whole product runs on</h3>
+              <p class="pcard__kind">Design system</p>
+            </div>
+            <span class="pcard__view">View</span>
+          </a>
+        </article>
+      </div>
+    </section>
+
+    <!-- The Experience section (title + three-paragraph bio) was removed on 11.08.2026.
+         Its CSS (.experience*) is still in styles.css. -->
 
     <!-- ===== GLIMPSE / ABOUT ===== -->
     <section class="section glimpse" id="about">
@@ -148,14 +194,14 @@
           <div class="glimpse__left">
             <div class="glimpse__text glimpse__anim">
               <p>When I'm not designing, I'm usually at a piano somewhere, chasing a melody until it
-                finally sits right.</p>
-              <p>The rest of the time I'm buried in some new tool or idea, taking things apart to see
-                how they work. Music keeps me patient; curiosity keeps me building.</p>
+                finally settles down just right. The rest of the time I'm buried in a new instrument
+                or idea, taking things apart to see how they work.</p>
+              <p>Music keeps me patient and curiosity keeps me moving forward.</p>
             </div>
             <figure class="glimpse__photo glimpse__photo--portrait glimpse__anim" data-depth="18">
               <!-- mirrored copy of glimpse-work.jpg, resized to the box it actually renders in
                    (the 1688px master is still on disk and still used by index-cards-backup.html) -->
-              <img src="glimpse-work-2.jpg?v=55" width="1400" height="968"
+              <img src="glimpse-work-2.jpg?v=131" width="1400" height="968"
                    alt="Yehuda working on a laptop" loading="lazy"
                    style="object-position: center 30%;" />
             </figure>
@@ -164,7 +210,7 @@
             <figure class="glimpse__photo glimpse__photo--tall glimpse__anim" data-depth="30">
               <!-- 1179x652 into a 3:2 frame, so cover crops the WIDTH, not the height -
                    object-position steers the horizontal crop. -->
-              <img src="glimpse-piano-2.jpg?v=55" width="1179" height="652"
+              <img src="glimpse-piano-2.jpg?v=131" width="1179" height="652"
                    alt="Yehuda playing a street piano at night" loading="lazy"
                    style="object-position: center;" />
             </figure>
@@ -199,6 +245,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=55"></script>
+  <script src="hero-dots.js?v=131"></script>
 </body>
 </html>

@@ -1,0 +1,124 @@
+/* ============================================================================================
+   Dot hero - a variant page, loaded AFTER styles.css and only by hero-dots.html.
+
+   This is a RESTORATION, not a new design: the rules below are the hero's original ones, brought
+   back for the elements the current stylesheet no longer carries (.hero__orb, .hero__cursor,
+   .hero__sub, and the dot line's own box). Three things are deliberately different from that
+   original, because they are what was asked for:
+     1. only the PINK halo, and pinned - the grey one is gone and this one no longer drifts,
+     2. the greeting is "Hey! I'm Yehuda", the sentence below it is purple,
+     3. the header is the small floating pill again, centred.
+   ============================================================================================ */
+
+/* ---- 0. The pill floats in the middle again. ------------------------------------------
+   The full-width bar that replaced it set `.hdr { display: block }`, which quietly took the
+   centring away from the pill rule: `justify-content` says nothing to a block. */
+.hdr--float { display: flex; justify-content: center; align-items: center; }
+
+/* ---- 1. The halo. ---------------------------------------------------------------------
+   Originally a pair - a grey one at the top left and this violet-rose one behind the wordmark -
+   and a rAF loop roamed both around the hero for as long as the page was open. The grey one is
+   gone, and this one is now the GREETING'S OWN ::before. That is the whole trick: "exactly behind
+   Hey! I'm Yehuda" stops being a measurement to keep in sync and becomes a fact of the box, true
+   at every window size, with no JS and nothing to drift out of place. */
+.hero--dots .hero__line--1 { position: relative; isolation: isolate; }
+.hero--dots .hero__line--1::before {
+  content: ""; position: absolute; z-index: -1; pointer-events: none;
+  left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: max(300px, 190%); aspect-ratio: 1.55; border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%,
+    rgba(221, 129, 178, 0.34) 0%, rgba(181, 117, 223, 0.20) 40%, rgba(181, 117, 223, 0) 70%);
+  filter: blur(46px);
+  animation: glowIn 1.4s ease .05s both;
+}
+
+/* ---- 2. The hero's own column. --------------------------------------------------------
+   The current stage is a two-column grid (copy | portrait) with the page's .wrap padding on it.
+   The original was a plain flex column: the greeting centred, the dot line stretched across the
+   full width, and the sentence tucked under its left edge. */
+.hero--dots .hero__stage {
+  display: flex; flex-direction: column;
+  position: relative; z-index: 1;
+  width: 100%; max-width: var(--wrap); margin-inline: auto;
+  padding-inline: var(--pad);
+  text-align: initial;
+  /* The grid this replaces carried `gap: clamp(1.5rem, 5vw, 5rem)`, and switching `display` does
+     not clear it - a flex column honours `gap` just as happily. It was silently adding ~36px
+     between every one of these three lines. All spacing here is set explicitly instead. */
+  gap: 0;
+}
+.hero--dots .hero__line {
+  display: block; font-family: var(--f-display); line-height: 1.0;
+  letter-spacing: -0.02em; will-change: transform;
+}
+/* 44px flat and ExtraLight. Not a clamp: a fixed size was asked for, and a clamp would quietly
+   be something else on most screens. The -4% nudge the original carried is gone with it - it
+   existed to optically centre a 5.4rem line over the wordmark, and at 44px it only reads as
+   crooked. */
+.hero--dots .hero__line--1 {
+  font-family: var(--f-display); font-weight: 200;
+  font-size: 44px; line-height: 1.05;
+  align-self: center; margin: 0; color: var(--ink);
+}
+.hero--dots .hero__line--1 .hero__rev { animation-delay: .15s; }
+
+/* The box the dot line is drawn into. It paints nothing - the pixels all come from the canvas
+   above it - and its HEIGHT is written by JS, from the type size it solves for. */
+.hero--dots .hero__line--2 {
+  position: relative; align-self: stretch; width: 100%; margin: 3px 0 0;
+}
+
+/* The sentence below: one line, centred. `max-width` has to go with the left alignment - it was
+   what forced the wrap in the first place - and the size is dialled back so a single line clears
+   the wrap on a laptop rather than only on a wide desktop. */
+.hero--dots .hero__sub {
+  align-self: center; text-align: center; max-width: none;
+  margin-top: 8px;
+  font-family: var(--f-display); font-weight: 400;
+  font-size: clamp(.95rem, 1.12vw, 1.16rem); line-height: 1.5;
+  color: var(--brand); will-change: transform;
+}
+.hero--dots .hero__sub .hero__rev { animation-delay: 1.9s; }   /* only after the dots assemble */
+/* Held to one line only where one line actually fits. Below that it wraps rather than running off
+   the side of the page - a sentence forced onto one line it has no room for is not a design. */
+@media (min-width: 860px) {
+  .hero--dots .hero__sub .hero__rev { white-space: nowrap; }
+}
+
+/* The aside, typed out. Centred like the sentence above it, and its top margin brought right in
+   to match the rest of the block - the site-wide rule sets clamp(3rem, 8.5vh, 6rem), which is the
+   spacing the portrait hero wants and roughly six times what this one does.
+   `.hero__typed` keeps its min-height: the box is sized by the FULL string from the first frame,
+   so typing into it never reflows the page - the text simply appears inside a box that was
+   already the right height. Centred, that matters twice over: without it every new character
+   would shift the whole line sideways under the reader's eye. */
+.hero--dots .hero__note {
+  align-self: center; text-align: center;
+  margin-top: 43px; max-width: 41rem;
+}
+
+/* ---- 3. The canvas. -------------------------------------------------------------------
+   It runs 240px past the foot of the hero so the scattering dots have somewhere to go. No mask:
+   they fade themselves out over the last stretch of it, per dot, inside drawDots. */
+.hero--dots .hero__dots {
+  -webkit-mask-image: none; mask-image: none;
+  animation: dotsIn .6s ease both;
+}
+
+/* ---- 4. The photo that becomes the cursor. --------------------------------------------
+   JS drives the transform frame by frame, so there is no transition on it - only on opacity. */
+.hero__cursor {
+  position: fixed; top: 0; left: 0; z-index: 80;
+  width: 80px; height: 80px; margin: 0;
+  border-radius: 50%; overflow: hidden; border: 0;
+  box-shadow: 0 20px 40px -18px rgba(40, 37, 30, 0.45);
+  pointer-events: none;
+  opacity: 0; transform: translate(-120px, -120px) scale(0.5);
+  transition: opacity .3s ease;
+  will-change: transform, opacity;
+}
+.hero__cursor img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__orb--b, .hero--dots .hero__dots { animation: none; }
+}

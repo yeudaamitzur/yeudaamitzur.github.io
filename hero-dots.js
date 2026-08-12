@@ -107,6 +107,10 @@ const cases = Array.from(document.querySelectorAll('.case'));
 const canvas = document.querySelector('.hero__dots');
 
 
+// ---- The tool wave is not on this page ----
+// It belongs to the portrait hero: the tiles ride a curve shaped around the portrait's circle,
+// and there is no portrait here for them to ride around.
+
 // ---- The aside types itself out ----
 // The string lives in data-type, so the markup still carries it for search engines and for anyone
 // who never sees the animation; the span starts empty and fills up. The clock is real time, not a
@@ -119,12 +123,12 @@ if (typed) {
     if (out) out.textContent = full;
     typed.classList.add('is-done');
   } else {
-    // START is measured from page load, and it is deliberately late: the purple line above finishes
-    // settling at 2.5s (1.35s delay + 1.15s rise) and this waits one second after that, so the
-    // reader has taken in the line above before anything moves down here. CPS is the pace, and
+    // START is measured from page load, and it is deliberately late. On this page the line above
+    // it finishes settling at 2.85s (1.9s delay + 0.95s rise), so this waits a beat after that -
+    // the reader takes in the sentence above before anything moves down here. CPS is the pace, and
     // it is a slow hand on purpose. Nothing is visible in the meantime - not even the caret, which
     // only appears with the first character (see .is-typing).
-    const START = 3500, CPS = 26, LEAD = 750;
+    const START = 3800, CPS = 26;
     // A constant rate reads like a machine. Every character gets a little jitter, and the ones
     // AFTER a comma or a full stop get a real pause - which is where a person actually stops.
     const at = []; let t = 0;
@@ -142,472 +146,271 @@ if (typed) {
       else typed.classList.add('is-done');
     };
     setTimeout(() => requestAnimationFrame(step), START);
-    // The tools set off a beat BEFORE the first character rather than on it. Tied to the same
-    // instant they read as one event fired twice; with a lead the wave is already moving when the
-    // writing starts, which is what makes the two feel like one sequence instead of a collision.
-    setTimeout(startTools, Math.max(0, START - LEAD));
   }
 }
 
-// ---- The tools, riding a wave in from the right ----
-// One path, and every tile is a point along it. It runs from off the right edge to off the left,
-// and its vertical shape is a cosine that starts high, drops into a trough under the portrait,
-// lifts once more and then falls away - the amplitude shrinking as it goes, so the far end decays
-// rather than stopping. The whole thing is anchored to the BOTTOM OF THE PORTRAIT CIRCLE, which is
-// why it is written here and not as a CSS keyframe: that anchor moves with the layout, and the
-// wave has to keep meeting it at every window size.
-//
-// Arrival is the other half of it. A tile does not appear at full size - over the first stretch of
-// the path it grows from a third of its size and lifts out of near-transparency, so it reads as
-// surfacing rather than as being switched on. The same happens in reverse at the far end.
-const stream = document.querySelector('.hero__stream');
-let toolsRunning = false;
-function startTools() {
-  if (!stream || toolsRunning || !hero) return;
-  toolsRunning = true;
-  const tiles = Array.from(stream.querySelectorAll('.tool'));
-  if (!tiles.length) return;
+const line2 = document.querySelector('.hero__line--2');
+const cursorEl = document.querySelector('.hero__cursor');
+const hdrAvatar = document.querySelector('.hdr__avatar');
+const hdrAvatarImg = document.querySelector('.hdr__avatar-img');
 
-  const LOOP = 26000;          // ms for one tile to cross the whole path
-  const IN = 0.16, OUT = 0.14; // the share of the path spent arriving and leaving
-  // 1.6 cycles across the width, and that number is not arbitrary: it is what puts the FIRST trough
-  // directly under the middle of the portrait. From there the shape falls out exactly as described -
-  // in high from the right, down into the hollow beneath the circle, up over a crest, and down into
-  // a second, shallower trough that carries it off the left.
-  const FREQ = 1.6;
-  const BLINKS = 2;            // times a tile fades out and back on one crossing
-  const ENTER_MS = 520, STEP_MS = 105;   // the opening fade, and the gap between tiles
-  // an irrational-ish step so the beats never line up into a visible pattern
-  const phase = Array.from({ length: 32 }, (_, i) => (i * 0.618) % 1);
-  const TROUGH_P = 1 / (2 * FREQ);   // where that first low point lands
-  let W = 0, H = 0, baseY = 0, amp0 = 0, drift = 0, lift = 0;
-  let gL = 0, gR = 0;          // the page's grid column, in hero coordinates
-  const ampAt = (p) => amp0 * (1 - 0.5 * p);          // the wave decays as it crosses
-  const measure = () => {
-    const hr = hero.getBoundingClientRect();
-    W = hr.width; H = hr.height;
-    // The path runs between the edges of the PAGE'S GRID, not the edges of the window. It used to
-    // sweep the full width of the display, which put tiles outside the column everything else in
-    // the hero lines up on. .hero__stage is that column, so it is measured rather than recomputed.
-    const stage = document.querySelector('.hero__stage');
-    const sr = stage ? stage.getBoundingClientRect() : hr;
-    const half = (stream.querySelector('.tool') || { offsetWidth: 46 }).offsetWidth / 2;
-    gL = (sr.left - hr.left) + half;
-    gR = (sr.right - hr.left) - half;
-    amp0 = Math.min(W * 0.15, 152);   // flatter than it was; the curve was too deep to read as a drift
-    drift = Math.min(H * 0.13, 108);
-    const pb = portraitBox ? portraitBox.getBoundingClientRect() : null;
-    // The trough is placed FIRST - just under the circle, so the wave picks up its underside - and
-    // the rest of the path is then hung off it. Anchoring the mid-line instead left the whole thing
-    // floating below the picture with no relationship to it.
-    const trough = pb ? (pb.bottom - hr.top) - 26 : H * 0.72;   // tucked up under the picture, not slung below it
-    baseY = trough - ampAt(TROUGH_P) * 0.5 - drift * TROUGH_P * TROUGH_P;
+// ---- The pink halo, pinned ----
+// In the original there were two of these and both roamed the hero on a slow rAF loop: a grey one
+// at the top left and this violet-rose one behind the wordmark. The grey one is gone, and this one
+// no longer drifts - it is placed once, behind the line, and stays exactly there.
 
-    // ...and then the whole path is pushed down until it clears everything it would otherwise run
-    // through. A tile is a box, not a point, so the clearance is measured from its EDGE: half its
-    // height plus a margin. The shift is global rather than a per-point clamp, because clamping
-    // flattens the wave into a shelf wherever an obstacle sits under it and you can see the tiles
-    // stop following the curve.
-    const vHalf = (stream.querySelector('.tool') || { offsetHeight: 46 }).offsetHeight / 2;
-    const pad = 10;   // just enough to clear; more than this pushed the whole wave down the page
-    const blockers = [];
-    if (pb) blockers.push({ l: pb.left - hr.left, r: pb.right - hr.left, b: pb.bottom - hr.top });
-    const col = document.querySelector('.hero__col');
-    if (col) { const c = col.getBoundingClientRect(); blockers.push({ l: c.left - hr.left, r: c.right - hr.left, b: c.bottom - hr.top }); }
-    let push = 0;
-    for (let q = 0; q <= 1; q += 0.004) {
-      const [x, y] = raw(q);
-      for (const bl of blockers) {
-        if (x < bl.l - vHalf || x > bl.r + vHalf) continue;
-        push = Math.max(push, (bl.b + vHalf + pad) - y);
-      }
-    }
-    lift = push;
-  };
-
-
-  // p = 0 at the right-hand edge, 1 off the left. `raw` is the wave on its own; `at` is that wave
-  // pushed clear of everything it would otherwise cross.
-  const raw = (p) => {
-    const x = gR + (gL - gR) * p;                    // right edge of the grid to its left edge
-    const wave = -Math.cos(2 * Math.PI * FREQ * p);   // +1 high at p = 0, trough at TROUGH_P
-    return [x, baseY + ampAt(p) * 0.5 * wave + drift * p * p];
-  };
-  const at = (p) => { const r = raw(p); return [r[0], r[1] + lift]; };
-
-  measure();
-  window.addEventListener('resize', measure);
-
-  const t0 = performance.now();
-  const frame = (now) => {
-    const t = (now - t0) / LOOP;
-    const age = now - t0;
-    for (let i = 0; i < tiles.length; i++) {
-      // Evenly spaced along the path, each one a fixed distance behind the last - all of them in
-      // their places from the first frame. An earlier version let them on ONE AT A TIME from the
-      // right-hand end, which spread the arrival over most of a 26-second loop and left the wave
-      // looking half-built for far too long. The staggering lives in the fade below instead.
-      const p = (t + i / tiles.length) % 1;
-      const tile = tiles[i];
-      const [x, y] = at(p);
-      // in at the start, out at the end; flat all the way between
-      const k = p < IN ? p / IN : (p > 1 - OUT ? (1 - p) / OUT : 1);
-      const e = k * k * (3 - 2 * k);                     // smoothstep, so neither end has a corner
-      // ...and on top of that, each tile breathes right out of existence and back BLINKS times on
-      // its way across, on its own offset beat so they never do it together. This is the reason the
-      // opacity floor is gone: it has to actually reach nothing, or it reads as a dimming rather
-      // than as a disappearance.
-      const beat = 0.5 - 0.5 * Math.cos(2 * Math.PI * (p * BLINKS + phase[i]));
-      // The stagger, and it is only this: each tile fades up a fraction of a second after the one
-      // before it. Half a second each, a tenth of a second apart, so the whole set is in within
-      // about a second and a half - a graded arrival rather than a switch, and nothing waits.
-      const b0 = clamp((age - i * STEP_MS) / ENTER_MS, 0, 1);
-      const born = b0 * b0 * (3 - 2 * b0);
-      const v = e * Math.pow(beat, 0.65) * born;
-      tile.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${(0.28 + 0.72 * v).toFixed(3)})`;
-      tile.style.opacity = v.toFixed(3);
-    }
-    // Unconditional. It used to stop whenever the hero left the viewport and never start again,
-    // so scrolling down and coming back up left the wave frozen in place. Eleven elements is not a
-    // frame budget worth protecting.
-    requestAnimationFrame(frame);
-  };
-  requestAnimationFrame(frame);
-}
-if (stream && reduced) {
-  // no travel: lay them out along the same path, once, and leave them there
-  toolsRunning = true;
-  const tiles = Array.from(stream.querySelectorAll('.tool'));
-  const hr = hero ? hero.getBoundingClientRect() : { width: 0, height: 0 };
-  tiles.forEach((tile, i) => {
-    const p = 0.08 + 0.84 * (i / Math.max(1, tiles.length - 1));
-    const x = (hr.width + 80) - (hr.width + 160) * p;
-    const y = hr.height * 0.62 + 60 * -Math.cos(2 * Math.PI * 1.15 * p);
-    tile.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-    tile.style.opacity = '1';
-  });
-}
-
-// ---- The portrait: assembled out of dots ----
-//
-// The picture is never drawn as a picture until the very last frame. What arrives first is a field
-// of coloured dots scattered across the WHOLE hero - every corner of the screen, not a puff around
-// where the face will be - and each one then travels to the pixel it belongs to. When the last one
-// lands the real raster is blitted once, so the finished state is the photograph itself rather than
-// a mosaic that approximates it. There is no exit: no scatter on scroll, no hover, no second loop.
-// The frame loop stops dead the moment the picture is whole and never starts again.
-//
-// Two things make ~40,000 moving dots affordable. Their colours are quantised and the dots sorted
-// by colour once at build time, so a frame walks the buckets and sets `fillStyle` a few hundred
-// times instead of forty thousand. And the flight is pure arithmetic on typed arrays - no objects,
-// no allocation, nothing read from the DOM - so a frame is a straight line through memory.
-//
-// Around all of that sits the part that was never about dots: WHERE the picture goes. It is fitted
-// to the subject's own bounds rather than to its file's frame, cropped to a circle, and - the
-// fiddly bit - pushed down far enough that the arc cannot cut the top of his head at any width.
+// ---- The line as living particles across the whole hero ----
+// This is the original engine, restored verbatim from the version that carried the site before the
+// portrait replaced it. The type is rendered off-screen in Hanken Grotesk, sampled on a 2-3px grid,
+// and every ink pixel becomes a dot that flies in from a random bearing at a random distance. It
+// keeps all three behaviours that belonged to it:
+//   - a staggered, eased ENTRY out of a scatter,
+//   - a scroll-driven EXIT: the same scatter run backwards as the page moves, biased downward so
+//     the dots gather below and fade out over the last stretch of the canvas,
+//   - and the hover: the header photo flies down to the cursor, the letter under it toggles purple
+//     and stays purple, and the dots of that letter lift and are pushed aside by the pointer.
+const TEXT = canvas ? (canvas.dataset.dots || 'UX/UI Designer') : '';
 const ctx = canvas ? canvas.getContext('2d') : null;
 const offc = document.createElement('canvas');
 const offx = offc.getContext('2d', { willReadFrequently: true });
-const portraitBox = document.querySelector('.hero__portrait');
+let dots = [], letters = [], letterHot = [], letterOn = [], letterLift = [], cw = 0, ch = 0, dotR = 3;
+let textRight = 0, textMidY = 0, textH = 0, entryStart = 0, hoverLetter = -1;
+let inkSprite = null, purpleSprite = null, spriteSize = 0;
+let mouseHX = -9999, mouseHY = -9999;   // cursor in hero coords (for the letter "push")
 
-// Which way round he faces. One line, because it has been asked for in both directions and will be
-// again; the flip is done to the raster, so everything measured afterwards sees it as drawn.
-const MIRROR = false;
+// Pre-render the dot + the purple dot once, then blit with drawImage (fast, no per-frame arc)
+function makeSprites() {
+  const S = 2;
+  spriteSize = Math.ceil(dotR * 2 + 2);
+  inkSprite = document.createElement('canvas');
+  inkSprite.width = inkSprite.height = spriteSize * S;
+  const ic = inkSprite.getContext('2d'); ic.scale(S, S);
+  // The ink sits back. Opacity is baked into the SPRITE rather than applied per draw, because the
+  // draw loop already spends its alpha on the foot-fade and a second multiply per dot would cost a
+  // state change on every one of them. The purple below stays at full strength - the point of the
+  // hover is that the letter you touch comes forward out of a quieter line.
+  ic.fillStyle = 'rgba(24,22,15,0.52)';
+  ic.beginPath(); ic.arc(spriteSize / 2, spriteSize / 2, dotR, 0, 6.283); ic.fill();
 
-const DOT_TARGET = 40000;   // dots in flight; the stride is solved back out of this
-const FLY_MS     = 1250;    // how long one dot takes to reach its pixel
-const STAGGER_MS = 700;     // spread of departure times, so they arrive as a wave, not a slam
-const MELT_MS    = 620;     // the dissolve from the assembled mosaic into the photograph itself
-
-const portraitImg = new Image();
-let portraitReady = false;
-let subject = null;   // where HE is inside the source frame, in source pixels
-let cw = 0, ch = 0, dpr = 1, px_ = 0, py_ = 0;
-
-// A cut-out PNG carries whatever empty margin the person exporting it happened to leave. Fitting
-// the FRAME would therefore spend part of the circle on nothing, so the subject's own bounds are
-// measured once, off a small downscaled copy (200px wide is ample for a bounding box).
-function measureSubject(im) {
-  const W = 200, H = Math.max(1, Math.round(200 * im.naturalHeight / im.naturalWidth));
-  const c = document.createElement('canvas'); c.width = W; c.height = H;
-  const g = c.getContext('2d', { willReadFrequently: true });
-  g.drawImage(im, 0, 0, W, H);
-  const d = g.getImageData(0, 0, W, H).data;
-  let x0 = W, y0 = H, x1 = -1, y1 = -1;
-  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-    if (d[(y * W + x) * 4 + 3] < 16) continue;
-    if (x < x0) x0 = x; if (x > x1) x1 = x;
-    if (y < y0) y0 = y; if (y > y1) y1 = y;
-  }
-  if (x1 < 0) return { x: 0, y: 0, w: im.naturalWidth, h: im.naturalHeight };
-  const kx = im.naturalWidth / W, ky = im.naturalHeight / H;
-  return { x: x0 * kx, y: y0 * ky, w: (x1 - x0 + 1) * kx, h: (y1 - y0 + 1) * ky };
+  purpleSprite = document.createElement('canvas');
+  purpleSprite.width = purpleSprite.height = spriteSize * S;
+  const pc = purpleSprite.getContext('2d'); pc.scale(S, S);
+  pc.fillStyle = '#B575DF';
+  pc.beginPath(); pc.arc(spriteSize / 2, spriteSize / 2, dotR, 0, 6.283); pc.fill();
 }
 
-// The dot field, all of it flat typed arrays.
-let hx = null, hy = null, sx = null, sy = null, del = null;   // home, start, departure delay
-let order = null, bStart = null, bFill = null, bList = null, dotSize = 4, dotCount = 0;
-let raf = 0, t0 = 0, meltT0 = 0, painted = false;
-
-// The landed mosaic, kept as a raster of its own. Once every dot is home the field stops changing,
-// so re-running twenty-odd thousand fills through the dissolve would be work for nothing - and
-// worse, it would put the frames that most need to be even on the most expensive path. Snapshot it
-// once and the dissolve is two blits, on a phone as much as on a desktop.
-const mosc = document.createElement('canvas');
-const mosx = mosc.getContext('2d');
-
-// The finished article: one blit of the raster that the dots were sampled from. `offc` already
-// carries the circular crop, so there is no clip to re-apply and nothing can drift between what
-// the dots showed and what finally lands.
-function paintFinal() {
-  ctx.clearRect(0, 0, px_, py_);
-  ctx.globalAlpha = 1;
-  ctx.drawImage(offc, 0, 0);
-  painted = true;
-}
-
-// Sample the cropped raster on a grid, quantise each dot's colour, and sort the whole field by
-// colour bucket with a counting sort. `order` then lists the dots grouped by bucket and `bStart`
-// says where each group begins - which is what lets a frame set a colour once per group.
 function buildDots() {
-  const data = offx.getImageData(0, 0, px_, py_).data;
-  // Stride chosen so the circle yields roughly DOT_TARGET dots, whatever the screen's size.
-  const area = Math.PI * lastCircle.r * lastCircle.r;
-  dotSize = Math.max(2, Math.round(Math.sqrt(area / DOT_TARGET)));
-  const st = dotSize;
-
-  const cxr = lastCircle.x, cyr = lastCircle.y, rr = lastCircle.r * lastCircle.r;
-  const x0 = Math.max(0, Math.floor((cxr - lastCircle.r) / st) * st);
-  const x1 = Math.min(px_, Math.ceil((cxr + lastCircle.r) / st) * st);
-  const y0 = Math.max(0, Math.floor((cyr - lastCircle.r) / st) * st);
-  const y1 = Math.min(py_, Math.ceil((cyr + lastCircle.r) / st) * st);
-
-  const cap = Math.ceil(((x1 - x0) / st + 2) * ((y1 - y0) / st + 2));
-  hx = new Float32Array(cap); hy = new Float32Array(cap);
-  sx = new Float32Array(cap); sy = new Float32Array(cap);
-  del = new Float32Array(cap);
-  // Five bits per colour channel and three for alpha. The key doubles as the sort bucket, so every
-  // bit quadruples the table and the split matters: measuring the finished mosaic against the
-  // photograph showed the colour was already within half a level while the ALPHA was the whole of
-  // the difference - this is a cut-out, and how transparent each dot is carries its edges.
-  const key = new Uint32Array(cap);
-  const NB = 1 << 18;
-  const count = new Uint32Array(NB + 1);
-
-  // The dots are seeded from a fixed sequence, so the opening is the same composition on every
-  // load - the same reason the confetti was seeded and the halo started on a fixed point.
-  let seed = 0x6D2B79F5 | 0;
-  const rnd = () => {
-    seed = (seed + 0x9E3779B9) | 0;
-    let t = Math.imul(seed ^ (seed >>> 16), 0x21F0AAAD);
-    t = Math.imul(t ^ (t >>> 15), 0x735A2D97);
-    return ((t ^ (t >>> 15)) >>> 0) / 4294967296;
-  };
-
-  let n = 0;
-  for (let y = y0; y < y1; y += st) {
-    for (let x = x0; x < x1; x += st) {
-      const dx = x + st / 2 - cxr, dy = y + st / 2 - cyr;
-      if (dx * dx + dy * dy > rr) continue;
-      const o = ((y | 0) * px_ + (x | 0)) * 4;
-      const a = data[o + 3];
-      if (a < 24) continue;
-      hx[n] = x; hy[n] = y;
-      // Where it comes FROM: anywhere on the visible field, edge to edge, and a little beyond it
-      // so the outermost dots read as having flown in rather than having faded up in place.
-      sx[n] = (rnd() * 1.24 - 0.12) * px_;
-      sy[n] = (rnd() * 1.24 - 0.12) * py_;
-      del[n] = rnd() * STAGGER_MS;
-      const k = ((data[o] >> 3) << 13) | ((data[o + 1] >> 3) << 8) | ((data[o + 2] >> 3) << 3)
-              | (a >> 5);
-      key[n] = k; count[k + 1]++;
-      n++;
-    }
-  }
-  dotCount = n;
-
-  for (let b = 0; b < NB; b++) count[b + 1] += count[b];
-  bStart = count;                       // now a prefix table: bucket b occupies [count[b], count[b+1])
-  order = new Uint32Array(n);
-  const cursor = count.slice();
-  for (let i = 0; i < n; i++) order[cursor[key[i]]++] = i;
-
-  // One fill string per non-empty bucket, built once. The centre of each 32-value band is used so
-  // the quantised colour sits in the middle of what it stands for rather than at its dark edge.
-  bFill = new Array(NB);
-  const used = [];
-  for (let b = 0; b < NB; b++) {
-    if (bStart[b] === bStart[b + 1]) continue;
-    used.push(b);
-    const r = ((b >> 13) & 31) * 8 + 4, g = ((b >> 8) & 31) * 8 + 4, bl = ((b >> 3) & 31) * 8 + 4;
-    bFill[b] = 'rgba(' + r + ',' + g + ',' + bl + ',' + (((b & 7) * 32 + 16) / 255).toFixed(3) + ')';
-  }
-  // Only the buckets that actually hold dots are walked each frame; a photograph fills a few
-  // hundred of the 65,536 possible ones, so this is the difference between a few hundred
-  // `fillStyle` writes per frame and sixty-five thousand pointless comparisons.
-  bList = new Uint32Array(used);
-}
-
-function frame(now) {
-  if (meltT0) return melt(now);
-  const t = now - t0;
-  ctx.clearRect(0, 0, px_, py_);
-  const st = dotSize;
-  let landed = true;
-
-  for (let q = 0; q < bList.length; q++) {
-    const b = bList[q], s0 = bStart[b], s1 = bStart[b + 1];
-    ctx.fillStyle = bFill[b];
-    for (let i = s0; i < s1; i++) {
-      const k = order[i];
-      let u = (t - del[k]) / FLY_MS;
-      if (u >= 1) { ctx.fillRect(hx[k], hy[k], st, st); continue; }
-      landed = false;
-      if (u < 0) u = 0;
-      const e = 1 - (1 - u) * (1 - u) * (1 - u);        // ease-out cubic: fast away, settling in
-      ctx.fillRect(sx[k] + (hx[k] - sx[k]) * e, sy[k] + (hy[k] - sy[k]) * e, st, st);
-    }
-  }
-
-  if (!landed) { raf = requestAnimationFrame(frame); return; }
-
-  // Every dot is home - but a grid of little squares in quantised colour is not the photograph, so
-  // swapping one for the other in a single frame reads as a jolt: the blockiness and the banding
-  // both vanish on the same tick. Instead the real raster is dissolved IN over the assembled
-  // mosaic, so the last thing the eye sees is the picture sharpening rather than replacing.
-  // Arrival is tested rather than elapsed time, so a throttled tab can never freeze a half-built
-  // face on screen; only once the dissolve is complete does the loop end, for good.
-  meltT0 = now;
-  mosx.clearRect(0, 0, px_, py_); mosx.drawImage(canvas, 0, 0);
-  melt(now);
-}
-
-// A real cross-fade, not one layer laid over the other. Fading the photograph IN on top of the
-// mosaic cannot work here: `source-over` can only ever ADD opacity, so the mosaic's own ink stays
-// underneath to the very last frame and then disappears all at once - which was the jump. Nor will
-// the naive fix do, fading the mosaic out while the photo fades in, because through the middle of
-// such a fade both layers are half-transparent and the portrait visibly thins against the page.
-//
-// `lighter` adds premultiplied colour AND premultiplied alpha, so drawing the mosaic at 1-k and
-// then ADDING the photograph at k is the straight linear blend of the two: it starts as exactly
-// the mosaic, ends as exactly the photograph, and never loses opacity in between.
-function melt(now) {
-  const u = clamp((now - meltT0) / MELT_MS, 0, 1);
-  const k = u * u * (3 - 2 * u);                // smoothstep: no slope at either end, so no edge
-  ctx.globalCompositeOperation = 'source-over';
-  ctx.globalAlpha = 1 - k;
-  ctx.clearRect(0, 0, px_, py_);
-  ctx.drawImage(mosc, 0, 0);
-  ctx.globalCompositeOperation = 'lighter';
-  ctx.globalAlpha = k;
-  ctx.drawImage(offc, 0, 0);
-  ctx.globalCompositeOperation = 'source-over';
-  ctx.globalAlpha = 1;
-  if (u >= 1) { paintFinal(); raf = 0; return; }
-  raf = requestAnimationFrame(melt);
-}
-
-let lastCircle = { x: 0, y: 0, r: 0 };
-
-function buildPortrait(animate) {
-  if (!canvas || !ctx || !hero || !portraitBox || !portraitReady || !subject) return;
+  if (!canvas || !ctx || !hero || !line2) return;
   const heroRect = hero.getBoundingClientRect();
-  cw = Math.round(heroRect.width); ch = Math.round(heroRect.height);
-  dpr = Math.min(window.devicePixelRatio || 1, 2);
-  px_ = Math.round(cw * dpr); py_ = Math.round(ch * dpr);
-  canvas.width = px_; canvas.height = py_;
+  cw = Math.round(heroRect.width);
+  // the canvas runs past the foot of the hero so the scattering dots have somewhere to go; they
+  // self-fade over the last stretch of it (see FADE in drawDots) rather than being cut off
+  const extraBelow = 240;
+  ch = Math.round(heroRect.height) + extraBelow;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.round(cw * dpr); canvas.height = Math.round(ch * dpr);
   canvas.style.width = cw + 'px'; canvas.style.height = ch + 'px';
-  ctx.setTransform(1, 0, 0, 1, 0, 0);       // device pixels, so the picture lands 1:1 on the screen
-  offc.width = px_; offc.height = py_;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  offc.width = cw; offc.height = ch;
 
-  const box = portraitBox.getBoundingClientRect();
-  const size = Math.min(box.width, box.height) * dpr;
-  const bx = (box.left - heroRect.left) * dpr + ((box.width * dpr) - size) / 2;
-  const by = (box.top - heroRect.top) * dpr + ((box.height * dpr) - size) / 2;
-  const circle = { x: bx + size / 2, y: by + size / 2, r: size / 2 };
-  lastCircle = circle;
+  const vw = window.innerWidth;
+  let fs = clamp(vw * 0.16, 52, 200);
+  const setFont = (c) => { c.font = `700 ${fs}px 'Hanken Grotesk', system-ui, sans-serif`; };
+  setFont(offx);
+  const maxW = (line2.clientWidth || cw) - 6;
+  let tw = offx.measureText(TEXT).width;
+  if (tw > maxW) { fs = fs * (maxW / tw); setFont(offx); tw = offx.measureText(TEXT).width; }
+  // The box the type is drawn into. 1.28 gave it a quarter of a line of air above and below, which
+  // read as spacing nobody had asked for - the ink is only ~0.72em tall, so the rest was padding.
+  // 1.04 keeps just enough for the descenders in "g" and "y" and nothing more.
+  textH = Math.round(fs * 1.04);
+  line2.style.height = textH + 'px';
 
-  const sc = Math.min(size / subject.w, size / subject.h);
-  const dw = Math.round(portraitImg.naturalWidth * sc), dh = Math.round(portraitImg.naturalHeight * sc);
-  const dx = Math.round(bx + size / 2 - (subject.x + subject.w / 2) * sc);
-  const dy0 = Math.round(by + size / 2 - (subject.y + subject.h / 2) * sc);
+  const wrapRect = line2.getBoundingClientRect();
+  textRight = Math.round(wrapRect.right - heroRect.left) - 2;
+  textMidY = Math.round(wrapRect.top + wrapRect.height / 2 - heroRect.top);
 
-  const drawSource = (atY) => {
-    offx.setTransform(1, 0, 0, 1, 0, 0);
-    offx.globalCompositeOperation = 'source-over';
-    offx.clearRect(0, 0, px_, py_);
-    if (MIRROR) {
-      offx.save();
-      offx.translate(dx + dw, atY); offx.scale(-1, 1);
-      offx.drawImage(portraitImg, 0, 0, dw, dh);
-      offx.restore();
-    } else {
-      offx.drawImage(portraitImg, dx, atY, dw, dh);
-    }
-  };
+  offx.setTransform(1, 0, 0, 1, 0, 0);
+  offx.clearRect(0, 0, cw, ch);
+  offx.fillStyle = '#000';
+  setFont(offx);
+  offx.textBaseline = 'middle'; offx.textAlign = 'right';
+  offx.fillText(TEXT, textRight, textMidY);
 
-  // A circle is only as wide as its diameter across its MIDDLE; by the top of the box the arc has
-  // closed almost to a point, so a picture merely centred in it loses the crown of the head. This
-  // measures rather than guesses: rasterise once, read how wide the subject is on every row, then
-  // take the smallest downward shift at which every row above the circle's centre fits inside the
-  // arc at its own depth. The bottom stays free to be cut - that is what a round crop is for.
-  drawSource(dy0);
-  const probe = offx.getImageData(0, 0, px_, py_).data;
-  const reach = new Float32Array(py_);
-  const xa = clamp(dx, 0, px_ - 1), xb = clamp(dx + dw, 0, px_);
-  for (let y = 0; y < py_; y++) {
-    let m = -1;
-    for (let x = xa; x < xb; x++) {
-      if (probe[(y * px_ + x) * 4 + 3] < 16) continue;
-      const e = Math.abs(x - circle.x); if (e > m) m = e;
-    }
-    reach[y] = m;
+  letters = [];
+  const leftEdge = textRight - tw;
+  for (let i = 0; i < TEXT.length; i++) {
+    letters.push({ x0: leftEdge + offx.measureText(TEXT.slice(0, i)).width,
+                   x1: leftEdge + offx.measureText(TEXT.slice(0, i + 1)).width, cx: 0, cy: textMidY });
   }
-  const topFits = (shift) => {
-    for (let y = 0; y < py_; y++) {
-      if (reach[y] < 0) continue;
-      const yy = y + shift;
-      if (yy > circle.y) break;                    // below the centre the arc only widens
-      const dyc = yy - circle.y;
-      if (reach[y] > Math.sqrt(Math.max(0, circle.r * circle.r - dyc * dyc))) return false;
+  // letterHot = eased COLOUR (sticky: stays purple until the letter is touched again)
+  // letterLift = eased MOTION (only while the cursor is actually on the letter)
+  // letterOn   = the toggled purple state itself, preserved across rebuilds where possible
+  const prevOn = letterOn;
+  letterHot = new Array(letters.length).fill(0);
+  letterLift = new Array(letters.length).fill(0);
+  letterOn = new Array(letters.length).fill(0).map((v, i) => (prevOn && prevOn[i]) || 0);
+
+  const data = offx.getImageData(0, 0, cw, ch).data;
+  // Sparser than it was: 4px on desktop and 3px on mobile, against the original 3 and 2. That is
+  // roughly half the dots, which is what "less dense" has to mean at a fixed dot size - the grid
+  // opens up and the letters read as drawn IN dots rather than as solid type.
+  const stepPx = fs >= 130 ? 4 : 3;
+  dotR = 1;                           // 2px dots, capped - small and crisp
+  const maxDist = Math.max(ch * 0.55, 280);
+
+  dots = [];
+  for (let y = 0; y < ch; y += stepPx) {
+    for (let x = 0; x < cw; x += stepPx) {
+      if (data[(y * cw + x) * 4 + 3] > 130) {
+        let li = -1;
+        for (let k = 0; k < letters.length; k++) { if (x >= letters[k].x0 && x < letters[k].x1) { li = k; break; } }
+        const ang = Math.random() * 6.283, dist = 120 + Math.random() * maxDist;
+        // bias the scatter downward so the dots gather behind what follows as you scroll
+        const oyBias = dist * 0.55;
+        dots.push({ hx: x, hy: y, li, ox: Math.cos(ang) * dist, oy: Math.sin(ang) * dist * 0.85 + oyBias,
+                    ph: Math.random() * 6.28, sp: 0.6 + Math.random() * 1.2, delay: Math.random() * 420, lx: 0, ly: 0 });
+      }
     }
-    return true;
-  };
-  let shift = 0;
-  const maxShift = Math.round(size * 0.55);
-  while (shift < maxShift && !topFits(shift)) shift += 2;
-  if (shift) drawSource(dy0 + shift);
+  }
+  const sums = {};
+  dots.forEach((d) => { if (d.li < 0) return; const s = sums[d.li] || (sums[d.li] = { x: 0, y: 0, n: 0 }); s.x += d.hx; s.y += d.hy; s.n++; });
+  letters.forEach((L, i) => { const s = sums[i]; if (s) { L.cx = s.x / s.n; L.cy = s.y / s.n; } });
+  dots.forEach((d) => { if (d.li >= 0) { const L = letters[d.li]; let vx = d.hx - L.cx, vy = d.hy - L.cy; const m = Math.hypot(vx, vy) || 1; d.lx = vx / m; d.ly = vy / m; } });
 
-  // Bake the round crop into the off-screen raster, so the dots are sampled from exactly the same
-  // pixels that the final blit puts on screen - the mosaic and the photograph cannot disagree.
-  offx.globalCompositeOperation = 'destination-in';
-  offx.beginPath(); offx.arc(circle.x, circle.y, circle.r, 0, 6.283); offx.fill();
-  offx.globalCompositeOperation = 'source-over';
+  makeSprites();
+  entryStart = performance.now();
+}
 
-  if (raf) { cancelAnimationFrame(raf); raf = 0; }
-  if (!animate || reduced) { paintFinal(); return; }
-  painted = false; meltT0 = 0;
-  mosc.width = px_; mosc.height = py_;
-  buildDots();
-  t0 = performance.now();
-  raf = requestAnimationFrame(frame);
+function drawDots() {
+  if (!ctx) return;
+  ctx.clearRect(0, 0, cw, ch);
+  const now = performance.now(), nowS = now / 1000;
+  // disperse across the FULL height the canvas occupies (hero + its bleed below), so the dots are
+  // still visibly drifting for as long as any of them is on screen
+  const scatter = clamp(window.scrollY / Math.max(1, ch * 0.9), 0, 1);
+  for (let i = 0; i < letterHot.length; i++) {
+    letterHot[i]  += ((letterOn[i] ? 1 : 0) - letterHot[i]) * 0.2;          // colour - sticky
+    letterLift[i] += ((i === hoverLetter ? 1 : 0) - letterLift[i]) * 0.2;   // motion - hover only
+  }
+
+  const half = spriteSize / 2, FADE = 190;   // px of self-fade at the canvas foot
+  const hotDots = [];
+  for (let i = 0; i < dots.length; i++) {
+    const d = dots[i];
+    const entry = easeOutCubic(clamp((now - entryStart - d.delay) / 1500, 0, 1));
+    const disperse = Math.max(1 - entry, scatter);
+    const wob = 1.5 * disperse;   // ambient jitter only while flying in / scattering
+    const x = d.hx + d.ox * disperse + Math.sin(nowS * d.sp + d.ph) * wob;
+    const y = d.hy + d.oy * disperse + Math.cos(nowS * d.sp * 0.9 + d.ph) * wob;
+    const hot = d.li >= 0 ? letterHot[d.li] : 0;
+    const lift = d.li >= 0 ? letterLift[d.li] : 0;
+    const fade = y > ch - FADE ? clamp((ch - y) / FADE, 0, 1) : 1;
+    if (fade <= 0.01) continue;
+    if (hot > 0.03 || lift > 0.03) {
+      d._x = x + d.lx * 11 * lift; d._y = y - 20 * lift + d.ly * 11 * lift;
+      d._hot = hot; d._lift = lift; d._fade = fade; hotDots.push(d);
+    } else {
+      ctx.globalAlpha = fade;
+      ctx.drawImage(inkSprite, x - half, y - half, spriteSize, spriteSize);
+    }
+  }
+  for (const d of hotDots) {
+    let x = d._x, y = d._y;
+    const dx = x - mouseHX, dy = y - mouseHY, dd = Math.hypot(dx, dy) || 1;   // the cursor pushes them outward
+    if (dd < 90) { const push = (1 - dd / 90) * 24 * d._lift; x += dx / dd * push; y += dy / dd * push; }
+    ctx.globalAlpha = d._fade;          ctx.drawImage(inkSprite,    x - half, y - half, spriteSize, spriteSize);
+    ctx.globalAlpha = d._hot * d._fade; ctx.drawImage(purpleSprite, x - half, y - half, spriteSize, spriteSize);
+  }
+  ctx.globalAlpha = 1;
+  if (!reduced) requestAnimationFrame(drawDots);
 }
 
 if (canvas && ctx) {
-  portraitImg.onload = () => {
-    subject = measureSubject(portraitImg); portraitReady = true;
-    buildPortrait(true);
+  // Wait for ALL the webfonts, not just the one this line is set in. buildDots reads where the
+  // line's box SITS, and that depends on the height of the greeting above it - so a face that is
+  // still swapping anywhere in the block moves the box after the dots have already been given
+  // their coordinates, and the line ends up drawn over the greeting. `fonts.ready` settles once
+  // every face in use has loaded, which is the only moment the geometry is final.
+  const startDots = () => { buildDots(); drawDots(); };
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(startDots).catch(startDots);
+  } else { startDots(); }
+  let rt;
+  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { buildDots(); if (reduced) drawDots(); }, 160); });
+}
+
+// ---- Only the header PHOTO flies to the cursor; per-letter toggle; Instagram-style return ----
+if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
+  const SIZE = 80, HOME_S = 46 / 80, RET = 760;
+  let tx = 0, ty = 0, cx = 0, cy = 0, cs = HOME_S;
+  let active = false, returning = false, raf = null, homeX = 0, homeY = 0;
+  let retStart = 0, rfx = 0, rfy = 0, rfs = HOME_S;
+
+  const render = () => {
+    cursorEl.style.transform = `translate(${(cx - SIZE / 2).toFixed(1)}px, ${(cy - SIZE / 2).toFixed(1)}px) scale(${cs.toFixed(3)})`;
   };
-  portraitImg.src = canvas.dataset.portrait || 'portrait.png';
-  // Rebuild on a real WIDTH change only. On phones the address bar collapsing while you scroll
-  // fires `resize` with a new height, and redrawing there would be work for nothing. A rebuild
-  // repaints; it does not replay the assembly, which is an opening and belongs to the opening.
-  let rt, lastVW = window.innerWidth;
-  window.addEventListener('resize', () => {
-    if (window.innerWidth === lastVW) return;
-    lastVW = window.innerWidth;
-    clearTimeout(rt); rt = setTimeout(() => buildPortrait(false), 160);
+  const ts = () => (active ? 1 : HOME_S);
+  const loop = () => {
+    if (returning) {
+      const t = clamp((performance.now() - retStart) / RET, 0, 1);
+      const e = easeInOutCubic(t);
+      cx = rfx + (homeX - rfx) * e;
+      const baseY = rfy + (homeY - rfy) * e;
+      const arc = -Math.sin(t * Math.PI) * 60;                  // soft rounded hop over the top
+      const bounce = Math.sin(t * Math.PI * 3) * (1 - t) * 12;  // two gentle, damped bounces
+      cy = baseY + arc + bounce;
+      cs = rfs + (HOME_S - rfs) * e;
+      render();
+      if (t >= 1) { returning = false; cursorEl.style.opacity = '0'; hdrAvatarImg.style.opacity = ''; raf = null; return; }
+      raf = requestAnimationFrame(loop); return;
+    }
+    cx += (tx - cx) * 0.26; cy += (ty - cy) * 0.26; cs += (ts() - cs) * 0.26;
+    render();
+    if (active || Math.hypot(tx - cx, ty - cy) > 0.6) { raf = requestAnimationFrame(loop); } else { raf = null; }
+  };
+  const kick = () => { if (!raf) raf = requestAnimationFrame(loop); };
+
+  const flyOut = (x, y) => {
+    const r = hdrAvatar.getBoundingClientRect();
+    homeX = r.left + r.width / 2; homeY = r.top + r.height / 2;
+    if (!active && !returning) { cx = homeX; cy = homeY; cs = HOME_S; render(); }
+    active = true; returning = false;
+    document.documentElement.classList.add('hero-ava-on');
+    cursorEl.style.opacity = '1';
+    hdrAvatarImg.style.opacity = '0';    // only the photo lifts off; the ring stays
+    tx = x; ty = y; kick();
+  };
+  const flyHome = () => {
+    if (!active) return;
+    active = false; returning = true;
+    document.documentElement.classList.remove('hero-ava-on');
+    retStart = performance.now(); rfx = cx; rfy = cy; rfs = cs;
+    kick();
+  };
+
+  const overLine2 = (x, y) => { const r = line2.getBoundingClientRect(); return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; };
+
+  document.addEventListener('pointermove', (e) => {
+    if (e.pointerType === 'touch') return;
+    if (overLine2(e.clientX, e.clientY)) {
+      if (!active) flyOut(e.clientX, e.clientY); else { tx = e.clientX; ty = e.clientY; kick(); }
+      const hr = hero.getBoundingClientRect();
+      const lx = e.clientX - hr.left;
+      mouseHX = lx; mouseHY = e.clientY - hr.top;
+      let found = -1;
+      for (let k = 0; k < letters.length; k++) { if (lx >= letters[k].x0 && lx < letters[k].x1) { found = k; break; } }
+      // toggle on ENTER only: a touched letter turns purple and stays purple until touched again
+      if (found !== hoverLetter) {
+        if (found >= 0 && letterOn.length > found) letterOn[found] = letterOn[found] ? 0 : 1;
+        hoverLetter = found;
+      }
+    } else {
+      if (active) flyHome();
+      hoverLetter = -1; mouseHX = -9999; mouseHY = -9999;
+    }
   });
+  window.addEventListener('blur', () => { if (active) flyHome(); hoverLetter = -1; mouseHX = -9999; mouseHY = -9999; });
 }
 
 // ---- Selected work: the scroll-driven card stack ----
@@ -788,9 +591,10 @@ if (reduced || !('IntersectionObserver' in window)) {
   const targetS = () => (hover ? 1.7 : 1) * (down ? 0.82 : 1);
 
   const render = () => {
-    // this used to stand down behind `html.hero-ava-on`, while the header photo was out over the
-    // portrait standing in for it. Nothing sets that class any more.
-    dot.style.opacity = (shown && inside) ? '1' : '0';
+    // it stands down behind `html.hero-ava-on`: while the header photo is out over the line it IS
+    // the cursor, and two cursors on screen at once is one too many.
+    const avaOut = document.documentElement.classList.contains('hero-ava-on');
+    dot.style.opacity = (shown && inside && !avaOut) ? '1' : '0';
     dot.classList.toggle('is-hover', hover);
     dot.style.transform = `translate3d(${(mx - 12.5).toFixed(2)}px, ${(my - 12.5).toFixed(2)}px, 0) scale(${cs.toFixed(3)})`;
   };
@@ -1186,15 +990,7 @@ document.querySelectorAll('a[href="#top"]').forEach((a) => {
   } else { live = true; raf = requestAnimationFrame(loop); }
 })();
 
-// ---- Keep the address bar clean, even when the visitor arrived on an old ".html" link ----
-// GitHub Pages serves /bianca and /bianca.html as the same page, and every link on the site now
-// points at the short form. But links shared before the custom domain went up still carry the
-// extension, so tidy those in place: replaceState rewrites the address without a reload and
-// without pushing a history entry, so Back still goes where the reader expects. The query and
-// hash are carried over, and index.html collapses to "/".
-(function () {
-  const p = location.pathname;
-  if (!p.endsWith('.html')) return;
-  const clean = p === '/index.html' ? '/' : p.slice(0, -5);
-  history.replaceState(history.state, '', clean + location.search + location.hash);
-})();
+// ---- The address-bar tidy-up is deliberately NOT on this page ----
+// GitHub Pages serves /hero-dots and /hero-dots.html as one page; the local preview server
+// 404s on a path with no extension, so stripping ".html" would leave a link that dies on the
+// first reload.
