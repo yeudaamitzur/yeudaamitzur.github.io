@@ -952,7 +952,11 @@ document.querySelectorAll('a[href="#top"]').forEach((a) => {
 // can't tunnel past. Nothing caps them upward: a hard enough hit throws them clean off screen.
 (function () {
   const foot = document.querySelector('.foot');
-  if (!foot) return;
+  // Opt-in, not automatic: the pile belongs to the home page only. The case studies end on their
+  // own closing move ("Liked this project?" -> the hand-off) and Yehuda asked for it off there, so
+  // a page asks for the rings by marking its footer `data-rings` rather than getting them for
+  // simply having a .foot. Both script.js and hero-dots.js carry this same gate.
+  if (!foot || !foot.hasAttribute('data-rings')) return;
 
   const canvas = document.createElement('canvas');
   canvas.className = 'foot__dots';
