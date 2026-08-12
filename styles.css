@@ -205,7 +205,10 @@ ul, ol { list-style: none; padding: 0; }
    going back is a matter of re-wrapping the markup and putting `hdr--float` back on the <header>. */
 
 /* ---- Floating pill header (kept, unused while the full-width bar is in place) ---- */
-.hdr--float { justify-content: center; padding: 16px 20px;
+/* display:flex is NOT optional here - the full-width-bar rewrite set `.hdr { display: block }`,
+   which silently drops justify-content and parks the pill at the left edge. hero-dots.css used to
+   carry this one line on its own, which is why only the homepage was centred. */
+.hdr--float { display: flex; align-items: center; justify-content: center; padding: 16px 20px;
   background: none; background-image: none; -webkit-backdrop-filter: none; backdrop-filter: none; pointer-events: none; }
 .hdr--float > * { pointer-events: auto; }
 .hdr__pill { display: inline-flex; align-items: center; gap: 0;
@@ -693,7 +696,7 @@ ul, ol { list-style: none; padding: 0; }
   font-family: var(--f-display); font-weight: 600; font-size: clamp(.78rem, .95vw, .88rem);
   transition: border-color .25s ease, color .25s ease;
 }
-.pcard.is-active:hover .pcard__view { border-color: var(--brand); color: var(--brand); }
+.pcard:hover .pcard__view { border-color: var(--brand); color: var(--brand); }
 /* Only the FIRST line has to stop short of the View button - the button sits at the top right and
    the chip at the top left, and everything below them has the full width to itself. A blanket
    right padding on the whole body was squeezing the headline and breaking the discipline list onto
@@ -714,10 +717,11 @@ ul, ol { list-style: none; padding: 0; }
    state on a card at 0.7 opacity, tilted and half off screen, reads as a bug. */
 .pcard__inner { transition: transform .4s cubic-bezier(.2,.7,.2,1); }
 @media (hover: hover) and (pointer: fine) {
-  .pcard.is-active:hover .pcard__inner { transform: scale(1.012); }
-  .pcard.is-active:hover .pcard__name { text-decoration: underline; text-underline-offset: .22em; }
+  .pcard:hover .pcard__inner { transform: scale(1.012); }
+  .pcard:hover .pcard__name { text-decoration: underline; text-underline-offset: .22em; }
 }
-.pstack.is-driven .pcard:not(.is-active) { pointer-events: none; }
+/* pointer-events are set per card by the arc driver, from the card's own opacity - every card
+   you can see is clickable, whether or not it is the centred one. */
 .pcard__inner:focus-visible { outline: 2px solid var(--brand); outline-offset: 4px; }
 
 @media (max-width: 900px) {
@@ -730,7 +734,7 @@ ul, ol { list-style: none; padding: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   .pcard__inner { transition: none; }
-  .pcard.is-active:hover .pcard__inner { transform: none; }
+  .pcard:hover .pcard__inner { transform: none; }
 }
 
 /* =========================================================

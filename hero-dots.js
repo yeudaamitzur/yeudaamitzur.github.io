@@ -474,12 +474,18 @@ if (pstack) {
         // ...and faded right out once it is far enough that it would otherwise stack on its
         // neighbour. Two cards on screen at a time is the transition; three is a pile.
         const vis = clamp((GONE - d) / GONE_FADE, 0, 1);
-        card.style.opacity = ((1 - 0.34 * Math.abs(s)) * vis).toFixed(3);
+        const op = (1 - 0.34 * Math.abs(s)) * vis;
+        card.style.opacity = op.toFixed(3);
         card.style.zIndex = String(20 - Math.round(d * 10));
+        // Every card you can SEE is clickable, not just the centred one. The gate is the card's own
+        // opacity, so a card faded out of the arc can never sit in front of the page swallowing
+        // clicks, and the z-index above still hands the click to the frontmost card where two
+        // overlap. (This used to be a blanket `pointer-events:none` on :not(.is-active) in CSS.)
+        card.style.pointerEvents = op > 0.15 ? 'auto' : 'none';
       });
 
-      // only the centred card is interactive. (This used to start and stop a video per card too;
-      // the cards carry still artwork now, so there is nothing left to play.)
+      // .is-active still marks the CENTRED card (the arc's focal point); it no longer decides
+      // what is clickable - see the pointer-events line above.
       if (nearest !== active) {
         active = nearest;
         cards.forEach((card, i) => card.classList.toggle('is-active', i === active));
