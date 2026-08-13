@@ -603,6 +603,12 @@ ul, ol { list-style: none; padding: 0; }
   overflow-x: clip; overflow-y: visible;
 }
 .pstack.is-driven .pcard { grid-area: 1 / 1; opacity: 0; will-change: transform, opacity; }
+/* The cards carry .reveal so that on a phone - where the arc stands down and the section is a
+   plain column - they simply rise into place one after another, the way everything else on the
+   site arrives. While the ARC is driving them, that must not apply: the driver rewrites transform
+   and opacity every frame, and .reveal.is-in's .7s transition would make the whole arc lag a beat
+   behind the scroll. The inline styles already win on the values; this cancels the transition. */
+.pstack.is-driven .pcard.reveal.is-in { transition: none; }
 
 .pcard {
   width: min(46vw, 600px); max-width: calc(100vw - 2 * var(--pad));
@@ -1134,13 +1140,27 @@ a.case__inner:hover .case__open span { transform: translateX(3px); }
   .hdr:not(.hdr--float) .hdr__cta { display: none; }
   /* the "EdTech · 2026" / "SaaS · 2025" eyebrow is dropped on phones to save vertical room */
   .case__year { display: none; }
-  .hero { min-height: auto; padding-top: calc(var(--hdr-h) + 3rem); padding-bottom: 3.5rem; }
+  /* The hero holds a whole screen on a phone too, and its block sits in the MIDDLE of it. The
+     padding stays symmetric on purpose: `justify-content: center` centres inside the padding box,
+     so an asymmetric pair silently pushes the block off the middle - which is what the old
+     `min-height: auto` + 3rem/3.5rem pair was doing. svh, not vh, so the mobile browser's
+     collapsing address bar cannot make the first screen taller than the screen. */
+  .hero { min-height: 100svh; padding-block: calc(var(--hdr-h) + 1.5rem); }
   .hero__stage { align-items: flex-start; }
+  /* the projects start closer under the hero than the desktop rhythm wants */
+  .pstack:not(.is-driven) .pstack__pin { padding-block: clamp(1.25rem, 6vw, 2.5rem); }
   /* one column: the words, then the portrait under them */
   .hero__stage { grid-template-columns: minmax(0, 1fr); gap: clamp(1.5rem, 6vw, 2.5rem); }
   .hero__portrait { justify-self: center; margin-right: 0; --pw: min(74vw, 348px); }
   .hero__note { margin-top: 3rem; }
   .hero__sub { position: static; margin-top: 1.75rem; max-width: 32rem; transform: none !important; }
+
+  /* About, on a phone only: the laptop photo leads. The one-column stack above (max-width: 900px)
+     pulls the piano up first with `order: -1`, which is the tablet order and stays; here the right
+     column goes back to its natural place and the laptop photo climbs above the text instead, so
+     the section reads photo -> words -> photo. */
+  .glimpse__right { order: 0; }
+  .glimpse__left .glimpse__photo { order: -1; }
 }
 
 @media (max-width: 520px) {

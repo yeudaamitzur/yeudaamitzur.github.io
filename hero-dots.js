@@ -174,6 +174,9 @@ const ctx = canvas ? canvas.getContext('2d') : null;
 const offc = document.createElement('canvas');
 const offx = offc.getContext('2d', { willReadFrequently: true });
 let dots = [], letters = [], letterHot = [], letterOn = [], letterLift = [], cw = 0, ch = 0, dotR = 3;
+// 0.52 is Yehuda's tuned weight for the line at its full size. Small type carries fewer dots per
+// stroke, so at that size the same alpha reads as a whisper - see the note in buildDots.
+let inkAlpha = 0.52;
 let textRight = 0, textMidY = 0, textH = 0, entryStart = 0, hoverLetter = -1;
 let inkSprite = null, purpleSprite = null, spriteSize = 0;
 let mouseHX = -9999, mouseHY = -9999;   // cursor in hero coords (for the letter "push")
@@ -189,7 +192,7 @@ function makeSprites() {
   // draw loop already spends its alpha on the foot-fade and a second multiply per dot would cost a
   // state change on every one of them. The purple below stays at full strength - the point of the
   // hover is that the letter you touch comes forward out of a quieter line.
-  ic.fillStyle = 'rgba(24,22,15,0.52)';
+  ic.fillStyle = `rgba(24,22,15,${inkAlpha})`;
   ic.beginPath(); ic.arc(spriteSize / 2, spriteSize / 2, dotR, 0, 6.283); ic.fill();
 
   purpleSprite = document.createElement('canvas');
@@ -213,21 +216,58 @@ function buildDots() {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   offc.width = cw; offc.height = ch;
 
-  const vw = window.innerWidth;
-  let fs = clamp(vw * 0.16, 52, 200);
-  const setFont = (c) => { c.font = `700 ${fs}px 'Hanken Grotesk', system-ui, sans-serif`; };
-  setFont(offx);
   const maxW = (line2.clientWidth || cw) - 6;
-  let tw = offx.measureText(TEXT).width;
-  if (tw > maxW) { fs = fs * (maxW / tw); setFont(offx); tw = offx.measureText(TEXT).width; }
+  const fontAt = (px) => `700 ${px}px 'Hanken Grotesk', system-ui, sans-serif`;
+  // width of a string at 100px, so a fitted size is one division rather than a search
+  const w100 = (s) => { offx.font = fontAt(100); return offx.measureText(s).width; };
+  // the size at which the WIDEST of these lines exactly fills the column
+  const fitFor = (parts) => (maxW / Math.max(...parts.map(w100))) * 100;
+
+  // Split the words into n lines, balanced: of every way to cut the word list into n runs, take
+  // the one whose widest run is narrowest. Four words and at most three lines, so this is a
+  // handful of comparisons - no need for anything cleverer.
+  const words = TEXT.split(' ');
+  const splitInto = (n) => {
+    if (n <= 1 || words.length < n) return [TEXT];
+    let best = null, bestW = Infinity;
+    const cuts = (start, left, acc) => {
+      if (left === 1) {
+        const parts = acc.concat([words.slice(start).join(' ')]);
+        const w = Math.max(...parts.map(w100));
+        if (w < bestW) { bestW = w; best = parts; }
+        return;
+      }
+      for (let i = start + 1; i <= words.length - left + 1; i++)
+        cuts(i, left - 1, acc.concat([words.slice(start, i).join(' ')]));
+    };
+    cuts(0, n, []);
+    return best;
+  };
+
+  // ---- How many lines. -------------------------------------------------------------------
+  // On a phone the whole sentence on one line solves to ~28px, and letterforms that small carry
+  // barely one dot across a stroke - the shapes stop resolving and the line is not readable,
+  // which is the one job it has. So a single line is kept only while it solves above the floor;
+  // below that the sentence is set over two. It stops at two on purpose: the line is meant to sit
+  // at the same WEIGHT it has on a desktop, not to grow into a poster, and three lines of ~83px
+  // was exactly that. On any desktop the one-line fit is ~90px, well clear of the floor, so this
+  // changes nothing there - the wrap is reached by width, not by a breakpoint.
+  const READABLE_FS = 40;
+  let lineTexts = [TEXT], fs = Math.min(fitFor(lineTexts), 200);
+  if (fs < READABLE_FS) { lineTexts = splitInto(2); fs = Math.min(fitFor(lineTexts), 200); }
+  const setFont = (c) => { c.font = fontAt(fs); };
+  setFont(offx);
+
   // The box the type is drawn into. 1.28 gave it a quarter of a line of air above and below, which
   // read as spacing nobody had asked for - the ink is only ~0.72em tall, so the rest was padding.
   // 1.04 keeps just enough for the descenders in "g" and "y" and nothing more.
-  textH = Math.round(fs * 1.04);
+  const lineH = Math.round(fs * 1.04);
+  textH = lineH * lineTexts.length;
   line2.style.height = textH + 'px';
 
   const wrapRect = line2.getBoundingClientRect();
   textRight = Math.round(wrapRect.right - heroRect.left) - 2;
+  const boxTop = Math.round(wrapRect.top - heroRect.top);
   textMidY = Math.round(wrapRect.top + wrapRect.height / 2 - heroRect.top);
 
   offx.setTransform(1, 0, 0, 1, 0, 0);
@@ -235,14 +275,22 @@ function buildDots() {
   offx.fillStyle = '#000';
   setFont(offx);
   offx.textBaseline = 'middle'; offx.textAlign = 'right';
-  offx.fillText(TEXT, textRight, textMidY);
 
+  // Every line is right-aligned to the same edge, the way the single line always was, and each
+  // letter carries its own row band as well as its column so the hover hit-test cannot pick a
+  // letter sitting above or below the pointer once there is more than one line.
   letters = [];
-  const leftEdge = textRight - tw;
-  for (let i = 0; i < TEXT.length; i++) {
-    letters.push({ x0: leftEdge + offx.measureText(TEXT.slice(0, i)).width,
-                   x1: leftEdge + offx.measureText(TEXT.slice(0, i + 1)).width, cx: 0, cy: textMidY });
-  }
+  lineTexts.forEach((lineText, n) => {
+    const midY = boxTop + lineH * n + lineH / 2;
+    offx.fillText(lineText, textRight, midY);
+    const leftEdge = textRight - offx.measureText(lineText).width;
+    for (let i = 0; i < lineText.length; i++) {
+      letters.push({ x0: leftEdge + offx.measureText(lineText.slice(0, i)).width,
+                     x1: leftEdge + offx.measureText(lineText.slice(0, i + 1)).width,
+                     y0: boxTop + lineH * n, y1: boxTop + lineH * (n + 1),
+                     cx: 0, cy: midY });
+    }
+  });
   // letterHot = eased COLOUR (sticky: stays purple until the letter is touched again)
   // letterLift = eased MOTION (only while the cursor is actually on the letter)
   // letterOn   = the toggled purple state itself, preserved across rebuilds where possible
@@ -252,10 +300,20 @@ function buildDots() {
   letterOn = new Array(letters.length).fill(0).map((v, i) => (prevOn && prevOn[i]) || 0);
 
   const data = offx.getImageData(0, 0, cw, ch).data;
-  // Sparser than it was: 4px on desktop and 3px on mobile, against the original 3 and 2. That is
-  // roughly half the dots, which is what "less dense" has to mean at a fixed dot size - the grid
-  // opens up and the letters read as drawn IN dots rather than as solid type.
-  const stepPx = fs >= 130 ? 4 : 3;
+  // ---- Density and ink, which are what decide whether the line READS. ---------------------
+  // The grid is deliberately open - Yehuda asked for fewer dots and a lighter ink, and at the
+  // line's full size that is what gives it its character: a word drawn IN dots rather than solid
+  // type. But the stride was a fixed 3px at every size, and legibility does not live in the
+  // stride, it lives in how many dots land across a stroke. At ~90px that is four dots and the
+  // word is unmistakable; at the ~44px a phone solves for, the same 3px grid puts barely two
+  // there and the sentence dissolves. So the stride is tied to the type size instead - 90px
+  // still gets 3 and anything past 130px still gets 4, exactly as tuned, while small type gets 2
+  // and keeps the same dots-per-stroke the big line has.
+  const stepPx = Math.max(2, Math.round(fs / 30));
+  // Same reasoning for the ink: fewer, smaller dots per letter means less of them to carry the
+  // 0.52, so the line comes out fainter than the one on a desktop rather than matching it. Small
+  // type is inked up to compensate, so what a reader sees is as plain on a phone as on a laptop.
+  inkAlpha = fs >= 70 ? 0.52 : 0.72;
   dotR = 1;                           // 2px dots, capped - small and crisp
   const maxDist = Math.max(ch * 0.55, 280);
 
@@ -264,7 +322,7 @@ function buildDots() {
     for (let x = 0; x < cw; x += stepPx) {
       if (data[(y * cw + x) * 4 + 3] > 130) {
         let li = -1;
-        for (let k = 0; k < letters.length; k++) { if (x >= letters[k].x0 && x < letters[k].x1) { li = k; break; } }
+        for (let k = 0; k < letters.length; k++) { if (x >= letters[k].x0 && x < letters[k].x1 && y >= letters[k].y0 && y < letters[k].y1) { li = k; break; } }
         const ang = Math.random() * 6.283, dist = 120 + Math.random() * maxDist;
         // bias the scatter downward so the dots gather behind what follows as you scroll
         const oyBias = dist * 0.55;
@@ -399,7 +457,8 @@ if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
       const lx = e.clientX - hr.left;
       mouseHX = lx; mouseHY = e.clientY - hr.top;
       let found = -1;
-      for (let k = 0; k < letters.length; k++) { if (lx >= letters[k].x0 && lx < letters[k].x1) { found = k; break; } }
+      const ly = e.clientY - hr.top;
+      for (let k = 0; k < letters.length; k++) { if (lx >= letters[k].x0 && lx < letters[k].x1 && ly >= letters[k].y0 && ly < letters[k].y1) { found = k; break; } }
       // toggle on ENTER only: a touched letter turns purple and stays purple until touched again
       if (found !== hoverLetter) {
         if (found >= 0 && letterOn.length > found) letterOn[found] = letterOn[found] ? 0 : 1;
@@ -449,8 +508,14 @@ if (pstack) {
     // count and handed to CSS as --ptail, so adding a project to the stack needs no second edit.
     const TAIL = cards.length + 0.4;
     const D2R = Math.PI / 180;
-    pstack.style.setProperty('--ptail', String(TAIL));
-    pstack.classList.add('is-driven');
+    // The arc is a DESKTOP motion. On a phone Yehuda asked for the plain thing instead: the
+    // projects simply arrive one under the other as you scroll. Below this width the driver
+    // stands down completely and the section falls back to its own CSS column
+    // (.pstack:not(.is-driven)), with the site's ordinary .reveal doing the arriving. Kept live
+    // on resize, so turning a phone - or dragging a desktop window narrow - lands on the right
+    // one either way, and every inline style the arc wrote is handed back when it stands down.
+    const wide = window.matchMedia('(min-width: 761px)');
+    let driven = false;
 
     let active = -1, pRaf = null;
     const place = () => {
@@ -494,10 +559,27 @@ if (pstack) {
         cards.forEach((card, i) => card.classList.toggle('is-active', i === active));
       }
     };
-    const onPStack = () => { if (pRaf === null) pRaf = requestAnimationFrame(place); };
+    const onPStack = () => { if (driven && pRaf === null) pRaf = requestAnimationFrame(place); };
+    const sync = () => {
+      if (wide.matches === driven) return;
+      driven = wide.matches;
+      pstack.classList.toggle('is-driven', driven);
+      if (driven) {
+        pstack.style.setProperty('--ptail', String(TAIL));
+        place();
+      } else {
+        pstack.style.removeProperty('--ptail');
+        active = -1;
+        cards.forEach((c) => {
+          c.style.transform = ''; c.style.opacity = ''; c.style.zIndex = ''; c.style.pointerEvents = '';
+          c.classList.add('is-active');
+        });
+      }
+    };
     window.addEventListener('scroll', onPStack, { passive: true });
-    window.addEventListener('resize', onPStack);
-    place();
+    window.addEventListener('resize', () => { sync(); onPStack(); });
+    if (wide.addEventListener) wide.addEventListener('change', sync);
+    sync();
   } else {
     // reduced motion: the section is a plain column (no .is-driven), so every card is simply there
     cards.forEach((c) => c.classList.add('is-active'));
