@@ -13,7 +13,7 @@
   <meta property="og:url" content="https://yehudaamitzur.com/talmind" />
   <meta property="og:title" content="Talmind case study · Yehuda Amitzur" />
   <meta property="og:description" content="Talmind is a tablet app that brings authentic Talmud study into Korean classrooms, teaching the questioning, reasoning mind behind it. A UX/UI case study by Yehuda Amitzur." />
-  <meta property="og:image" content="https://yehudaamitzur.com/tile-talmind.jpg?v=136" />
+  <meta property="og:image" content="https://yehudaamitzur.com/tile-talmind.jpg?v=138" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="750" />
@@ -21,7 +21,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Talmind case study · Yehuda Amitzur" />
   <meta name="twitter:description" content="Talmind is a tablet app that brings authentic Talmud study into Korean classrooms, teaching the questioning, reasoning mind behind it. A UX/UI case study by Yehuda Amitzur." />
-  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-talmind.jpg?v=136" />
+  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-talmind.jpg?v=138" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -32,8 +32,8 @@
   <!-- The hero dashboard is the largest thing on the first screen; without this the
        browser only discovers it after the CSS has parsed, by which time the hero video
        is already pulling. -->
-  <link rel="preload" as="image" href="talmind-tablet.webp?v=136" fetchpriority="high" />
-  <link rel="stylesheet" href="styles.css?v=136" />
+  <link rel="preload" as="image" href="talmind-tablet.webp?v=138" fetchpriority="high" />
+  <link rel="stylesheet" href="styles.css?v=138" />
 
   <style>
     /* =========================================================
@@ -321,6 +321,11 @@
     .tl-col--problem .tl-block__label { color: var(--brand); }
     .tl-col--solution .tl-block__label { color: var(--ink); }
     .tl-block p { color: var(--tl-mut); font-size: 1.02rem; line-height: 1.55; margin-top: .45rem; max-width: 34rem; }
+    /* the single running paragraph that now carries each side of Problem / Solution */
+    .tl-col__text { color: var(--tl-mut); font-size: clamp(1.06rem, 1.5vw, 1.3rem); line-height: 1.6;
+      margin-top: clamp(1.2rem, 2.2vw, 1.6rem); max-width: 62rem; }
+    /* Problem and Solution now stack - the second one keeps a section-sized gap above it */
+    .tl-col--next { margin-top: clamp(2.5rem, 5.5vw, 4.5rem); }
 
     .tl-h2--brand { color: var(--brand); }
     /* headings that are meant to hold a full line rather than break at the default 20ch */
@@ -349,6 +354,10 @@
     .tl-factrow__src:hover { border-color: var(--brand); }
     .tl-factrow__src span { font-size: .85em; }
 
+    /* the tablet that closes the challenge - two thirds of the grid, centred, with air before Sketch */
+    .tl-challenge__fig { width: 66%; margin: clamp(3rem, 7vw, 6rem) auto 0; }
+    .tl-challenge__fig img { display: block; width: 100%; height: auto; }
+
     /* ---------- Sketch - the single flow sheet, three quarters of the grid, left-aligned ---------- */
     .tl-sketch__stage { margin-top: clamp(2rem, 4.5vw, 3.5rem); width: 75%; }
     .tl-sketch__stage img { display: block; width: 100%; height: auto; }
@@ -367,6 +376,7 @@
       .tl-diptych { grid-template-columns: 1fr; }
       .tl-media, .tl-brand { grid-template-columns: 1fr; }
       .tl-sketch__stage { width: 100%; }
+      .tl-challenge__fig { width: 100%; }
       .tl-dip-arrow { transform: rotate(90deg); }
       .tl-users, .tl-metrics { grid-template-columns: 1fr; }
       .tl-srow { grid-template-columns: 1fr; gap: .5rem; }
@@ -422,7 +432,7 @@
       <a class="tl-rail__dot" href="#gemara" aria-label="What is Talmud"></a>
       <a class="tl-rail__dot" href="#problem" aria-label="Problem & solution"></a>
       <a class="tl-rail__dot" href="#challenge" aria-label="The challenges"></a>
-      <a class="tl-rail__dot" href="#exertion" aria-label="The home screen"></a>
+      <a class="tl-rail__dot" href="#home-final" aria-label="The home screen"></a>
       <a class="tl-rail__dot" href="#quiz" aria-label="The quiz"></a>
       <a class="tl-rail__dot" href="#lessons" aria-label="The lessons"></a>
       <span class="tl-rail__dot tl-rail__cap" aria-hidden="true"></span>
@@ -452,7 +462,7 @@
              4476px, 2.5 MB PNG - it has to keep its alpha (56% of it is transparent), so a
              256-colour PNG was the obvious shrink and it banded the hand badly. WebP keeps
              the alpha at full colour. talmind-tablet-only.png stays on disk as the master. -->
-        <img class="tl-tablet__img" src="talmind-tablet.webp?v=136" width="2240" height="967"
+        <img class="tl-tablet__img" src="talmind-tablet.webp?v=138" width="2240" height="967"
              fetchpriority="high" decoding="async"
              alt="Tablet running the Talmind home screen" />
       </div>
@@ -466,7 +476,7 @@
       <dl class="tl-meta reveal">
         <div><dt>Platform</dt><dd>Classroom tablet app</dd></div>
         <div><dt>Role</dt><dd>UX/UI · Branding</dd></div>
-        <div><dt>Timeline</dt><dd>One month, end to end</dd></div>
+        <div><dt>Timeline</dt><dd>Three months, end to end</dd></div>
         <div><dt>Tools</dt><dd>Figma</dd></div>
       </dl>
     </section>
@@ -518,31 +528,19 @@
       </div>
     </section>
 
-    <!-- ===== THE PROBLEM / THE SOLUTION (two columns) ===== -->
+    <!-- ===== PROBLEM / SOLUTION (stacked, one under the other) ===== -->
     <section class="tl-section tl-wrap" id="problem">
-      <div class="tl-cols">
-        <div class="tl-col tl-col--problem reveal">
-          <h2 class="tl-h2">The Problem</h2>
-          <div class="tl-block"><span class="tl-block__label">Teachers</span>
-            <p>Knowledge gaps and limited cultural context lead to an approach that overlooks the fundamental
-              principles, and that makes the material hard to teach well.</p></div>
-          <div class="tl-block"><span class="tl-block__label">Students</span>
-            <p>Cultural norms make students hesitate to ask questions in front of their peers, so they miss the
-              deeper learning that asking would open up.</p></div>
-          <div class="tl-block"><span class="tl-block__label">Parents</span>
-            <p>Struggle to determine whether their children truly understand the material, develop critical
-              thinking, and actively ask questions.</p></div>
-        </div>
-        <div class="tl-col tl-col--solution reveal">
-          <h2 class="tl-h2">The Solution</h2>
-          <div class="tl-block"><span class="tl-block__label">Teachers</span>
-            <p>A proper connection to authentic Talmudic topics, with a clear two-stage learning path: first
-              embedding the dry fundamentals clearly, then moving to the more interesting and deeper material.</p></div>
-          <div class="tl-block"><span class="tl-block__label">Students</span>
-            <p>A critical pedagogy that actively encourages asking questions, with ongoing feedback on progress.</p></div>
-          <div class="tl-block"><span class="tl-block__label">Parents</span>
-            <p>Clear tracking of three parameters measuring their children's skill improvement.</p></div>
-        </div>
+      <div class="tl-col tl-col--problem reveal">
+        <h2 class="tl-h2">Problem</h2>
+        <p class="tl-col__text">Gaps in knowledge and a limited cultural context lead to an approach that ignores
+          core principles, making it hard to learn the material effectively. Additionally, social norms make
+          students hesitant to ask questions in front of their peers, so they miss out on deeper learning.</p>
+      </div>
+      <div class="tl-col tl-col--solution tl-col--next reveal">
+        <h2 class="tl-h2">Solution</h2>
+        <p class="tl-col__text">The experience connects to authentic Talmudic topics using a simple two-step path:
+          first, getting a clear grip on the dry facts, and then diving into the more engaging and deeper parts of
+          the material.</p>
       </div>
       <p class="tl-statement reveal">To ensure fit and profitability, I have currently focused the product on the
         student side and it will serve as a classroom pilot allowing teachers to track real-world progress and
@@ -572,6 +570,12 @@
           analyze each Talmudic section and automatically adapt its content to each learning level, so that the game
           structure itself will never have to change.</p>
       </div>
+      <!-- the drag-and-match board on a tablet, closing the challenge before the sketch -->
+      <div class="tl-challenge__fig reveal">
+        <img src="talmind-game-tablet.png?v=138" width="2400" height="1654"
+             alt="The drag-and-match game board on a tablet, a card being dragged onto the Torah Source category"
+             loading="lazy" />
+      </div>
     </section>
 
     <!-- ===== SKETCH - the flow sheet, worked out by hand ===== -->
@@ -580,28 +584,12 @@
       <p class="tl-lead reveal">Before a single pixel: The flow of the three steps of lesson preparation, the daily
         quiz, and the drag-and-match game, which were initially developed manually.</p>
       <div class="tl-sketch__stage reveal">
-        <img src="talmind-sketch-flow.jpg?v=136" width="1700" height="1030"
+        <img src="talmind-sketch-flow.jpg?v=138" width="1700" height="1030"
              alt="A hand sketch of the flow: first a video, then a quiz game, then a game the student will never forget"
              loading="lazy" />
       </div>
     </section>
 
-
-    <!-- ===== HOME - EXERTION (the first pass, and why it was dropped) ===== -->
-    <section class="tl-section tl-wrap" id="exertion">
-      <div class="tl-media">
-        <div class="tl-media__body reveal">
-          <h2 class="tl-h2">Home - Exertion</h2>
-          <p class="tl-lead">I initially considered allowing direct lesson access from the homepage, but decided to
-            lock it until preparation is complete to ensure all students start the lesson equally prepared</p>
-        </div>
-        <div class="tl-media__fig reveal">
-          <img src="talmind-home-exertion.jpg?v=136" width="1760" height="1291"
-               alt="The first pass at the home screen, with today's lesson openable straight from the dashboard"
-               loading="lazy" />
-        </div>
-      </div>
-    </section>
 
     <!-- ===== HOME - FINAL DESIGN ===== -->
     <section class="tl-section tl-wrap" id="home-final">
@@ -643,9 +631,10 @@
     <!-- ===== GAME ===== -->
     <section class="tl-section tl-wrap" id="game">
       <h2 class="tl-h2 reveal">Game</h2>
-      <p class="tl-lead reveal">To reduce development costs for a game targeting 4th to 12th graders, I opted for a
-        simple drag-and-drop mechanics. This allowed me to easily scale the difficulty based on the complexity of the
-        concepts.<br />and to be honest, I was also inspired by the Duolingo app on how to teach in a fun way.</p>
+      <p class="tl-lead reveal">To reduce development costs for a game targeting 4th to 12th graders, as a first step
+        I chose a simple drag-and-drop mechanics. This allowed me to easily scale the difficulty based on the
+        complexity of the concepts.<br />and to be honest, I was also inspired by the Duolingo app on how to teach in
+        a fun way.</p>
       <figure class="tl-shot reveal">
         <img src="talmind-game.jpg" width="3840" height="2400" alt="The Talmind drag-and-match game board" loading="lazy" />
       </figure>
@@ -664,15 +653,31 @@
       </figure>
     </section>
 
+    <!-- ===== HOME - EXERTION (the first pass, and why it was dropped) ===== -->
+    <section class="tl-section tl-wrap" id="exertion">
+      <div class="tl-media">
+        <div class="tl-media__body reveal">
+          <h2 class="tl-h2">Home - Exertion</h2>
+          <p class="tl-lead">I initially considered allowing direct lesson access from the homepage, but decided to
+            lock it until preparation is complete to ensure all students start the lesson equally prepared</p>
+        </div>
+        <div class="tl-media__fig reveal">
+          <img src="talmind-home-exertion.jpg?v=138" width="1760" height="1291"
+               alt="The first pass at the home screen, with today's lesson openable straight from the dashboard"
+               loading="lazy" />
+        </div>
+      </div>
+    </section>
+
     <!-- ===== BRANDING - the name being built, and the icon on a home screen ===== -->
     <section class="tl-section tl-wrap" id="brand">
       <div class="tl-brand">
         <div class="tl-brand__card tl-brand__card--word reveal">
-          <img src="talmind-brand-word.jpg?v=136" width="1561" height="1792"
+          <img src="talmind-brand-word.jpg?v=138" width="1561" height="1792"
                alt="How the name was built: Talmud plus mind becomes Talmind" loading="lazy" />
         </div>
         <div class="tl-brand__card tl-brand__card--phone reveal">
-          <img src="talmind-brand-phone.jpg?v=136" width="1600" height="1067"
+          <img src="talmind-brand-phone.jpg?v=138" width="1600" height="1067"
                alt="The Talmind app icon on an iPhone home screen" loading="lazy" />
         </div>
       </div>
@@ -722,7 +727,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=136"></script>
+  <script src="script.js?v=138"></script>
   <script>
     /* ---- Talmind case-study interactions (page-scoped) ---- */
     (function () {
