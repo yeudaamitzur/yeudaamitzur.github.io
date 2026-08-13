@@ -13,7 +13,7 @@
   <meta property="og:url" content="https://yehudaamitzur.com/bianca" />
   <meta property="og:title" content="Bianca case study · Yehuda Amitzur" />
   <meta property="og:description" content="Bianca is a restaurant management dashboard built around the decisions a manager has to make first thing in the morning. A UX/UI case study by Yehuda Amitzur." />
-  <meta property="og:image" content="https://yehudaamitzur.com/tile-bianca.jpg?v=140" />
+  <meta property="og:image" content="https://yehudaamitzur.com/tile-bianca.jpg?v=141" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="750" />
@@ -21,7 +21,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Bianca case study · Yehuda Amitzur" />
   <meta name="twitter:description" content="Bianca is a restaurant management dashboard built around the decisions a manager has to make first thing in the morning. A UX/UI case study by Yehuda Amitzur." />
-  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-bianca.jpg?v=140" />
+  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-bianca.jpg?v=141" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -32,8 +32,8 @@
   <!-- The hero dashboard is the largest thing on the first screen; without this the
        browser only discovers it after the CSS has parsed, by which time the hero video
        is already pulling. -->
-  <link rel="preload" as="image" href="bianca-hero.webp?v=140" fetchpriority="high" />
-  <link rel="stylesheet" href="styles.css?v=140" />
+  <link rel="preload" as="image" href="bianca-hero.webp?v=141" fetchpriority="high" />
+  <link rel="stylesheet" href="styles.css?v=141" />
 
   <style>
     /* =========================================================
@@ -336,7 +336,7 @@
              2880px wide - far more pixels than this can ever show, and it would race the hero
              video for bandwidth. bianca-hero.jpg is still on disk as the full-size master.
              Redesigned dashboard, 13.08.2026 - the previous export is in versions/bianca-home-v1/. -->
-        <img class="bn-tablet__img" src="bianca-hero.webp?v=140" width="1600" height="1407"
+        <img class="bn-tablet__img" src="bianca-hero.webp?v=141" width="1600" height="1407"
              fetchpriority="high" decoding="async"
              alt="The Bianca restaurant management dashboard" />
       </div>
@@ -411,7 +411,7 @@
         need to <span class="hl">decide fast in the morning</span> rather than analyze deeply. The dashboard is built
         around action: what needs attention right now.</p>
       <figure class="bn-shot reveal">
-        <img src="bianca-home.jpg?v=140" width="2880" height="2532" alt="The Bianca dashboard: the restaurant's whole day at a glance" loading="lazy" />
+        <img src="bianca-home.jpg?v=141" width="2880" height="2532" alt="The Bianca dashboard: the restaurant's whole day at a glance" loading="lazy" />
       </figure>
       <p class="bn-body reveal" style="margin-top: clamp(1.9rem, 3.6vw, 2.6rem);"><b>Separating critical from important.</b>
         To reduce the cognitive load the research identified, I clearly separated Critical Alerts, shown first at the
@@ -501,15 +501,17 @@
     </section>
 
     <!-- ===== NEXT PROJECT - the loop, handed over before the contact ask ===== -->
-    <section class="nxt nxt--ds" aria-label="Next project">
+    <!-- Pointed at the Design System case study until 13.08.2026, when that page was retired and
+         its two surviving foundations moved into Talmind. The loop is Talmind -> Bianca -> TrailDesk. -->
+    <section class="nxt nxt--traildesk" aria-label="Next project">
       <div class="nxt__inner reveal">
-        <a class="nxt__link" href="/design-system">
+        <a class="nxt__link" href="/traildesk">
           <span class="nxt__text">
             <span class="nxt__name">Next project<i class="nxt__arrow" aria-hidden="true">→</i></span>
-            <span class="nxt__desc"><b>DESIGN SYSTEM</b> tokens, components and a developer handoff</span>
+            <span class="nxt__desc"><b>TRAILDESK</b> finding a public place you can actually work from</span>
           </span>
           <span class="nxt__frame">
-            <img class="nxt__img" src="tile-ds.jpg?v=140" width="1200" height="750" alt="" loading="lazy" />
+            <img class="nxt__img" src="tile-traildesk.jpg?v=141" width="1200" height="750" alt="" loading="lazy" />
           </span>
         </a>
       </div>
@@ -531,7 +533,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=140"></script>
+  <script src="script.js?v=141"></script>
   <script>
     /* ---- Bianca case-study interactions (page-scoped) ---- */
     (function () {

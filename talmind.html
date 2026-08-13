@@ -13,7 +13,7 @@
   <meta property="og:url" content="https://yehudaamitzur.com/talmind" />
   <meta property="og:title" content="Talmind case study · Yehuda Amitzur" />
   <meta property="og:description" content="Talmind is a tablet app that brings authentic Talmud study into Korean classrooms, teaching the questioning, reasoning mind behind it. A UX/UI case study by Yehuda Amitzur." />
-  <meta property="og:image" content="https://yehudaamitzur.com/tile-talmind.jpg?v=140" />
+  <meta property="og:image" content="https://yehudaamitzur.com/tile-talmind.jpg?v=141" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="750" />
@@ -21,7 +21,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Talmind case study · Yehuda Amitzur" />
   <meta name="twitter:description" content="Talmind is a tablet app that brings authentic Talmud study into Korean classrooms, teaching the questioning, reasoning mind behind it. A UX/UI case study by Yehuda Amitzur." />
-  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-talmind.jpg?v=140" />
+  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-talmind.jpg?v=141" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -32,8 +32,8 @@
   <!-- The hero dashboard is the largest thing on the first screen; without this the
        browser only discovers it after the CSS has parsed, by which time the hero video
        is already pulling. -->
-  <link rel="preload" as="image" href="talmind-tablet.webp?v=140" fetchpriority="high" />
-  <link rel="stylesheet" href="styles.css?v=140" />
+  <link rel="preload" as="image" href="talmind-tablet.webp?v=141" fetchpriority="high" />
+  <link rel="stylesheet" href="styles.css?v=141" />
 
   <style>
     /* =========================================================
@@ -239,6 +239,19 @@
     .tl-shot__screen { position: absolute; inset: 0; }
     .tl-shot__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 
+    /* ---------- Design system - the foundations the whole product runs on ----------
+       NOT .tl-shot: these are flat foundation exports, not screenshots of a product, so they carry
+       no frame at all - no radius, no shadow - exactly as they were set on the Design System page
+       (.ds-figure--flat). They are also tall (semantic tokens is 1168x1832), so at the full 1180px
+       wrap each would run past a screen and a half; capped, and left-aligned to the text column. */
+    .tl-sysfig { margin-top: clamp(1.6rem, 3vw, 2.25rem); margin-inline: 0; }
+    .tl-sysfig > img { display: block; width: 100%; height: auto; border-radius: 0; box-shadow: none; }
+    .tl-sysfig--color { max-width: 620px; }
+    .tl-sysfig--type  { max-width: 880px; }
+    .tl-subhead { font-family: var(--f-display); font-weight: 700;
+      font-size: clamp(1.3rem, 2.4vw, 1.8rem); line-height: 1.1; letter-spacing: -0.01em;
+      margin-top: clamp(2.5rem, 5vw, 3.75rem); }
+
     /* HOME - the three-step "prepare for today's lesson" block, laid back onto the empty dashboard
        with its status badges and progress bar, each at the exact spot it occupies in the design. */
     .tl-comp { position: absolute; z-index: 2; left: var(--comp-l); top: var(--comp-t); width: var(--comp-w); }
@@ -435,6 +448,7 @@
       <a class="tl-rail__dot" href="#home-final" aria-label="The home screen"></a>
       <a class="tl-rail__dot" href="#quiz" aria-label="The quiz"></a>
       <a class="tl-rail__dot" href="#lessons" aria-label="The lessons"></a>
+      <a class="tl-rail__dot" href="#system" aria-label="The design system"></a>
       <span class="tl-rail__dot tl-rail__cap" aria-hidden="true"></span>
     </span>
   </nav>
@@ -462,7 +476,7 @@
              4476px, 2.5 MB PNG - it has to keep its alpha (56% of it is transparent), so a
              256-colour PNG was the obvious shrink and it banded the hand badly. WebP keeps
              the alpha at full colour. talmind-tablet-only.png stays on disk as the master. -->
-        <img class="tl-tablet__img" src="talmind-tablet.webp?v=140" width="2240" height="967"
+        <img class="tl-tablet__img" src="talmind-tablet.webp?v=141" width="2240" height="967"
              fetchpriority="high" decoding="async"
              alt="Tablet running the Talmind home screen" />
       </div>
@@ -572,7 +586,7 @@
       </div>
       <!-- the drag-and-match board on a tablet, closing the challenge before the sketch -->
       <div class="tl-challenge__fig reveal">
-        <img src="talmind-game-tablet.png?v=140" width="2400" height="1654"
+        <img src="talmind-game-tablet.png?v=141" width="2400" height="1654"
              alt="The drag-and-match game board on a tablet, a card being dragged onto the Torah Source category"
              loading="lazy" />
       </div>
@@ -584,7 +598,7 @@
       <p class="tl-lead reveal">Before a single pixel: The flow of the three steps of lesson preparation, the daily
         quiz, and the drag-and-match game, which were initially developed manually.</p>
       <div class="tl-sketch__stage reveal">
-        <img src="talmind-sketch-flow.jpg?v=140" width="1700" height="1030"
+        <img src="talmind-sketch-flow.jpg?v=141" width="1700" height="1030"
              alt="A hand sketch of the flow: first a video, then a quiz game, then a game the student will never forget"
              loading="lazy" />
       </div>
@@ -662,7 +676,7 @@
             lock it until preparation is complete to ensure all students start the lesson equally prepared</p>
         </div>
         <div class="tl-media__fig reveal">
-          <img src="talmind-home-exertion.jpg?v=140" width="1760" height="1291"
+          <img src="talmind-home-exertion.jpg?v=141" width="1760" height="1291"
                alt="The first pass at the home screen, with today's lesson openable straight from the dashboard"
                loading="lazy" />
         </div>
@@ -673,14 +687,39 @@
     <section class="tl-section tl-wrap" id="brand">
       <div class="tl-brand">
         <div class="tl-brand__card tl-brand__card--word reveal">
-          <img src="talmind-brand-word.jpg?v=140" width="1561" height="1792"
+          <img src="talmind-brand-word.jpg?v=141" width="1561" height="1792"
                alt="How the name was built: Talmud plus mind becomes Talmind" loading="lazy" />
         </div>
         <div class="tl-brand__card tl-brand__card--phone reveal">
-          <img src="talmind-brand-phone.jpg?v=140" width="1600" height="1067"
+          <img src="talmind-brand-phone.jpg?v=141" width="1600" height="1067"
                alt="The Talmind app icon on an iPhone home screen" loading="lazy" />
         </div>
       </div>
+    </section>
+
+    <!-- ===== DESIGN SYSTEM - the foundations every screen above is built on =====
+         Was its own case study until 13.08.2026. Only the two foundations that say something
+         about Talmind itself survived the move: semantic colour tokens and the type scale. The
+         component sheets stayed behind - the screens above already show what they build. -->
+    <section class="tl-section tl-wrap" id="system">
+      <h2 class="tl-h2 tl-h2--wide reveal">None of these screens were designed one at a time</h2>
+      <p class="tl-lead reveal">Every screen above is built on a full design system I made for the product: colour
+        primitives and semantic tokens as Figma Variables, one type scale, and primitive components that compose
+        into all of it. Change a primitive once and it updates everywhere it appears.</p>
+
+      <h3 class="tl-subhead reveal">Colors</h3>
+      <figure class="tl-sysfig tl-sysfig--color reveal">
+        <img src="ds-semantic.jpg?v=141" width="1168" height="1832"
+             alt="Talmind semantic tokens: brand and accents, surfaces and text, status, and game category boxes, each mapped to a primitive and a hex value"
+             loading="lazy" />
+      </figure>
+
+      <h3 class="tl-subhead reveal">Typography</h3>
+      <figure class="tl-sysfig tl-sysfig--type reveal">
+        <img src="ds-typography.jpg?v=141" width="1670" height="1544"
+             alt="The Talmind type scale: Display Large, Display, H1, H2, Subtitle, Label, Body, Caption and Tiny, each with its weight, size, usage and a sample"
+             loading="lazy" />
+      </figure>
     </section>
 
     <!-- ===== IMPACT & TAKEAWAYS - where the product went, and what it taught ===== -->
@@ -705,7 +744,7 @@
             <span class="nxt__desc"><b>BIANCA</b> restaurant management dashboard</span>
           </span>
           <span class="nxt__frame">
-            <img class="nxt__img" src="tile-bianca.jpg?v=140" width="1200" height="750" alt="" loading="lazy" />
+            <img class="nxt__img" src="tile-bianca.jpg?v=141" width="1200" height="750" alt="" loading="lazy" />
           </span>
         </a>
       </div>
@@ -727,7 +766,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=140"></script>
+  <script src="script.js?v=141"></script>
   <script>
     /* ---- Talmind case-study interactions (page-scoped) ---- */
     (function () {
