@@ -604,10 +604,19 @@ ul, ol { list-style: none; padding: 0; }
 }
 .pstack.is-driven .pcard { grid-area: 1 / 1; opacity: 0; will-change: transform, opacity; }
 /* The cards carry .reveal so that on a phone - where the arc stands down and the section is a
-   plain column - they simply rise into place one after another, the way everything else on the
-   site arrives. While the ARC is driving them, that must not apply: the driver rewrites transform
-   and opacity every frame, and .reveal.is-in's .7s transition would make the whole arc lag a beat
-   behind the scroll. The inline styles already win on the values; this cancels the transition. */
+   plain column - they arrive one after another. The site's plain reveal (18px, .7s, ease) is the
+   right thing for a paragraph and too flat for a card this size, so the cards get their own: a
+   longer rise with a touch of scale, on the same overshoot-free curve the rest of the page's
+   motion uses, so each one settles rather than snaps. They enter on their own scroll positions,
+   which is what makes them read as a sequence - no stagger delay is needed or wanted. */
+.pstack:not(.is-driven) .pcard.reveal { opacity: 0; transform: translateY(44px) scale(.965); }
+.pstack:not(.is-driven) .pcard.reveal.is-in {
+  opacity: 1; transform: none;
+  transition: opacity .8s ease, transform .9s cubic-bezier(.2, .7, .2, 1);
+}
+/* While the ARC is driving them, none of that may apply: the driver rewrites transform and
+   opacity every frame, and a transition would make the whole arc lag a beat behind the scroll.
+   The inline styles already win on the values; this cancels the transition. */
 .pstack.is-driven .pcard.reveal.is-in { transition: none; }
 
 .pcard {
@@ -1147,8 +1156,17 @@ a.case__inner:hover .case__open span { transform: translateX(3px); }
      collapsing address bar cannot make the first screen taller than the screen. */
   .hero { min-height: 100svh; padding-block: calc(var(--hdr-h) + 1.5rem); }
   .hero__stage { align-items: flex-start; }
-  /* the projects start closer under the hero than the desktop rhythm wants */
-  .pstack:not(.is-driven) .pstack__pin { padding-block: clamp(1.25rem, 6vw, 2.5rem); }
+  /* The greeting steps back on a phone. At 44px it was the same size as the dot line under it and
+     the two competed; the greeting is the small line that introduces the big one. */
+  .hero__line--1 { font-size: clamp(22px, 7.4vw, 30px); }
+  /* The projects start close under the hero, breathe between themselves, and then leave a proper
+     stretch before "A glimpse of me" - a section change needs more air than the gap between two
+     cards of the same list, which is the one thing the old single padding value could not say. */
+  .pstack:not(.is-driven) .pstack__pin {
+    gap: clamp(2.25rem, 9vw, 3.5rem);
+    padding-top: clamp(1.25rem, 6vw, 2.5rem);
+    padding-bottom: clamp(4rem, 16vw, 7rem);
+  }
   /* one column: the words, then the portrait under them */
   .hero__stage { grid-template-columns: minmax(0, 1fr); gap: clamp(1.5rem, 6vw, 2.5rem); }
   .hero__portrait { justify-self: center; margin-right: 0; --pw: min(74vw, 348px); }
@@ -1166,11 +1184,9 @@ a.case__inner:hover .case__open span { transform: translateX(3px); }
 @media (max-width: 520px) {
   .stats { gap: 1.5rem 2.5rem; }
 }
-/* 44px is the greeting's size everywhere it fits; below ~400px "Hey! I'm Yehuda" would run past
-   the gutter, so it scales with the screen instead of overflowing it. */
-@media (max-width: 400px) {
-  .hero__line--1 { font-size: 11vw; }
-}
+/* 44px is the greeting's size on a desktop. On phones the clamp in the 760px block already scales
+   it with the screen and keeps it clear of the gutter, so the old flat 11vw rule here - which was
+   larger than that clamp and overrode it - is gone. */
 /* four contact links don't fit on one line on a phone, so they sit as a balanced 2 x 2 block
    rather than 3 + 1 with a lone link underneath */
 @media (max-width: 560px) {

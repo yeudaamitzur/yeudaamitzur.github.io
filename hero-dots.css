@@ -68,6 +68,22 @@
   position: relative; align-self: stretch; width: 100%; margin: 3px 0 0;
 }
 
+/* ---- Phones. --------------------------------------------------------------------------
+   The greeting steps back. 44px is its size on a desktop, where the dot line under it solves to
+   ~90px and the greeting is plainly the small line introducing the big one. On a phone the dot
+   line solves to ~28px, so at 44px the greeting was nearly twice the size of the line it
+   introduces and the two read in the wrong order. This has to live HERE rather than in
+   styles.css: `.hero--dots .hero__line--1` above is two classes deep and this file loads last,
+   so a plain `.hero__line--1` rule in the main sheet never gets a word in. */
+@media (max-width: 760px) {
+  .hero--dots .hero__line--1 { font-size: clamp(21px, 7vw, 30px); }
+  .hero--dots .hero__line--2 { margin-top: 12px; }
+  /* the dot line's box is only fs*1.04, so "Designer"'s descender sits right on its edge - the
+     sentence needs real clearance under it, not the 8px the desktop rule gives */
+  .hero--dots .hero__sub { margin-top: 24px; }
+  .hero--dots .hero__note { margin-top: 30px; }
+}
+
 /* The sentence below: one line, centred. `max-width` has to go with the left alignment - it was
    what forced the wrap in the first place - and the size is dialled back so a single line clears
    the wrap on a laptop rather than only on a wide desktop. */

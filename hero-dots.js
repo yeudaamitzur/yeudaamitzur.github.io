@@ -245,14 +245,11 @@ function buildDots() {
   };
 
   // ---- How many lines. -------------------------------------------------------------------
-  // On a phone the whole sentence on one line solves to ~28px, and letterforms that small carry
-  // barely one dot across a stroke - the shapes stop resolving and the line is not readable,
-  // which is the one job it has. So a single line is kept only while it solves above the floor;
-  // below that the sentence is set over two. It stops at two on purpose: the line is meant to sit
-  // at the same WEIGHT it has on a desktop, not to grow into a poster, and three lines of ~83px
-  // was exactly that. On any desktop the one-line fit is ~90px, well clear of the floor, so this
-  // changes nothing there - the wrap is reached by width, not by a breakpoint.
-  const READABLE_FS = 40;
+  // ONE line, at every width. It was briefly wrapped to two on a phone to buy bigger letters, and
+  // that is not the design - the sentence is one line. What makes it readable down there is the
+  // grid and the ink below, not the type size. The wrapping machinery is kept because it is what
+  // guarantees the line fits the column at all; the floor is simply never reached.
+  const READABLE_FS = 0;
   let lineTexts = [TEXT], fs = Math.min(fitFor(lineTexts), 200);
   if (fs < READABLE_FS) { lineTexts = splitInto(2); fs = Math.min(fitFor(lineTexts), 200); }
   const setFont = (c) => { c.font = fontAt(fs); };
@@ -309,11 +306,12 @@ function buildDots() {
   // there and the sentence dissolves. So the stride is tied to the type size instead - 90px
   // still gets 3 and anything past 130px still gets 4, exactly as tuned, while small type gets 2
   // and keeps the same dots-per-stroke the big line has.
-  const stepPx = Math.max(2, Math.round(fs / 30));
+  const stepPx = fs >= 70 ? Math.max(3, Math.round(fs / 30)) : 2;
   // Same reasoning for the ink: fewer, smaller dots per letter means less of them to carry the
-  // 0.52, so the line comes out fainter than the one on a desktop rather than matching it. Small
-  // type is inked up to compensate, so what a reader sees is as plain on a phone as on a laptop.
-  inkAlpha = fs >= 70 ? 0.52 : 0.72;
+  // 0.52, so the line comes out fainter than the one on a desktop rather than matching it. Phone
+  // type is inked most of the way up to compensate - at ~28px there are only two dots across a
+  // stroke, and they have to do on their own what a dozen do at full size.
+  inkAlpha = fs >= 70 ? 0.52 : 0.88;
   dotR = 1;                           // 2px dots, capped - small and crisp
   const maxDist = Math.max(ch * 0.55, 280);
 
