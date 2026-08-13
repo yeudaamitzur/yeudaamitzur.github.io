@@ -177,6 +177,8 @@ let dots = [], letters = [], letterHot = [], letterOn = [], letterLift = [], cw 
 // 0.52 is Yehuda's tuned weight for the line at its full size. Small type carries fewer dots per
 // stroke, so at that size the same alpha reads as a whisper - see the note in buildDots.
 let inkAlpha = 0.52;
+// Square dots instead of round ones - only at phone size; see the note in makeSprites.
+let squareDots = false;
 let textRight = 0, textMidY = 0, textH = 0, entryStart = 0, hoverLetter = -1;
 let inkSprite = null, purpleSprite = null, spriteSize = 0;
 let mouseHX = -9999, mouseHY = -9999;   // cursor in hero coords (for the letter "push")
@@ -193,7 +195,12 @@ function makeSprites() {
   // state change on every one of them. The purple below stays at full strength - the point of the
   // hover is that the letter you touch comes forward out of a quieter line.
   ic.fillStyle = `rgba(24,22,15,${inkAlpha})`;
-  ic.beginPath(); ic.arc(spriteSize / 2, spriteSize / 2, dotR, 0, 6.283); ic.fill();
+  // A CIRCLE is the dot everywhere the line is big. At phone size it is the reason the sentence
+  // reads furry: a 2px circle is mostly its own antialiased rim, so every letter gets a soft halo
+  // instead of an edge, and a stroke two dots wide is then all halo. A square of the same size is
+  // the same amount of ink with a hard edge, and it lands on the pixel grid instead of across it.
+  if (squareDots) ic.fillRect(spriteSize / 2 - dotR, spriteSize / 2 - dotR, dotR * 2, dotR * 2);
+  else { ic.beginPath(); ic.arc(spriteSize / 2, spriteSize / 2, dotR, 0, 6.283); ic.fill(); }
 
   purpleSprite = document.createElement('canvas');
   purpleSprite.width = purpleSprite.height = spriteSize * S;
@@ -205,6 +212,7 @@ function makeSprites() {
 function buildDots() {
   if (!canvas || !ctx || !hero || !line2) return;
   const heroRect = hero.getBoundingClientRect();
+  const prevCw = cw;
   cw = Math.round(heroRect.width);
   // the canvas runs past the foot of the hero so the scattering dots have somewhere to go; they
   // self-fade over the last stretch of it (see FADE in drawDots) rather than being cut off
@@ -306,19 +314,33 @@ function buildDots() {
   // there and the sentence dissolves. So the stride is tied to the type size instead - 90px
   // still gets 3 and anything past 130px still gets 4, exactly as tuned, while small type gets 2
   // and keeps the same dots-per-stroke the big line has.
-  const stepPx = fs >= 70 ? Math.max(3, Math.round(fs / 30)) : 2;
+  const small = fs < 70;
+  const stepPx = small ? 2 : Math.max(3, Math.round(fs / 30));
   // Same reasoning for the ink: fewer, smaller dots per letter means less of them to carry the
   // 0.52, so the line comes out fainter than the one on a desktop rather than matching it. Phone
   // type is inked most of the way up to compensate - at ~28px there are only two dots across a
   // stroke, and they have to do on their own what a dozen do at full size.
-  inkAlpha = fs >= 70 ? 0.52 : 0.88;
-  dotR = 1;                           // 2px dots, capped - small and crisp
+  inkAlpha = small ? 0.8 : 0.52;
+  // SMALLER dots at small type, and SQUARE ones. A round 2px dot on a 2px grid is mostly its own
+  // antialiased rim, so at phone size every stroke came out as a soft mass with a furry outline
+  // rather than a letter with an edge. 1.7px squares are very slightly apart, each lands as its
+  // own mark on the pixel grid, and the edge of a stroke is drawn by where the dots ARE.
+  // Three other combinations were tried and are worse, so don't rediscover them: bigger round
+  // dots (furry), the same size on a 1px grid (sharp, but solid type - the dots disappear), and
+  // small dots on the same 2px grid without squaring them (thin and hollow).
+  dotR = small ? 0.85 : 1;
+  squareDots = small;
+  // The threshold stays where it is. Raising it to trim the antialiased fringe was tried and it
+  // takes the mass of the stroke with it - at 28px the fringe IS a good part of the letter, and
+  // without it the words come out thin and broken. Sharpness comes from the dot size above and
+  // the grid below, not from throwing away half the glyph.
+  const inkCut = 130;
   const maxDist = Math.max(ch * 0.55, 280);
 
   dots = [];
   for (let y = 0; y < ch; y += stepPx) {
     for (let x = 0; x < cw; x += stepPx) {
-      if (data[(y * cw + x) * 4 + 3] > 130) {
+      if (data[(y * cw + x) * 4 + 3] > inkCut) {
         let li = -1;
         for (let k = 0; k < letters.length; k++) { if (x >= letters[k].x0 && x < letters[k].x1 && y >= letters[k].y0 && y < letters[k].y1) { li = k; break; } }
         const ang = Math.random() * 6.283, dist = 120 + Math.random() * maxDist;
@@ -335,7 +357,13 @@ function buildDots() {
   dots.forEach((d) => { if (d.li >= 0) { const L = letters[d.li]; let vx = d.hx - L.cx, vy = d.hy - L.cy; const m = Math.hypot(vx, vy) || 1; d.lx = vx / m; d.ly = vy / m; } });
 
   makeSprites();
-  entryStart = performance.now();
+  // Fly the dots in on the FIRST build, and after that only when the width changed - a width
+  // change is a real relayout (the type is re-solved and every dot has a new home), so replaying
+  // the arrival there reads as intended. A height-only change must not replay it: on a phone the
+  // address bar collapsing and expanding as you scroll fires `resize` with the same width over
+  // and over, and the whole sentence was flying in again on every one of them. The hero is sized
+  // in `svh`, so its own box does not even move when that happens - the dots simply stay put.
+  if (!entryStart || cw !== prevCw) entryStart = performance.now();
 }
 
 function drawDots() {
@@ -392,8 +420,22 @@ if (canvas && ctx) {
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(startDots).catch(startDots);
   } else { startDots(); }
-  let rt;
-  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { buildDots(); if (reduced) drawDots(); }, 160); });
+  // A phone fires `resize` on nearly every scroll, because the address bar collapsing changes
+  // innerHeight. The hero is `100svh` so its box does not move for that, and rebuilding when
+  // nothing has actually moved is pure churn - so the geometry is compared first and a resize
+  // that changes neither the hero's width nor its height does nothing at all.
+  let rt, lastW = -1, lastH = -1;
+  window.addEventListener('resize', () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => {
+      const r = hero.getBoundingClientRect();
+      const w = Math.round(r.width), h = Math.round(r.height);
+      if (w === lastW && h === lastH) return;
+      lastW = w; lastH = h;
+      buildDots();
+      if (reduced) drawDots();
+    }, 160);
+  });
 }
 
 // ---- Only the header PHOTO flies to the cursor; per-letter toggle; Instagram-style return ----
