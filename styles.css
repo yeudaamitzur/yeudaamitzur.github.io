@@ -588,9 +588,10 @@ ul, ol { list-style: none; padding: 0; }
 .pstack__pin { display: flex; flex-direction: column; align-items: center;
   gap: clamp(1.5rem, 4vw, 3rem); padding-block: clamp(3rem, 8vw, 6rem); }
 
-/* 3.4 steps: one per card, plus a 0.4 tail so the last card is held centred for a beat before the
-   section releases and the page moves on. */
-.pstack.is-driven { height: calc(100vh + 3.4 * var(--pstep)); }
+/* One step per card, plus a 0.4 tail so the last card is held centred for a beat before the
+   section releases and the page moves on. --ptail is written by the arc driver from the card
+   count (see script.js); the 3.4 fallback is the value for the three cards this started with. */
+.pstack.is-driven { height: calc(100vh + var(--ptail, 3.4) * var(--pstep)); }
 .pstack.is-driven .pstack__pin {
   position: sticky; top: 0; height: 100vh; padding-block: 0;
   display: grid; place-items: center;
@@ -717,6 +718,7 @@ ul, ol { list-style: none; padding: 0; }
 .pcard--talmind { --pc-top: rgba(173, 179, 197, .88); --pc-soft: #EEF1F8; }
 .pcard--bianca  { --pc-top: rgba(243, 178, 112, .82); --pc-soft: #FCF2E7; }
 .pcard--ds      { --pc-top: rgba(179, 236, 202, .70); --pc-soft: #EAF7F0; }
+.pcard--traildesk { --pc-top: rgba(110, 205, 214, .78); --pc-soft: #E5F5F7; }
 
 /* Only the card in the middle answers a pointer - the two parked ones are scenery, and a hover
    state on a card at 0.7 opacity, tilted and half off screen, reads as a bug. */

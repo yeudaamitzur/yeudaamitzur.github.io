@@ -642,8 +642,11 @@ if (pstack) {
     // 1.5 or beyond must already be at zero, or a third card shows behind the two mid-transition.
     // At 1.45 it was still surfacing at 3% opacity, which is exactly the heap this is meant to stop.
     const GONE = 1.4, GONE_FADE = 0.35;
-    const TAIL = 3.4;      // steps of scroll: one per card + 0.4 holding the last one centred
+    // steps of scroll: one per card + 0.4 holding the last one centred. Derived from the card
+    // count and handed to CSS as --ptail, so adding a project to the stack needs no second edit.
+    const TAIL = cards.length + 0.4;
     const D2R = Math.PI / 180;
+    pstack.style.setProperty('--ptail', String(TAIL));
     pstack.classList.add('is-driven');
 
     let active = -1, pRaf = null;
