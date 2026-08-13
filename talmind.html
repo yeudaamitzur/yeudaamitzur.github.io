@@ -247,11 +247,6 @@
     .tl-comp__badge { transform: translate(-50%, -50%); }
 
     /* ---------- Text in one column, the screen it describes in the other ---------- */
-    /* Home - Exertion reads top to bottom: heading, lead, then the shot at full grid width.
-       The crop carries its own soft edge, so no radius or shadow is added on top of it. */
-    .tl-exertion__fig { margin-top: clamp(1.75rem, 3.5vw, 2.75rem); }
-    .tl-exertion__fig img { display: block; width: 100%; height: auto; }
-
     .tl-media { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.5rem, 5vw, 4rem); align-items: start; }
     .tl-media__body > .tl-h2 { margin-top: 0; }
     .tl-media__fig img { display: block; width: 100%; height: auto; }
@@ -326,8 +321,10 @@
     .tl-col--problem .tl-block__label { color: var(--brand); }
     .tl-col--solution .tl-block__label { color: var(--ink); }
     .tl-block p { color: var(--tl-mut); font-size: 1.02rem; line-height: 1.55; margin-top: .45rem; max-width: 34rem; }
-    /* the single running paragraph that now carries each side of Problem / Solution */
-    .tl-col__text { color: var(--tl-mut); font-size: clamp(1.06rem, 1.5vw, 1.3rem); line-height: 1.6;
+    /* the single running paragraph that now carries each side of Problem / Solution -
+       same ink and same display weight as the overview paragraph, at its own size */
+    .tl-col__text { color: var(--ink); font-family: var(--f-display); font-weight: 400; letter-spacing: -0.01em;
+      font-size: clamp(1.06rem, 1.5vw, 1.3rem); line-height: 1.6;
       margin-top: clamp(1.2rem, 2.2vw, 1.6rem); max-width: 62rem; }
     /* Problem and Solution now stack - the second one keeps a section-sized gap above it */
     .tl-col--next { margin-top: clamp(2.5rem, 5.5vw, 4.5rem); }
@@ -660,13 +657,17 @@
 
     <!-- ===== HOME - EXERTION (the first pass, and why it was dropped) ===== -->
     <section class="tl-section tl-wrap" id="exertion">
-      <h2 class="tl-h2 reveal">Home - Exertion</h2>
-      <p class="tl-lead reveal">I initially considered allowing direct lesson access from the homepage, but decided to
-        lock it until preparation is complete to ensure all students start the lesson equally prepared</p>
-      <div class="tl-exertion__fig reveal">
-        <img src="talmind-home-exertion.jpg?v=138" width="1760" height="1291"
-             alt="The first pass at the home screen, with today's lesson openable straight from the dashboard"
-             loading="lazy" />
+      <div class="tl-media">
+        <div class="tl-media__body reveal">
+          <h2 class="tl-h2">Home - Exertion</h2>
+          <p class="tl-lead">I initially considered allowing direct lesson access from the homepage, but decided to
+            lock it until preparation is complete to ensure all students start the lesson equally prepared</p>
+        </div>
+        <div class="tl-media__fig reveal">
+          <img src="talmind-home-exertion.jpg?v=138" width="1760" height="1291"
+               alt="The first pass at the home screen, with today's lesson openable straight from the dashboard"
+               loading="lazy" />
+        </div>
       </div>
     </section>
 
