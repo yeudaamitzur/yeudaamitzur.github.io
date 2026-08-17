@@ -13,7 +13,7 @@
   <meta property="og:url" content="https://yehudaamitzur.com/bianca" />
   <meta property="og:title" content="Bianca case study · Yehuda Amitzur" />
   <meta property="og:description" content="Bianca is a restaurant management dashboard built around the decisions a manager has to make first thing in the morning. A UX/UI case study by Yehuda Amitzur." />
-  <meta property="og:image" content="https://yehudaamitzur.com/tile-bianca.jpg?v=144" />
+  <meta property="og:image" content="https://yehudaamitzur.com/tile-bianca.jpg?v=145" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="750" />
@@ -21,7 +21,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Bianca case study · Yehuda Amitzur" />
   <meta name="twitter:description" content="Bianca is a restaurant management dashboard built around the decisions a manager has to make first thing in the morning. A UX/UI case study by Yehuda Amitzur." />
-  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-bianca.jpg?v=144" />
+  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-bianca.jpg?v=145" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -29,11 +29,10 @@
   <!-- favicon: the same ring as the site cursor - purple stroke, lighter purple fill -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
   <link rel="canonical" href="https://yehudaamitzur.com/bianca" />
-  <!-- The hero dashboard is the largest thing on the first screen; without this the
-       browser only discovers it after the CSS has parsed, by which time the hero video
-       is already pulling. -->
-  <link rel="preload" as="image" href="bianca-hero.webp?v=144" fetchpriority="high" />
-  <link rel="stylesheet" href="styles.css?v=144" />
+  <!-- The hero dashboard is the largest thing on the first screen. It is a recording now, so what
+       gets preloaded is its poster - the first frame paints while the mp4 is still arriving. -->
+  <link rel="preload" as="image" href="bianca-critical-poster.jpg" fetchpriority="high" />
+  <link rel="stylesheet" href="styles.css?v=145" />
 
   <style>
     /* =========================================================
@@ -83,13 +82,16 @@
     .bn-hero__title b { font-weight: 800; }
     .bn-hero__title .hl { color: var(--brand); }
 
-    /* dashboard - reduced to the Figma proportion, dropped well below the title; scrolls over the pinned video */
+    /* dashboard - reduced to the Figma proportion, dropped well below the title; scrolls over the pinned video.
+       17.08.2026: the still export was replaced by the critical-alerts recording, played at 2x. It sits in
+       the same box, at the same moment, and keeps the same cursor parallax - only the media changed. */
     .bn-tablet { position: relative; z-index: 2; width: min(782px, 100%);
       margin: clamp(3.5rem, 9vw, 7rem) auto 0;
       transform-style: preserve-3d; will-change: transform, opacity;
       animation: bnTabletIn 1.15s cubic-bezier(.2,.7,.2,1) 2.2s both; }
-    .bn-tablet__img { display: block; width: 100%; height: auto; border-radius: clamp(12px, 1.5vw, 20px);
-      box-shadow: 0 44px 90px -46px rgba(40,37,30,0.55); }
+    /* with the hero line gone there is nothing above the recording, so it does not need the drop
+       that used to clear a two-line title */
+    .bn-tablet--notitle { margin-top: clamp(1.5rem, 3.5vw, 3rem); }
     @keyframes bnTabletIn {
       from { opacity: 0; transform: translateY(72px) scale(1.1); }
       to   { opacity: 1; transform: translateY(0) scale(1); }
@@ -134,18 +136,25 @@
     .bn-wire--line { stroke: #e08a2b; stroke-width: 2.2; opacity: .8; }
     .bn-wire--soft { stroke: #e6a869; stroke-width: 12; opacity: .16; }
 
-    /* glass frame - glass spec, but padding + radii matched to the "Inside the project" cards */
+    /* glass frame - every video on the page sits in this one frame, the hero included.
+       17.08.2026: the border was halved (was clamp(16px, 2.6vw, 40px)) so the frame reads as a rim
+       around the recording rather than a mat under it, and the pane behind it was thinned a step
+       (0.29 -> 0.20 / 0.02 -> 0.014) so more of the page shows through. */
     .bn-videoframe { position: relative; z-index: 1; width: 100%; margin-inline: auto;
-      padding: clamp(16px, 2.6vw, 40px);
-      border-radius: clamp(20px, 2.4vw, 34px);   /* same box as .bn-shot - the only other media frame here */
-      border: 1.055px solid rgba(255, 255, 255, 0.32);
-      background: linear-gradient(308deg, rgba(65, 65, 65, 0.02) -65.63%, rgba(167, 167, 167, 0.29) 147.78%);
+      padding: clamp(8px, 1.3vw, 20px);
+      border-radius: clamp(20px, 2.4vw, 34px);
+      border: 1.055px solid rgba(255, 255, 255, 0.28);
+      background: linear-gradient(308deg, rgba(65, 65, 65, 0.014) -65.63%, rgba(167, 167, 167, 0.20) 147.78%);
       box-shadow: 0 -4px 29.4px 10px rgba(217, 130, 43, 0.10);
       -webkit-backdrop-filter: blur(13.72px); backdrop-filter: blur(13.72px); }
-    /* the inner radius matches .bn-shot > img exactly - at phone widths a flat 20px read far
-       rounder than every other screenshot on the page */
-    .bn-video { display: block; width: 100%; height: auto; aspect-ratio: 2580 / 1834;
-      object-fit: cover; border-radius: clamp(12px, 1.4vw, 18px); background: #eceae3; }
+    /* hero only: it floats over the pinned restaurant video, so it keeps the deep drop the
+       dashboard still had before it became a recording */
+    .bn-videoframe--hero { box-shadow: 0 -4px 29.4px 10px rgba(217, 130, 43, 0.10),
+      0 44px 90px -46px rgba(40,37,30,0.55); }
+    /* --ar is set per instance from the file's real pixel size, so the box is reserved before
+       the first frame arrives and nothing is cropped */
+    .bn-video { display: block; width: 100%; height: auto; aspect-ratio: var(--ar, 1600 / 1122);
+      object-fit: cover; border-radius: clamp(10px, 1.2vw, 16px); background: #eceae3; }
 
     /* ---------- Cognitive-load note ---------- */
     .bn-note p { color: var(--ink); font-family: var(--f-display); font-weight: 500;
@@ -213,12 +222,31 @@
     .bn-serifline { font-family: var(--f-serif); font-weight: 400; color: var(--ink);
       font-size: clamp(1.4rem, 2.8vw, 2rem); line-height: 1.25; letter-spacing: -0.01em; margin-top: clamp(2rem, 4vw, 3rem); }
 
-    /* Open / exposed screenshot - grey device mat, soft shadow, flat in the flow
-       (replaces the old sticky-stacking "Inside the project" cards) */
-    .bn-shot { width: 100%; margin: 0; margin-top: clamp(1.6rem, 3.2vw, 2.4rem);
-      background: #e7e5de; border-radius: clamp(20px, 2.4vw, 34px); padding: clamp(16px, 2.6vw, 40px);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 10px 36px rgba(0,0,0,0.11); }
-    .bn-shot > img, .bn-shot > video { display: block; width: 100%; height: auto; border-radius: clamp(12px, 1.4vw, 18px); }
+    /* Single screenshots - no mat, no frame, and (17.08.2026) no shadow either: the screen itself,
+       flat on the page. Radius is still computed off the grid width, the way Talmind's .tl-shot does it. */
+    .bn-shot { width: 100%; margin: 0; margin-top: clamp(1.6rem, 3.2vw, 2.4rem); }
+    .bn-shot > img, .bn-shot > video { display: block; width: 100%; height: auto;
+      border-radius: max(18px, calc((min(100vw, 1180px) - var(--pad) * 2) * 0.024)); }
+    /* the three screens that close the page stand apart, not stacked tight */
+    .bn-shot + .bn-shot { margin-top: clamp(2.5rem, 5vw, 4rem); }
+
+    /* Lead statement - the problem and the solution, each said once, in the page's display face */
+    .bn-lead { color: var(--ink); font-family: var(--f-display); font-weight: 500;
+      font-size: clamp(1.18rem, 2vw, 1.6rem); line-height: 1.42; letter-spacing: -0.01em;
+      margin-top: 1.1rem; max-width: 58rem; }
+    .bn-lead .hl { color: var(--brand); font-weight: 600; }
+
+    /* Plain section heading, one step under .bn-h2 */
+    .bn-subhead { font-family: var(--f-display); font-weight: 700; color: var(--ink);
+      font-size: clamp(1.4rem, 2.6vw, 2rem); line-height: 1.12; letter-spacing: -0.02em; }
+
+    /* Video caption - the line that names the flow you are about to watch. Bianca's own orange,
+       heavier than body copy, so it reads as the label on the recording under it. */
+    .bn-vcap { font-family: var(--f-display); font-weight: 700; color: var(--bn-orange);
+      font-size: clamp(1.15rem, 1.9vw, 1.5rem); line-height: 1.35; letter-spacing: -0.012em;
+      margin-top: clamp(1.7rem, 3.2vw, 2.5rem); }
+    /* a caption belongs to the recording under it, so the block it opens carries almost no top padding */
+    .bn-flow--tight { padding-top: clamp(.35rem, .8vw, .6rem); }
 
     @media (max-width: 760px) {
       .bn-stats, .bn-cols2 { grid-template-columns: 1fr; }
@@ -277,7 +305,7 @@
 <body class="bn">
   <!-- phones: the side rail is hidden, so progress runs along the top edge instead -->
   <div class="pgbar" aria-hidden="true"><span></span></div>
-  <a class="skip-link" href="#research">Skip to content</a>
+  <a class="skip-link" href="#problem">Skip to content</a>
 
   <!-- ===== HEADER (floating frosted pill → collapses to a badge on scroll) ===== -->
   <header class="hdr hdr--float hdr--bare" id="top">
@@ -310,9 +338,9 @@
     <span class="bn-rail__bar"><span class="bn-rail__fill"></span></span>
     <span class="bn-rail__dots">
       <a class="bn-rail__dot" href="#problem" aria-label="The problem"></a>
-      <a class="bn-rail__dot" href="#dashboard" aria-label="Solution, dashboard"></a>
-      <a class="bn-rail__dot" href="#operations" aria-label="Solution, operations"></a>
-      <a class="bn-rail__dot" href="#staff" aria-label="Solution, staff"></a>
+      <a class="bn-rail__dot" href="#dashboard" aria-label="Dashboard"></a>
+      <a class="bn-rail__dot" href="#operations" aria-label="Order products"></a>
+      <a class="bn-rail__dot" href="#staff" aria-label="Shift management"></a>
       <span class="bn-rail__dot bn-rail__cap" aria-hidden="true"></span>
     </span>
   </nav>
@@ -327,18 +355,22 @@
         </video>
       </div>
 
-      <div class="bn-hero__head" data-hero-head>
-        <p class="bn-hero__title reveal"><b>48 managers</b> and <b>572 employees</b> reported the exact same problem. <span class="hl">No one had solved it.</span></p>
-      </div>
+      <!-- The hero line ("48 managers and 572 employees...") was removed on 17.08.2026 along with
+           the whole research block it belonged to. The recording opens the page on its own now, so
+           the top margin below stands in for the space the title used to hold. -->
 
-      <div class="bn-tablet" data-tablet>
-        <!-- WebP, sized for the 782px box it actually renders in. The source export is
-             2880px wide - far more pixels than this can ever show, and it would race the hero
-             video for bandwidth. bianca-hero.jpg is still on disk as the full-size master.
-             Redesigned dashboard, 13.08.2026 - the previous export is in versions/bianca-home-v1/. -->
-        <img class="bn-tablet__img" src="bianca-hero.webp?v=144" width="1600" height="1407"
-             fetchpriority="high" decoding="async"
-             alt="The Bianca restaurant management dashboard" />
+      <div class="bn-tablet bn-tablet--notitle" data-tablet>
+        <!-- The manager clearing two critical alerts, at double speed (data-rate="2", applied in the
+             page script). Same box, same entrance, same cursor parallax the still export had.
+             bianca-hero.webp / .jpg are still on disk as the previous hero. -->
+        <figure class="bn-videoframe bn-videoframe--hero">
+          <video class="bn-video" data-rate="2" style="--ar: 1600 / 1122"
+                 autoplay muted loop playsinline preload="metadata"
+                 poster="bianca-critical-poster.jpg" width="1600" height="1122"
+                 aria-label="The Bianca dashboard: a manager clearing two critical alerts">
+            <source src="bianca-critical.mp4" type="video/mp4" />
+          </video>
+        </figure>
       </div>
     </section>
 
@@ -350,37 +382,22 @@
       <dl class="bn-meta reveal">
         <div><dt>Platform</dt><dd>restaurant management app</dd></div>
         <div><dt>Role</dt><dd>UX/UI · Branding</dd></div>
-        <div><dt>Timeline</dt><dd>6 weeks</dd></div>
+        <div><dt>Timeline</dt><dd>2 months</dd></div>
         <div><dt>Tools</dt><dd>Figma</dd></div>
       </dl>
     </section>
 
-    <!-- ===== RESEARCH ===== -->
-    <section class="bn-section bn-wrap" id="research">
-      <h2 class="bn-h2 reveal">Two weeks. Two sides of the same system.</h2>
-      <p class="bn-body reveal">To understand why running a restaurant feels so chaotic, I ran a research sprint:
-        I surveyed managers and employees separately, then cross-referenced their frustrations. The scale of the
-        problem came through immediately.</p>
-      <div class="bn-stats reveal">
-        <!-- stat__val + data-count hands these to the shared count-up in script.js - the same
-             growth the homepage "3+ years / 10+ projects" figures use -->
-        <div class="bn-stat"><b class="bn-stat__n stat__val" data-count="48">48</b><span>Quantitative survey sent to restaurant managers</span></div>
-        <div class="bn-stat"><b class="bn-stat__n stat__val" data-count="3">3</b><span>In-depth interviews conducted with managers</span></div>
-        <div class="bn-stat"><b class="bn-stat__n stat__val" data-count="572">572</b><span>Separate quantitative survey across restaurant employees</span></div>
-      </div>
-    </section>
-
-    <!-- ===== THE KEY INSIGHT ===== -->
-    <section class="bn-section bn-wrap" id="insight">
-      <span class="bn-mini reveal">The key insight</span>
-      <p class="bn-insight reveal">The information was already there. What the research found was
-        <span class="hl">cognitive load:</span> in existing interfaces, urgent and trivial blend together.</p>
-    </section>
+    <!-- The research block (the "Two weeks. Two sides of the same system." section with the 48 / 3 /
+         572 stats) and the key-insight section that followed it were removed on 17.08.2026. The page
+         now opens straight on the problem. -->
 
     <!-- ===== THE PROBLEM - the same pain, two directions ===== -->
     <section class="bn-section bn-wrap" id="problem">
       <span class="bn-mini reveal">The problem</span>
-      <h2 class="bn-h2 reveal">The same pain, experienced from opposite directions</h2>
+      <p class="bn-lead reveal">Restaurant managers face operational and human resource chaos due to a lack of
+        real-time visibility into profitability, low inventory, and high employee turnover. Tracking tasks across
+        multiple separate boards further disrupts their workflow, making day-to-day management less efficient.</p>
+      <h3 class="bn-subhead reveal" style="margin-top: clamp(2rem, 4vw, 3rem);">The same pain, experienced from opposite directions</h3>
       <div class="bn-cols2 reveal">
         <div>
           <span class="bn-collabel">Managers:</span>
@@ -403,24 +420,34 @@
       </div>
     </section>
 
-    <!-- ===== SOLUTION - DASHBOARD (home screen -> alert note -> dashboard-in-motion flow) ===== -->
-    <section class="bn-section bn-wrap" id="dashboard">
-      <span class="bn-mini reveal">Solution · Dashboard</span>
-      <h2 class="bn-h2 reveal">A dashboard built for decisions, not just data display</h2>
-      <p class="bn-body reveal">I chose a central dashboard over separate reports because the research showed managers
-        need to <span class="hl">decide fast in the morning</span> rather than analyze deeply. The dashboard is built
-        around action: what needs attention right now.</p>
-      <figure class="bn-shot reveal">
-        <img src="bianca-home.jpg?v=144" width="2880" height="2532" alt="The Bianca dashboard: the restaurant's whole day at a glance" loading="lazy" />
-      </figure>
-      <p class="bn-body reveal" style="margin-top: clamp(1.9rem, 3.6vw, 2.6rem);"><b>Separating critical from important.</b>
-        To reduce the cognitive load the research identified, I clearly separated Critical Alerts, shown first at the
-        top, from Important and Informational Alerts shown below. Urgent things look urgent, and routine things don't
-        compete with them.</p>
+    <!-- ===== THE SOLUTION - said once, before the product starts ===== -->
+    <section class="bn-section bn-wrap" id="solution">
+      <span class="bn-mini reveal">The solution</span>
+      <p class="bn-lead reveal">A central dashboard with <span class="hl">real-time insights</span> and a smart alert
+        system for all required management activities.</p>
     </section>
 
+    <!-- ===== DASHBOARD - the screen, then the two alert flows that run on it ===== -->
+    <!-- no eyebrow here: "The solution" is the label one section up, and two mini-caps in a row
+         read as a stutter -->
+    <section class="bn-section bn-wrap" id="dashboard">
+      <h2 class="bn-h2 reveal">Dashboard</h2>
+      <p class="bn-body reveal">I established a clear division between action types <span class="hl">based on
+        urgency.</span> Critical tasks trigger a red alert icon in the top bar, while the rest are divided into
+        important actions and general information that the manager needs to track.</p>
+      <figure class="bn-shot reveal">
+        <img src="bianca-dashboard.jpg" width="2200" height="1934" alt="The Bianca dashboard: revenue, diners and orders for the day, recent orders, and the Action Required column" loading="lazy" />
+      </figure>
+    </section>
+
+    <!-- outside the section on purpose: inside it, the section's bottom padding pushed the caption
+         away from the recording it names -->
+    <div class="bn-wrap">
+      <p class="bn-vcap reveal">Quick handling of two critical alerts</p>
+    </div>
+
     <!-- full-bleed: the wires must reach both screen edges, so this sits OUTSIDE .bn-wrap -->
-    <div class="bn-flow" aria-label="The Bianca dashboard in motion">
+    <div class="bn-flow bn-flow--tight" aria-label="Two critical alerts, cleared from the dashboard">
         <div class="bn-flow__wires" aria-hidden="true">
           <svg viewBox="0 0 1440 520" preserveAspectRatio="none">
             <path class="bn-wire bn-wire--soft" d="M0,300 C 260,300 380,150 720,150 C 1060,150 1180,352 1440,352" />
@@ -431,25 +458,20 @@
         </div>
       <div class="bn-wrap">
         <figure class="bn-videoframe reveal">
-          <video class="bn-video" autoplay muted loop playsinline preload="metadata" poster="bianca-mockup-1.png">
-            <source src="bianca-flow-1.mp4" type="video/mp4" />
+          <video class="bn-video" style="--ar: 1600 / 1122" autoplay muted loop playsinline
+                 preload="none" poster="bianca-critical-poster.jpg" width="1600" height="1122"
+                 aria-label="Two critical alerts cleared from the Bianca dashboard">
+            <source src="bianca-critical.mp4" type="video/mp4" />
           </video>
         </figure>
       </div>
     </div>
 
-    <!-- ===== SOLUTION - OPERATIONS (alerts-in-motion flow -> operations screen) ===== -->
-    <section class="bn-section bn-wrap" id="operations">
-      <span class="bn-mini reveal">Solution · Operations</span>
-      <h2 class="bn-h2 reveal">Menu, inventory and ordering in one place</h2>
-      <p class="bn-body reveal">Previously, managers had to jump between three disconnected sections to manage the
-        daily flow of ingredients and supplies. I unified <span class="hl">Menu management, Inventory, and Purchases</span>
-        into a single operational category, so a manager can move from "what do we have" to "what do we need to order"
-        in one place, without context-switching.</p>
-    </section>
+    <div class="bn-wrap">
+      <p class="bn-vcap reveal">Handling an &ldquo;important&rdquo; alert</p>
+    </div>
 
-    <!-- full-bleed: the wires must reach both screen edges, so this sits OUTSIDE .bn-wrap -->
-    <div class="bn-flow" aria-label="Bianca alert separation in motion">
+    <div class="bn-flow bn-flow--tight" aria-label="An important alert, handled from the dashboard">
         <div class="bn-flow__wires" aria-hidden="true">
           <svg viewBox="0 0 1440 520" preserveAspectRatio="none">
             <path class="bn-wire bn-wire--soft" d="M0,210 C 260,210 380,392 720,392 C 1060,392 1180,180 1440,180" />
@@ -460,45 +482,56 @@
         </div>
       <div class="bn-wrap">
         <figure class="bn-videoframe reveal">
-          <video class="bn-video" autoplay muted loop playsinline preload="metadata" poster="bianca-mockup-2.png">
-            <source src="bianca-flow-2.mp4" type="video/mp4" />
+          <video class="bn-video" style="--ar: 1600 / 1146" autoplay muted loop playsinline
+                 preload="none" poster="bianca-important-poster.jpg" width="1600" height="1146"
+                 aria-label="An important alert handled from the Bianca dashboard">
+            <source src="bianca-important.mp4" type="video/mp4" />
           </video>
         </figure>
       </div>
     </div>
 
-    <!-- ===== SOLUTION - STAFF MANAGEMENT (was "Inside the project"; now open & exposed) ===== -->
+    <!-- ===== ORDER PRODUCTS ===== -->
+    <section class="bn-section bn-wrap" id="operations">
+      <h2 class="bn-subhead reveal">Order products</h2>
+    </section>
+
+    <div class="bn-flow bn-flow--tight" aria-label="Ordering products in Bianca">
+        <div class="bn-flow__wires" aria-hidden="true">
+          <svg viewBox="0 0 1440 520" preserveAspectRatio="none">
+            <path class="bn-wire bn-wire--soft" d="M0,168 C 300,168 400,330 720,330 C 1040,330 1160,140 1440,140" />
+            <path class="bn-wire bn-wire--line" d="M0,168 C 300,168 400,330 720,330 C 1040,330 1160,140 1440,140" />
+            <path class="bn-wire bn-wire--soft" d="M0,212 C 300,212 400,374 720,374 C 1040,374 1160,184 1440,184" />
+            <path class="bn-wire bn-wire--line" d="M0,212 C 300,212 400,374 720,374 C 1040,374 1160,184 1440,184" />
+          </svg>
+        </div>
+      <div class="bn-wrap">
+        <figure class="bn-videoframe reveal">
+          <video class="bn-video" style="--ar: 1600 / 1122" autoplay muted loop playsinline
+                 preload="none" poster="bianca-orders-poster.jpg" width="1600" height="1122"
+                 aria-label="Ordering products from the Bianca operations screen">
+            <source src="bianca-orders.mp4" type="video/mp4" />
+          </video>
+        </figure>
+      </div>
+    </div>
+
+    <!-- ===== SHIFT MANAGEMENT ===== -->
     <section class="bn-section bn-wrap" id="staff">
-      <span class="bn-mini reveal">Solution · Staff management</span>
-      <h2 class="bn-h2 reveal">Built for high turnover</h2>
-      <p class="bn-body reveal">High employee turnover is one of the most consistent pain points managers reported.
-        I built a dedicated Staff section with <span class="hl">full transparency</span>: who's active, who isn't, and
-        how to quickly find and edit any record. An add-employee flow keeps onboarding fast even when someone joins
-        mid-week.</p>
+      <h2 class="bn-subhead reveal">Shift management</h2>
       <figure class="bn-shot reveal">
-        <img src="bianca-staff-1.jpg" width="2724" height="1937" alt="Bianca staff management: the employee directory with active, on-leave and inactive states" loading="lazy" />
+        <img src="bianca-shifts.jpg" width="2200" height="1564" alt="Bianca shift management: the morning shift team for one day, with a worker-missing flag" loading="lazy" />
       </figure>
-      <p class="bn-body reveal">Scheduling was the other half of the shared problem. Both managers and employees
-        reported not having a clear picture of the week. The weekly shift board shows the manager the whole week at a
-        glance, and shows the employee exactly when they're working, instead of leaving that information scattered
-        between a WhatsApp group and personal messages. If a shift is understaffed, the system flags it in red, so the
-        manager doesn't discover the problem at the last minute. If an employee ends a shift early, the system
-        automatically bumps them to the top of the list, in gray, with their available hours marked, so re-staffing
-        happens immediately, without manually searching for who's free.</p>
       <figure class="bn-shot reveal">
-        <img src="bianca-staff-2.jpg" width="2722" height="1936" alt="Bianca staff management: the weekly scheduling board with understaffed shifts flagged in red" loading="lazy" />
+        <img src="bianca-weekly.jpg" width="2200" height="1564" alt="Bianca shift management: the weekly board, with missing shifts flagged in red" loading="lazy" />
+      </figure>
+      <figure class="bn-shot reveal">
+        <img src="bianca-employees.jpg" width="2200" height="1564" alt="Bianca staff management: the employee directory with active, on-leave and inactive states" loading="lazy" />
       </figure>
     </section>
 
-    <!-- ===== IMPACT ===== -->
-    <section class="bn-section bn-wrap" id="impact">
-      <span class="bn-mini reveal">Impact</span>
-      <p class="bn-insight reveal" style="max-width: 34ch;">A manager opens Bianca in the morning and sees
-        <span class="hl">exactly what to do next.</span></p>
-      <p class="bn-body reveal">The urgency levels are separated, operations sit in one category, and the whole week
-        is on a single board. That turns a noisy dashboard into one a manager can act on without switching tabs or
-        hunting through menus to find out who's free.</p>
-    </section>
+    <!-- The Impact section ("A manager opens Bianca in the morning...") was removed on 17.08.2026.
+         The page now closes on the last shift screen and hands straight over to the next project. -->
 
     <!-- ===== NEXT PROJECT - the loop, handed over before the contact ask ===== -->
     <!-- Pointed at the Design System case study until 13.08.2026, when that page was retired and
@@ -513,7 +546,7 @@
             <span class="nxt__desc"><b>TALMIND</b> a tablet learning app for Korean classrooms</span>
           </span>
           <span class="nxt__frame">
-            <img class="nxt__img" src="tile-talmind.jpg?v=144" width="1200" height="750" alt="" loading="lazy" />
+            <img class="nxt__img" src="tile-talmind.jpg?v=145" width="1200" height="750" alt="" loading="lazy" />
           </span>
         </a>
       </div>
@@ -535,7 +568,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=144"></script>
+  <script src="script.js?v=145"></script>
   <script>
     /* ---- Bianca case-study interactions (page-scoped) ---- */
     (function () {
@@ -557,7 +590,8 @@
       const railCap = document.querySelector('.bn-rail__cap');
       const targets = dots.map((d) => document.querySelector(d.getAttribute('href')));
       const revealSec = document.querySelector('#problem');   // rail appears from The problem onward
-      const endSec = document.querySelector('#impact');       // ...and is gone by Impact
+      // ...and is gone by the hand-off (this was #impact until that section was removed, 17.08.2026)
+      const endSec = document.querySelector('.nxt');
       const pgbar = document.querySelector('.pgbar');
       const pgfill = pgbar && pgbar.firstElementChild;
       function railUpdate() {
@@ -657,6 +691,33 @@
           if (!raf) raf = requestAnimationFrame(apply);
         });
         (hero || tablet).addEventListener('pointerleave', () => { if (!ready) return; tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(apply); });
+      }
+
+      // ---- Product recordings: silent, endless, and only running while you can see them ----
+      // data-rate carries a playback multiplier (the hero runs at 2x). Browsers reset the rate on
+      // some source changes, so it is re-applied on metadata and on every play.
+      const vids = Array.from(document.querySelectorAll('.bn-video'));
+      vids.forEach((v) => {
+        v.muted = true;                       // belt and braces: autoplay is refused with sound
+        const rate = parseFloat(v.dataset.rate || '1');
+        const setRate = () => { if (v.playbackRate !== rate) v.playbackRate = rate; };
+        setRate();
+        v.addEventListener('loadedmetadata', setRate);
+        v.addEventListener('play', setRate);
+      });
+      // Offscreen recordings are paused - four looping videos decoding at once is real battery for
+      // nothing. They pick up where they left off when they scroll back in.
+      if ('IntersectionObserver' in window && !reduce) {
+        const vio = new IntersectionObserver((entries) => {
+          entries.forEach((e) => {
+            const v = e.target;
+            if (e.isIntersecting) { const p = v.play(); if (p && p.catch) p.catch(() => {}); }
+            // unconditional: pausing before the first frame also clears the element's autoplay
+            // flag, which is what stops an offscreen recording from pulling its mp4 on load
+            else v.pause();
+          });
+        }, { rootMargin: '200px 0px', threshold: 0.05 });
+        vids.forEach((v) => vio.observe(v));
       }
 
       onScroll();
