@@ -48,10 +48,15 @@
              frame's own padding is subtracted from the flow block's, or a video would sit that much
              lower than a screenshot under the same heading. */
           --bn-capgap:   clamp(1.6rem, 3.2vw, 2.4rem);
-          /* ONE frame padding for every recording on the page, the hero's own. The three inside the
-             study had a wider rim of their own (--bn-framepad-in, last at clamp(15px,2.3vw,34px));
-             17.08.2026 they were set back to the hero's, so a frame is a frame wherever it appears. */
+          /* The hero's frame padding, and the study frames' - which are the SAME RIM IN PROPORTION,
+             not the same number of pixels. The hero's box caps at 880px (.bn-tablet) while the three
+             study frames run the full 1084px of the wrap, so the hero's 20px rim reads visibly
+             thinner once it is wrapped around the wider box. --bn-framepad-in scales it by exactly
+             the width ratio, 1084/880 = 1.232, and only from the viewport where .bn-tablet first
+             hits its cap (~976px); below that the two boxes are the same width, so the same padding
+             is already the same proportion and the multiplier is 1. */
           --bn-framepad: clamp(8px, 1.3vw, 20px);
+          --bn-framepad-in: var(--bn-framepad);
           --bn-shadow:  0 30px 60px -34px rgba(40,37,30,0.4);
           --bn-shadow-lift: 0 46px 84px -40px rgba(40,37,30,0.5);
           --bn-mut: rgba(40,37,30,0.55);
@@ -175,14 +180,17 @@
        17.08.2026: their shadow was two orange layers, one thrown up and one thrown down, so the card
        was lit from a direction. It is the page's near-black now, both layers at zero offset - the
        same soft edge on all four sides, which is what a card resting flat on the page looks like. */
-    /* Padding is NOT overridden here any more - these carry the hero's --bn-framepad, inherited from
-       the rule above. Only the paint differs between a hero frame and a study frame, never the rim. */
     .bn-videoframe:not(.bn-videoframe--hero) {
+      padding: var(--bn-framepad-in);
       background: linear-gradient(308deg, rgba(65, 65, 65, 0.004) -65.63%, rgba(167, 167, 167, 0.035) 147.78%);
       border-color: rgba(255, 255, 255, 0.14);
       -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
       box-shadow: 0 0 24px 2px rgba(40, 37, 30, 0.055),
         0 0 64px 10px rgba(40, 37, 30, 0.045); }
+
+    /* From here up the hero's box is pinned at 880px while the study frames keep widening, so their
+       rim is scaled to match it in proportion. See the note on --bn-framepad-in for the arithmetic. */
+    @media (min-width: 976px) { .bn { --bn-framepad-in: calc(var(--bn-framepad) * 1.232); } }
 
     /* hero only: it floats over the pinned restaurant video, so it keeps a drop under it.
        17.08.2026: back to the page's near-black after a pass in orange, but at the softer weight
