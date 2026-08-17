@@ -161,15 +161,15 @@
       /* 17.08.2026: was blur(13.72px), which turned whatever passed behind the frame into a smear.
          At 4px the glass still reads as glass, but a wire crossing behind it stays a wire. */
       -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
-    /* The pane never read the same in both places. Over the hero's bright veil the grey wash
-       disappears and the card is pure glass; over the flat cream of the page the same wash lands as
-       a visible grey mat. So the frames inside the study drop the wash entirely - what is left is the
-       rim, the orange glow, the backdrop blur, and the hero's own drop shadow. Same card, everywhere. */
-       17.08.2026: their drop is orange now, not the page near-black, and both the drop and the top
-       glow were pulled back to a little over half their weight (0.40 -> 0.22, 0.10 -> 0.055). The
-       hero keeps its dark drop - it has a photograph behind it, not cream. */
+    /* The three frames inside the study are nearly transparent - a whisper of pane, a whisper of
+       rim, a 2px backdrop blur. Fully invisible was a step too far: the recording lost its card and
+       just sat on the cream. These values are about a fifth of the hero's, which is what keeps the
+       hero reading as glass over its photograph while these read as barely-there over flat colour.
+       Their shadow is orange rather than the page near-black, at a little over half the hero's weight. */
     .bn-videoframe:not(.bn-videoframe--hero) {
-      background: none;
+      background: linear-gradient(308deg, rgba(65, 65, 65, 0.004) -65.63%, rgba(167, 167, 167, 0.035) 147.78%);
+      border-color: rgba(255, 255, 255, 0.14);
+      -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
       box-shadow: 0 -4px 29.4px 10px rgba(217, 130, 43, 0.055),
         0 40px 92px -52px rgba(191, 96, 8, 0.22); }
 
