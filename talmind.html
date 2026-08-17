@@ -368,8 +368,13 @@
     .tl-factrow__src span { font-size: .85em; }
 
     /* the tablet that closes the challenge - two thirds of the grid, centred, with air before Sketch */
-    .tl-challenge__fig { width: 66%; margin: clamp(3rem, 7vw, 6rem) auto 0; }
-    .tl-challenge__fig img { display: block; width: 100%; height: auto; }
+    /* The board rotates up from below in 3D as it enters - the entrance the single quiz screen
+       (.tl-solo) used to carry before the 12.08 rebuild, brought back on 17.08.2026 and moved onto
+       this figure. perspective on the box, the transform on the image itself. */
+    .tl-challenge__fig { width: 66%; margin: clamp(3rem, 7vw, 6rem) auto 0; perspective: 1500px; }
+    .tl-challenge__fig img { display: block; width: 100%; height: auto;
+      transform-origin: 50% 100%; transform: var(--t3d, rotateX(42deg) translateY(150px)); opacity: var(--o3d, 0);
+      will-change: transform, opacity; }
 
     /* ---------- Sketch - the single flow sheet, three quarters of the grid, left-aligned ---------- */
     .tl-sketch__stage { margin-top: clamp(2rem, 4.5vw, 3.5rem); width: 75%; }
@@ -385,6 +390,24 @@
       .tl-panel { width: 100%; }
       .tl-journey { padding-block: clamp(2.75rem, 5.5vw, 4.75rem); }
     }
+    /* ---------- Two-screen showcase - the tablets slide in from the sides ----------
+       Restored 17.08.2026, exactly as it ran before the 12.08 rebuild, minus the purple thread
+       that used to be drawn between them. Same stage, same widths, same easing. */
+    .tl-duo { position: relative; overflow: hidden; padding-block: clamp(1.5rem, 4vw, 3.25rem); }
+    .tl-duo__stage { position: relative; width: 100%; max-width: 1240px; margin-inline: auto; aspect-ratio: 1440 / 470; }
+    .tl-duo__screen { position: absolute; top: 50%; width: 49%; z-index: 2; height: auto;
+      will-change: transform; }
+    .tl-duo__screen--left  { left: -1%;  transform: translate(var(--dx, -150%), -50%); }
+    .tl-duo__screen--right { right: -1%; transform: translate(var(--dx, 150%),  -50%); z-index: 3; }
+
+    /* two-screen showcase stacks on small screens */
+    @media (max-width: 720px) {
+      .tl-duo__stage { aspect-ratio: auto; display: flex; flex-direction: column; align-items: center; gap: 1.25rem; }
+      .tl-duo__screen { position: static; width: min(420px, 86%); }
+      .tl-duo__screen--left  { transform: translateX(var(--dx, -60%)); }
+      .tl-duo__screen--right { transform: translateX(var(--dx, 60%)); }
+    }
+
     @media (max-width: 760px) {
       .tl-diptych { grid-template-columns: 1fr; }
       .tl-media, .tl-brand { grid-template-columns: 1fr; }
@@ -401,6 +424,8 @@
       .tl-hero__bg { position: absolute; }
       .tl-hero__head { position: static; }
       .tl-tablet__img { opacity: 1 !important; }
+      .tl-duo__screen { transform: translate(0, -50%) !important; }
+      .tl-challenge__fig img { transform: none !important; opacity: 1 !important; }
     }
   </style>
 </head>
@@ -502,6 +527,15 @@
         elementary, middle, and high&nbsp;school classrooms in Korea to help them acquire and adopt a Jewish mindset.</p>
     </section>
 
+    <!-- ===== TWO-SCREEN SHOWCASE (slide in from the sides) ===== -->
+    <section class="tl-duo" data-duo aria-label="Two Talmind screens">
+      <div class="tl-duo__stage">
+        <img class="tl-duo__screen tl-duo__screen--left" src="talmind-screen-lessons.png" width="1500" height="1033"
+             alt="Talmind lesson dashboard on a tablet" loading="lazy" />
+        <img class="tl-duo__screen tl-duo__screen--right" src="talmind-screen-game.png" width="1500" height="1033"
+             alt="Talmind drag-and-match game on a tablet" loading="lazy" />
+      </div>
+    </section>
 
     <!-- ===== THE JOURNEY - numbered list ===== -->
     <section class="tl-section tl-wrap" id="journey">
@@ -585,7 +619,8 @@
           structure itself will never have to change.</p>
       </div>
       <!-- the drag-and-match board on a tablet, closing the challenge before the sketch -->
-      <div class="tl-challenge__fig reveal">
+      <!-- no `reveal` here: the 3D rise below IS this figure's entrance -->
+      <div class="tl-challenge__fig" data-solo>
         <img src="talmind-game-tablet.png?v=146" width="2400" height="1654"
              alt="The drag-and-match game board on a tablet, a card being dragged onto the Torah Source category"
              loading="lazy" />
@@ -772,6 +807,7 @@
     (function () {
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
+      const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 
       // Right-side progress rail
       const railEl = document.querySelector('.tl-rail');
@@ -826,10 +862,45 @@
         heroHead.style.pointerEvents = o < 0.05 ? 'none' : '';
       }
 
+      // Two-screen showcase - vertical scroll slides the tablets in from the sides.
+      // The screens have to have ARRIVED by the time you are actually looking at them. Keyed off
+      // the section's TOP this used to finish only once the block had climbed to the middle of
+      // the screen, so you watched it still assembling as it passed you. Keyed off its MIDDLE
+      // instead - which also adapts when the block restacks on a phone - it runs from just below
+      // the fold (115%) to just fully entered (70%), and is settled while the block is still low
+      // on the screen.
+      const duo = document.querySelector('[data-duo]');
+      const duoLeft = duo && duo.querySelector('.tl-duo__screen--left');
+      const duoRight = duo && duo.querySelector('.tl-duo__screen--right');
+      function duoUpdate() {
+        if (!duo || reduce) return;
+        const r = duo.getBoundingClientRect(), vh = window.innerHeight;
+        const mid = r.top + r.height / 2;
+        const p = clamp((vh * 1.15 - mid) / (vh * 0.45), 0, 1);
+        const e = easeOutCubic(p);
+        const off = (1 - e) * 150;
+        if (duoLeft) duoLeft.style.setProperty('--dx', (-off) + '%');
+        if (duoRight) duoRight.style.setProperty('--dx', off + '%');
+      }
+
+      // The challenge board - rotates up from below in 3D as it enters. Same numbers the single
+      // quiz screen used before the 12.08 rebuild: it starts arriving at 90% of the viewport and
+      // is fully settled 60% of a screen later.
+      const solo = document.querySelector('[data-solo]');
+      const soloImg = solo && solo.querySelector('img');
+      function soloUpdate() {
+        if (!soloImg || reduce) return;
+        const r = solo.getBoundingClientRect(), vh = window.innerHeight;
+        const p = clamp((vh * 0.9 - r.top) / (vh * 0.6), 0, 1);
+        const e = easeOutCubic(p), k = 1 - e;
+        soloImg.style.setProperty('--t3d', 'rotateX(' + (k * 46).toFixed(1) + 'deg) translateY(' + (k * 150).toFixed(0) + 'px) rotateZ(' + (k * -5).toFixed(1) + 'deg) scale(' + (0.92 + 0.08 * e).toFixed(3) + ')');
+        soloImg.style.setProperty('--o3d', clamp(p * 1.6, 0, 1).toFixed(3));
+      }
+
       let ticking = false;
       function onScroll() {
         if (ticking) return; ticking = true;
-        requestAnimationFrame(() => { railUpdate(); heroFade(); ticking = false; });
+        requestAnimationFrame(() => { railUpdate(); heroFade(); duoUpdate(); soloUpdate(); ticking = false; });
       }
       window.addEventListener('scroll', onScroll, { passive: true });
       window.addEventListener('resize', onScroll);
