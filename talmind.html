@@ -231,7 +231,12 @@
        computed off the grid width instead. */
     .tl-shot { margin-top: clamp(1.75rem, 3.5vw, 2.75rem); }
     .tl-shot > img, .tl-shot__stage {
-      border-radius: max(18px, calc((min(100vw, 1180px) - var(--pad) * 2) * 0.024));
+      /* 17.08.2026: the FLOOR came down, 18px -> 11px, the same correction Bianca's .bn-shot took the
+         same day - this is the identical formula. The 0.024 term keeps the corner proportional to the
+         grid, but below ~750px it falls under the floor and the floor becomes the radius: a fixed 18px
+         on a 335px phone screenshot is 5.37% of its width against 2.40% on desktop, so the corner was
+         cutting more than twice as far into the picture on a phone. 11px lands at 3.28%. */
+      border-radius: max(11px, calc((min(100vw, 1180px) - var(--pad) * 2) * 0.024));
       box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 10px 36px rgba(0,0,0,0.11); }
     .tl-shot > img { display: block; width: 100%; height: auto; }
     /* only the home screen needs a stage: its "prepare" component is not baked into the shot */
