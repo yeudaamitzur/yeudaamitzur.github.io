@@ -858,10 +858,13 @@ ul, ol { list-style: none; padding: 0; }
   .nxt__link { grid-template-columns: 1fr; align-items: stretch; gap: 1.6rem; }
   /* down here the tile runs the full width of the wrap - which is exactly the width a Bianca video
      frame has at the same viewport. Same width means the proportion is matched by using its actual
-     numbers, so these are Bianca's own clamps rather than the percentage derivation above. */
+     numbers, so these are Bianca's own clamps rather than the percentage derivation above.
+     17.08.2026: and that is why the radius floors moved with Bianca's, 20/10 -> 14/7. On a 335px
+     phone a 20px corner is 5.97% of the tile against 3.14% on the 270px desktop tile - the corner
+     was 1.9x rounder in proportion, and cutting that much further into the cover. */
   .nxt__frame { width: 100%;
-    padding: clamp(8px, 1.3vw, 20px); border-radius: clamp(20px, 2.4vw, 34px); }
-  .nxt__img { border-radius: clamp(10px, 1.2vw, 16px); }
+    padding: clamp(8px, 1.3vw, 20px); border-radius: clamp(14px, 2.4vw, 34px); }
+  .nxt__img { border-radius: clamp(7px, 1.2vw, 16px); }
   .nxt__desc { max-width: none; }
   /* the cover goes full width again down here, so it is no longer "beside" anything */
   .nxt__link { justify-content: stretch; }
