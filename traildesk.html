@@ -82,16 +82,25 @@
       padding-bottom: clamp(1rem, 3vw, 2rem); }
     .td-hero__bg { position: fixed; top: 0; left: 50%; transform: translateX(-50%);
       width: 100vw; height: clamp(560px, 54vw, 800px); z-index: 0; overflow: hidden; pointer-events: none;
+      background: var(--bg) url("td-hero-poster.jpg?v=149") center / cover no-repeat; }
+    /* THE FOOTAGE (17.08.2026) - a park with the skyline behind it, which is the product's whole
+       subject. It sits at the bottom of the band's three layers and everything else is painted over
+       it, so the z-indexes here are explicit rather than left to DOM order. */
+    .td-hero__vid { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%;
+      object-fit: cover; display: block; }
+    /* the wash, now a translucent veil rather than an opaque background: enough teal to carry the
+       page's colour and to hold black text over a bright, moving picture, still landing on the
+       page's own background at its foot so the sheet below meets no seam */
+    .td-hero__bg::before { content: ""; position: absolute; inset: 0; z-index: 1;
       background:
-        radial-gradient(120% 92% at 16% -8%, rgba(62, 163, 180, 0.42), rgba(62, 163, 180, 0) 62%),
-        radial-gradient(105% 78% at 88% 6%,  rgba(20, 113, 127, 0.30), rgba(20, 113, 127, 0) 60%),
-        linear-gradient(180deg, #D9EFF2 0%, rgba(224, 240, 242, 0.62) 52%, var(--bg) 100%); }
-    /* the dot texture, faded out towards the edges so it never ends on a hard line */
-    .td-hero__bg::after { content: ""; position: absolute; inset: 0;
-      background-image: radial-gradient(circle at center, rgba(20, 113, 127, 0.17) 2.1px, transparent 2.5px);
-      background-size: 26px 26px;
-      -webkit-mask-image: radial-gradient(78% 66% at 50% 26%, #000 0%, transparent 74%);
-              mask-image: radial-gradient(78% 66% at 50% 26%, #000 0%, transparent 74%); }
+        /* both radials must die at ZERO alpha: a residual film would carry all the way to the
+           band's bottom edge and draw a hard line there, where the pinned band simply stops */
+        radial-gradient(120% 92% at 16% -8%, rgba(62, 163, 180, 0.50), rgba(62, 163, 180, 0) 62%),
+        radial-gradient(105% 78% at 88% 6%,  rgba(20, 113, 127, 0.38), rgba(20, 113, 127, 0) 60%),
+        linear-gradient(180deg, rgba(214, 238, 241, 0.80) 0%, rgba(224, 240, 242, 0.86) 40%, var(--bg) 78%); }
+    /* The dot texture that used to sit on top of the wash came out with the footage (17.08.2026):
+       it was there to give a flat gradient something to be, and over moving film it only read as
+       dirt on the lens. */
 
     .td-hero__head { position: sticky; top: calc(var(--hdr-h) + clamp(2.25rem, 6vw, 5rem)); z-index: 3;
       max-width: 66rem; margin-inline: auto; text-align: center; will-change: opacity; }
@@ -178,15 +187,24 @@
       padding: clamp(1.1rem, 2.6vw, 2.1rem); }
     .td-jscroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .td-jinner { min-width: 760px; }
-    .td-jrow { display: grid; grid-template-columns: repeat(6, 1fr); gap: clamp(.6rem, 1.4vw, 1.1rem); }
-    .td-jstep { text-align: center; }
-    .td-jnum { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
+    /* Three shared rows - number, action, quote - not six independent columns. Each step spans the
+       same three grid rows (subgrid), so a step whose action runs to three lines pushes EVERY quote
+       down with it and the two rules stay two straight lines across the map. Before this the columns
+       sized themselves and every divider sat at its own height. The fallback for a browser without
+       subgrid is the old behaviour, which is only ever worse by a few pixels. */
+    .td-jrow { display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: auto auto auto;
+      gap: 0 clamp(.6rem, 1.4vw, 1.1rem); align-items: start; }
+    .td-jstep { text-align: center; display: grid; grid-row: span 3; grid-template-rows: subgrid; row-gap: 0; }
+    .td-jnum { justify-self: center; display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
       background: #fff; border: 1.5px solid var(--p4); color: var(--p6);
       font-family: var(--f-display); font-weight: 700; font-size: .88rem; }
+    /* the rule belongs to the row, so it is drawn at the row's foot rather than under the text */
     .td-jact { margin-top: .85rem; padding-bottom: .85rem; border-bottom: 1px solid var(--p3);
-      font-family: var(--f-display); font-weight: 600; color: var(--ink); font-size: .95rem; line-height: 1.35; }
+      font-family: var(--f-display); font-weight: 600; color: var(--ink); font-size: .95rem; line-height: 1.35;
+      align-self: stretch; }
     .td-jsay { margin-top: .85rem; padding-bottom: .85rem; border-bottom: 1px solid var(--p3);
-      font-family: var(--f-display); font-weight: 400; color: var(--td-mut); font-size: .92rem; line-height: 1.4; }
+      font-family: var(--f-display); font-weight: 400; color: var(--td-mut); font-size: .92rem; line-height: 1.4;
+      align-self: stretch; }
     /* the mood curve. The emoji are positioned on the SAME six points the path is drawn through,
        so they sit exactly on the line at any width (the svg stretches, the percentages don't). */
     .td-jcurve { position: relative; height: clamp(120px, 15vw, 190px); margin-top: 1.1rem; }
@@ -194,16 +212,18 @@
     .td-jface { position: absolute; transform: translate(-50%, -50%); font-size: clamp(1.35rem, 2.4vw, 1.75rem); line-height: 1; }
 
     /* ---------- Diagrams (IA + user flow) ----------
-       Hand-drawn SVG rather than an export, so they stay crisp at any zoom and re-tint from the
-       scale above. Wide on purpose: the diagram scrolls inside its own box, the page never does. */
+       STATIC PICTURES since 17.08.2026. They used to be wider than the card and scrolled sideways
+       inside it; now each one simply scales to the width it is given - one drawing, shrunk, at every
+       size. No min-width, no scroller, no separate mobile layout. The SVG is still inline rather than
+       a .png so the shrinking stays sharp instead of turning to mush on a phone.
+       The two cards' gradients are one continuous wash read top to bottom: the IA card ends on the
+       teal, the flow card PICKS THAT TEAL UP AT ITS TOP and fades to white at its foot. */
     .td-diagram { margin-top: clamp(1.9rem, 3.6vw, 2.6rem);
-      background: linear-gradient(180deg, #FAFDFE, #EAF6F8);
+      background: linear-gradient(180deg, #FAFDFE, #DCF0F4);
       border: 1px solid var(--p3); border-radius: clamp(20px, 2.4vw, 30px);
       padding: clamp(1rem, 2.4vw, 2rem); }
-    .td-dscroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .td-dscroll svg { display: block; width: 100%; height: auto; }
-    .td-dscroll--ia svg { min-width: 780px; }
-    .td-dscroll--flow svg { min-width: 880px; }
+    .td-diagram--flow { background: linear-gradient(180deg, #DCF0F4, #FCFEFE); }
+    .td-dfit svg { display: block; width: 100%; height: auto; }
     .td-node { fill: var(--p2); }
     .td-node--home { fill: var(--p6); }
     .td-node--goal { fill: var(--p4); }
@@ -220,16 +240,22 @@
     .td-link { fill: none; stroke: #A6D6DE; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
     .td-link--dash { stroke-dasharray: 7 7; }
 
-    /* ---------- UI showcase - the three screens on the project's own gradient ---------- */
-    .td-showcase { margin-top: clamp(1.9rem, 3.6vw, 2.6rem);
-      background: linear-gradient(135deg, #0F6B78 0%, #3AA3B3 46%, #A9DCE3 100%);
-      border-radius: clamp(20px, 2.4vw, 34px);
-      padding: clamp(1.4rem, 4vw, 3.4rem) clamp(1rem, 3vw, 2.6rem);
-      display: flex; align-items: center; justify-content: center; gap: clamp(.8rem, 2.4vw, 2.2rem);
-      box-shadow: var(--td-card); }
-    .td-showcase img { display: block; width: auto; height: clamp(230px, 30vw, 420px);
-      filter: drop-shadow(0 26px 40px rgba(8, 42, 48, 0.34)); }
-    .td-showcase img.is-lead { height: clamp(275px, 36vw, 500px); }
+    /* ---------- UI showcase - the three screens on Yehuda's own band ----------
+       The band is his artwork (td-band.jpg, the mark watermarked into it), and the three phones are
+       his cut-outs laid on top. DESKTOP is the still composition from the source file: the middle
+       screen tall and centred, the two side screens smaller and dropped, everything in PERCENT of the
+       band so the whole picture scales as one.
+       MOBILE is the same three phones turned into a swipeable strip - see the block further down. */
+    .td-band { position: relative; margin-top: clamp(1.9rem, 3.6vw, 2.6rem);
+      aspect-ratio: 3576 / 2595;
+      background: url("td-band.jpg?v=149") center / cover no-repeat;
+      border-radius: clamp(20px, 2.4vw, 34px); box-shadow: var(--td-card); overflow: hidden; }
+    .td-band__track { position: absolute; inset: 0; }
+    .td-band__ph { position: absolute; width: auto; transform: translateX(-50%);
+      filter: drop-shadow(0 22px 34px rgba(8, 42, 48, 0.30)); }
+    .td-band__ph--mid   { left: 50%;  top: 13.3%; height: 74.6%; z-index: 2; }
+    .td-band__ph--left  { left: 21%;  top: 22.8%; height: 62.6%; }
+    .td-band__ph--right { left: 79%;  top: 22.8%; height: 62.6%; }
     .td-mark { margin-top: clamp(1rem, 2vw, 1.6rem);
       background: linear-gradient(180deg, #FAFDFE, #EAF6F8); border: 1px solid var(--p3);
       border-radius: clamp(16px, 2vw, 26px); padding: clamp(1.5rem, 4vw, 3rem) 1rem; text-align: center; }
@@ -270,17 +296,35 @@
       .td-insight { max-width: none; }
       .td-meta { gap: 1rem 1.5rem; }
       .td-meta div { min-width: 40%; }
-      /* one screen is enough on a phone; three would be 60px wide each */
-      .td-showcase img { display: none; }
-      .td-showcase img.is-lead { display: block; height: clamp(300px, 74vw, 440px); }
+
+      /* ---- the band becomes a swipeable strip ----
+         The three phones stop being a fixed composition and become one scrolling row: the middle one
+         parked in the centre, the other two peeking in at the edges. Swiping moves all three at once,
+         and whichever lands in the centre is the one that grows - the scale is written by the small
+         script at the foot of the page, from each phone's distance to the centre, so a half-finished
+         swipe reads as a half-finished growth instead of snapping. The padding on the track is what
+         lets the FIRST and LAST phone reach the middle at all. */
+      .td-band { aspect-ratio: auto; padding-block: clamp(1.5rem, 7vw, 2.4rem);
+        --td-slide: 58vw; }
+      .td-band__track { position: static; display: flex; align-items: center; gap: clamp(.5rem, 3vw, 1rem);
+        overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory;
+        padding-inline: calc(50% - var(--td-slide) / 2);
+        scrollbar-width: none; -ms-overflow-style: none; }
+      .td-band__track::-webkit-scrollbar { display: none; }
+      .td-band__ph { position: static; flex: 0 0 var(--td-slide); width: var(--td-slide); height: auto;
+        top: auto; left: auto; scroll-snap-align: center;
+        transform: scale(var(--td-s, .8)); transform-origin: center bottom;
+        transition: transform .18s linear; }
     }
     @media (prefers-reduced-motion: reduce) {
       .td-phone { transform: none !important; animation: none !important; opacity: 1 !important; }
       .td-donuts .td-donut { opacity: 1; animation: none !important; }
       .td-donut__val { transition: none; stroke-dashoffset: calc(327 - 327 * var(--pct) / 100); }
-      /* fall back to a normal scrolling hero (no pinned band / sticky title) */
+      /* fall back to a normal scrolling hero (no pinned band / sticky title), and the footage holds
+         on its first frame - the poster - instead of playing */
       .td-hero__bg { position: absolute; }
       .td-hero__head { position: static; }
+      .td-hero__vid { display: none; }
     }
   </style>
 </head>
@@ -331,7 +375,12 @@
     <!-- ===== HERO ===== -->
     <h1 class="sr-only">TrailDesk, an app for finding a public place you can actually work from</h1>
     <section class="td-hero td-wrap">
-      <div class="td-hero__bg" aria-hidden="true"></div>
+      <div class="td-hero__bg" aria-hidden="true">
+        <video class="td-hero__vid" autoplay muted loop playsinline preload="metadata"
+               poster="td-hero-poster.jpg?v=149">
+          <source src="td-hero.mp4?v=149" type="video/mp4" />
+        </video>
+      </div>
 
       <div class="td-hero__head" data-hero-head>
         <p class="td-hero__title reveal"><b>70% of remote workers</b> face difficulties working from home.
@@ -395,7 +444,7 @@
 
     <!-- ===== USER RESEARCH ===== -->
     <section class="td-section td-wrap" id="research">
-      <h2 class="td-h2 reveal">Three interviews, and the same loop described three times</h2>
+      <h2 class="td-h2 reveal">Research</h2>
       <p class="td-body reveal">To make sure TrailDesk solved a problem people actually have, I ran in-depth
         qualitative research with remote workers — <span class="hl">three long-form interviews</span>, a survey, and
         user-journey mapping. The three people worked in different fields and on different schedules, and still
@@ -416,7 +465,7 @@
           <span class="td-donut__ring">
             <svg viewBox="0 0 120 120" aria-hidden="true">
               <circle class="td-donut__track" cx="60" cy="60" r="52" />
-              <circle class="td-donut__val" cx="60" cy="60" r="52" style="--pct: 74; stroke: #1E8C9C;" />
+              <circle class="td-donut__val" cx="60" cy="60" r="52" style="--pct: 74; stroke: #14717F;" />
             </svg>
             <b class="td-donut__n"><i class="stat__val" data-count="74">74</i>%</b>
           </span>
@@ -426,7 +475,7 @@
           <span class="td-donut__ring">
             <svg viewBox="0 0 120 120" aria-hidden="true">
               <circle class="td-donut__track" cx="60" cy="60" r="52" />
-              <circle class="td-donut__val" cx="60" cy="60" r="52" style="--pct: 68; stroke: #3EA3B4;" />
+              <circle class="td-donut__val" cx="60" cy="60" r="52" style="--pct: 68; stroke: #14717F;" />
             </svg>
             <b class="td-donut__n"><i class="stat__val" data-count="68">68</i>%</b>
           </span>
@@ -436,24 +485,13 @@
           <span class="td-donut__ring">
             <svg viewBox="0 0 120 120" aria-hidden="true">
               <circle class="td-donut__track" cx="60" cy="60" r="52" />
-              <circle class="td-donut__val" cx="60" cy="60" r="52" style="--pct: 59; stroke: #7CC4CF;" />
+              <circle class="td-donut__val" cx="60" cy="60" r="52" style="--pct: 59; stroke: #14717F;" />
             </svg>
             <b class="td-donut__n"><i class="stat__val" data-count="59">59</i>%</b>
           </span>
           <p>ask friends or search social media to find a public workspace instead</p>
         </div>
       </div>
-    </section>
-
-    <!-- ===== MARKET OVERVIEW ===== -->
-    <section class="td-section td-wrap" id="market">
-      <h2 class="td-h2 reveal">Everything on the market points at the same two answers</h2>
-      <p class="td-body reveal">I ran in-depth market and competitive research with AI-assisted desk research.
-        The existing products all lead to the same two places: <span class="hl">a very expensive coworking space,
-        or a generic coffee shop.</span> None of them cover the free, public, in-between places people already
-        work from — a library, a park, a quiet lobby.</p>
-      <p class="td-insight reveal">The gap wasn't a missing place to work.
-        It was <span class="hl">missing information</span> about the places that already exist.</p>
     </section>
 
     <!-- ===== USER JOURNEY MAP ===== -->
@@ -526,7 +564,7 @@
       <h2 class="td-h2 reveal">Information architecture</h2>
 
       <div class="td-diagram reveal">
-        <div class="td-dscroll td-dscroll--ia">
+        <div class="td-dfit">
           <svg viewBox="0 0 1200 1060" role="img" aria-label="TrailDesk information architecture: Splash to Walk through to Onboarding, which splits into Sign in and Sign up and leads to Home (Map). Home branches into Categories, Favorites, Messages and Profile, each with up to three further levels.">
             <defs>
               <marker id="tdArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -610,8 +648,8 @@
     <section class="td-section td-wrap" id="flow">
       <h2 class="td-h2 reveal">User flow</h2>
 
-      <div class="td-diagram reveal">
-        <div class="td-dscroll td-dscroll--flow">
+      <div class="td-diagram td-diagram--flow reveal">
+        <div class="td-dfit">
           <svg viewBox="0 0 1200 1160" role="img" aria-label="TrailDesk user flow: onboarding runs from Start through Splash and Logo, App Walkthrough and Sign in or Sign up to the Home Screen. The main flow goes from the Home Screen through Category Selection or Search to the Places List and the Place Properties Filter, into a decision about finding an interesting place, then Place Details, a decision about suitability, and finally Initiate Navigation, with a branch through User Reviews, Ask Someone, Member Profile and Direct Messaging.">
             <defs>
               <marker id="tdArrowF" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -694,13 +732,17 @@
     <section class="td-section td-wrap" id="ui">
       <h2 class="td-h2 reveal">UI design</h2>
 
-      <div class="td-showcase reveal">
-        <img src="td-ui-a.png?v=149" width="477" height="997" loading="lazy" decoding="async"
-             alt="TrailDesk: the map filtered to parks, with a place preview card at the bottom" />
-        <img class="is-lead" src="td-ui-b.png?v=149" width="574" height="1200" loading="lazy" decoding="async"
-             alt="TrailDesk home screen: a map of nearby public workspaces with colour-coded category pins" />
-        <img src="td-ui-c.png?v=149" width="478" height="997" loading="lazy" decoding="async"
-             alt="TrailDesk place detail: Dawn Cloud Park with its conditions scored out of ten" />
+      <!-- On a phone this strip is swipeable: the three screens travel together and whichever one
+           reaches the middle is the one shown large. The order here is the order on screen. -->
+      <div class="td-band reveal">
+        <div class="td-band__track" data-band>
+          <img class="td-band__ph td-band__ph--left" src="td-ui-left.png?v=149" width="270" height="544" loading="lazy" decoding="async"
+               alt="TrailDesk: the map filtered to parks, with a place preview card at the bottom" />
+          <img class="td-band__ph td-band__ph--mid" src="td-ui-mid.png?v=149" width="332" height="664" loading="lazy" decoding="async"
+               alt="TrailDesk home screen: a map of nearby public workspaces with colour-coded category pins" />
+          <img class="td-band__ph td-band__ph--right" src="td-ui-right.png?v=149" width="268" height="546" loading="lazy" decoding="async"
+               alt="TrailDesk place detail: Dawn Cloud Park with its conditions scored out of ten" />
+        </div>
       </div>
       <div class="td-mark reveal"><span>Trail Desk</span></div>
     </section>
@@ -755,6 +797,12 @@
     (function () {
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
+
+      // Reduced motion: the hero holds on the poster still, and the file is never fetched at all.
+      if (reduce) {
+        const v = document.querySelector('.td-hero__vid');
+        if (v) { v.pause(); v.remove(); }
+      }
 
       // Right-side progress rail
       const railEl = document.querySelector('.td-rail');
@@ -836,6 +884,48 @@
           if (!raf) raf = requestAnimationFrame(apply);
         });
         (hero || phone).addEventListener('pointerleave', () => { if (!ready) return; tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(apply); });
+      }
+
+      // ---- The UI band on a phone: three screens on one swipeable strip ----
+      // Only ever runs at the width where the CSS turns the band into a scroller. Whichever screen
+      // is nearest the middle is the biggest; the growth is written from the live scroll distance,
+      // so a swipe held half-way looks half-way. Nothing here reads a layout box per scroll frame -
+      // the offsets are measured once per resize and reused.
+      const band = document.querySelector('[data-band]');
+      if (band) {
+        const phones = Array.from(band.children);
+        const mq = window.matchMedia('(max-width: 760px)');
+        let centres = [], half = 0, bandRaf = null;
+
+        function measure() {
+          half = band.clientWidth / 2;
+          centres = phones.map((p) => p.offsetLeft + p.offsetWidth / 2);
+        }
+        function paint() {
+          bandRaf = null;
+          const mid = band.scrollLeft + half;
+          const reach = phones[0] ? phones[0].offsetWidth * 1.15 : 1;
+          phones.forEach((p, i) => {
+            const t = clamp(Math.abs(centres[i] - mid) / reach, 0, 1);
+            p.style.setProperty('--td-s', (1 - 0.2 * t).toFixed(3));
+          });
+        }
+        function schedule() { if (!bandRaf) bandRaf = requestAnimationFrame(paint); }
+        function enable() {
+          if (!mq.matches) { phones.forEach((p) => p.style.removeProperty('--td-s')); return; }
+          measure();
+          // open on the middle screen, without animating there in front of the reader
+          const midPhone = phones[1] || phones[0];
+          band.scrollLeft = midPhone.offsetLeft - (band.clientWidth - midPhone.offsetWidth) / 2;
+          paint();
+        }
+        band.addEventListener('scroll', schedule, { passive: true });
+        window.addEventListener('resize', enable);
+        mq.addEventListener('change', enable);
+        // the phones are lazy-loaded, so their boxes only exist once they have actually arrived
+        phones.forEach((p) => p.complete || p.addEventListener('load', enable, { once: true }));
+        enable();
+        window.addEventListener('load', enable);
       }
 
       onScroll();
