@@ -811,26 +811,37 @@ ul, ol { list-style: none; padding: 0; }
   align-items: center; gap: clamp(1.25rem, 3.5vw, 2.75rem); }
 .nxt__text { display: flex; flex-direction: column; align-items: flex-start; gap: .55rem; min-width: 0; }
 .nxt__label { font-family: var(--f-body); font-size: .72rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--brand); }
+/* 17.08.2026: the hand-off's name reads in the brand purple and lightens on hover - the same two
+   colours, in the same order, as the "Let's work together" pill directly below it (--brand ->
+   --brand-lit). It used to sit in --ink and only turn purple on hover, which read as a heading that
+   happened to be a link rather than the page's last call to action. */
 .nxt__name { display: inline-flex; align-items: baseline; gap: .32em;
   font-family: var(--f-display); font-weight: 700; font-size: clamp(2.1rem, 5vw, 3.6rem);
-  line-height: 1; letter-spacing: -0.03em; color: var(--ink); transition: color .25s ease; }
+  line-height: 1; letter-spacing: -0.03em; color: var(--brand); transition: color .25s ease; }
 .nxt__arrow { font-style: normal; font-size: .5em; transition: transform .38s cubic-bezier(.2,.7,.2,1); }
 /* 44ch clears the longest of the three one-liners, so none of them wraps */
 /* the hand-off names the project inside its own description line */
 .nxt__desc b { color: var(--ink); font-weight: 700; }
 .nxt__desc { font-size: clamp(.95rem, 1.2vw, 1.08rem); line-height: 1.5; color: var(--ink-mute); max-width: 44ch; }
-/* same mat, same nested radii and same shadow as the homepage tile - this IS that tile */
-.nxt__frame { width: clamp(170px, 19vw, 270px);
-  padding: clamp(5px, .7vw, 9px); border-radius: clamp(14px, 1.7vw, 22px);
+/* Same mat, same nested radii and same shadow as the homepage tile - this IS that tile.
+   17.08.2026: its rim and its two radii are now Bianca's video frame, taken as PROPORTIONS rather
+   than copied as pixels. That frame settles at 1084px wide carrying a 24.6px rim (2.27% of its
+   width), a 34px outer radius (3.14%) and a 16px radius on the recording inside it (1.48%). This
+   tile is a quarter of that width, so the same numbers would have read as a much heavier mat and a
+   much rounder corner. --nx-w IS the tile's width, and the three calcs below hang off it, so the
+   proportion holds at every size the tile is drawn at. */
+.nxt__frame { --nx-w: clamp(170px, 19vw, 270px);
+  width: var(--nx-w);
+  padding: calc(var(--nx-w) * 0.0227); border-radius: calc(var(--nx-w) * 0.0314);
   background: var(--nx-tint);
   box-shadow: 0 2px 6px var(--nx-sh1), 0 18px 34px -16px var(--nx-sh2);
   transition: transform .38s cubic-bezier(.2,.7,.2,1), box-shadow .38s ease; }
-.nxt__img { display: block; width: 100%; height: auto; border-radius: clamp(7px, .8vw, 10px); }
+.nxt__img { display: block; width: 100%; height: auto; border-radius: calc(var(--nx-w) * 0.0148); }
 
 @media (hover: hover) and (pointer: fine) {
   .nxt__link:hover .nxt__frame { transform: translateY(-8px);
     box-shadow: 0 4px 10px var(--nx-sh1), 0 30px 52px -18px var(--nx-sh2); }
-  .nxt__link:hover .nxt__name { color: var(--brand); }
+  .nxt__link:hover .nxt__name { color: var(--brand-lit); }
   .nxt__link:hover .nxt__arrow { transform: translateX(.35em); }
 }
 .nxt__link:active .nxt__frame { transform: translateY(-2px) scale(.988); transition-duration: .12s; }
@@ -845,8 +856,12 @@ ul, ol { list-style: none; padding: 0; }
 @media (max-width: 760px) {
   /* text first, then the cover: you read who is next, then see it */
   .nxt__link { grid-template-columns: 1fr; align-items: stretch; gap: 1.6rem; }
-  .nxt__frame { width: 100%; padding: 10px; border-radius: 20px; }
-  .nxt__img { border-radius: 8px; }
+  /* down here the tile runs the full width of the wrap - which is exactly the width a Bianca video
+     frame has at the same viewport. Same width means the proportion is matched by using its actual
+     numbers, so these are Bianca's own clamps rather than the percentage derivation above. */
+  .nxt__frame { width: 100%;
+    padding: clamp(8px, 1.3vw, 20px); border-radius: clamp(20px, 2.4vw, 34px); }
+  .nxt__img { border-radius: clamp(10px, 1.2vw, 16px); }
   .nxt__desc { max-width: none; }
   /* the cover goes full width again down here, so it is no longer "beside" anything */
   .nxt__link { justify-content: stretch; }
