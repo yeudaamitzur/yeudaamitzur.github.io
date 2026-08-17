@@ -202,9 +202,12 @@
     .bn-video { display: block; width: 100%; height: auto; aspect-ratio: var(--ar, 1600 / 1122);
       object-fit: cover; border-radius: clamp(10px, 1.2vw, 16px); background: #eceae3; }
 
-    /* ---------- Cognitive-load note ---------- */
+    /* ---------- Cognitive-load note, and the Impact statement that closes the page ---------- */
+    /* 1.1rem under the heading is the gap .bn-lead already holds under its own label - the page's
+       heading-to-TEXT step, not --bn-capgap, which is the heading-to-MEDIA one. */
     .bn-note p { color: var(--ink); font-family: var(--f-display); font-weight: 500;
-      font-size: clamp(1.15rem, 1.8vw, 1.5rem); line-height: 1.5; letter-spacing: -0.01em; max-width: 64rem; }
+      font-size: clamp(1.15rem, 1.8vw, 1.5rem); line-height: 1.5; letter-spacing: -0.01em; max-width: 64rem;
+      margin-top: 1.1rem; }
 
     /* ---------- Inside the project - grey cards that stack & grow on scroll ---------- */
     .bn-head__sub { color: var(--bn-mut); font-family: var(--f-display); font-weight: 500;
@@ -392,6 +395,7 @@
       <a class="bn-rail__dot" href="#dashboard" aria-label="Dashboard"></a>
       <a class="bn-rail__dot" href="#operations" aria-label="Order products"></a>
       <a class="bn-rail__dot" href="#staff" aria-label="Shift management"></a>
+      <a class="bn-rail__dot" href="#impact" aria-label="Impact"></a>
       <span class="bn-rail__dot bn-rail__cap" aria-hidden="true"></span>
     </span>
   </nav>
@@ -575,15 +579,25 @@
         <img src="bianca-shifts.jpg" width="2200" height="1564" alt="Bianca shift management: the morning shift team for one day, with a worker-missing flag" loading="lazy" />
       </figure>
       <figure class="bn-shot reveal">
-        <img src="bianca-weekly.jpg" width="2200" height="1564" alt="Bianca shift management: the weekly board, with missing shifts flagged in red" loading="lazy" />
+        <!-- re-exported 17.08.2026; the filename did not change, so the src carries ?v= or the old
+             picture stays in every cache that already has it -->
+        <img src="bianca-weekly.jpg?v=147" width="2200" height="1564" alt="Bianca shift management: the weekly board, with missing shifts flagged in red" loading="lazy" />
       </figure>
       <figure class="bn-shot reveal">
         <img src="bianca-employees.jpg" width="2200" height="1564" alt="Bianca staff management: the employee directory with active, on-leave and inactive states" loading="lazy" />
       </figure>
     </section>
 
-    <!-- The Impact section ("A manager opens Bianca in the morning...") was removed on 17.08.2026.
-         The page now closes on the last shift screen and hands straight over to the next project. -->
+    <!-- ===== IMPACT - the closing statement =====
+         The old Impact section ("A manager opens Bianca in the morning...") was removed earlier on
+         17.08.2026 and the page closed on the last shift screen. It comes back here the same day as
+         one line, in Yehuda's own voice - what the project taught him, not what the product does.
+         .bn-note is the class that was already waiting for exactly this block. -->
+    <section class="bn-section bn-wrap bn-note" id="impact">
+      <h2 class="bn-subhead reveal">Impact</h2>
+      <p class="reveal">This project taught me how much <b>architecture and a strong hierarchy</b> matter,
+        and how they shape every design decision.</p>
+    </section>
 
     <!-- ===== NEXT PROJECT - the loop, handed over before the contact ask ===== -->
     <!-- Pointed at the Design System case study until 13.08.2026, when that page was retired and
@@ -690,7 +704,9 @@
       const railCap = document.querySelector('.bn-rail__cap');
       const targets = dots.map((d) => document.querySelector(d.getAttribute('href')));
       const revealSec = document.querySelector('#problem');   // rail appears from The problem onward
-      // ...and is gone by the hand-off (this was #impact until that section was removed, 17.08.2026)
+      // ...and is gone by the hand-off. #impact is a rail stop again (it was one until that section
+      // came out earlier on 17.08.2026), but the rail still ENDS at .nxt, not at #impact - the last
+      // dot has to be reachable, and a rail that switched off on its own final stop never lights it.
       const endSec = document.querySelector('.nxt');
       const pgbar = document.querySelector('.pgbar');
       const pgfill = pgbar && pgbar.firstElementChild;
