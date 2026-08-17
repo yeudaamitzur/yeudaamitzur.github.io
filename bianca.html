@@ -300,6 +300,12 @@
     .bn-vcap { font-family: var(--f-display); font-weight: 700; color: var(--bn-orange);
       font-size: clamp(1.15rem, 1.9vw, 1.5rem); line-height: 1.35; letter-spacing: -0.012em;
       margin-top: clamp(1.7rem, 3.2vw, 2.5rem); }
+    /* The light cut of the same caption, for the one that follows a paragraph rather than a heading.
+       400 is the page's own body weight (.bn-body), so the caption stops out-weighing the copy above
+       it; the orange and the size stay, which is what still marks it as a caption and not more copy.
+       Its letter-spacing is eased back to 0 - the -0.012em was there to hold a bold line together,
+       and at 400 the same tracking closes the text up. */
+    .bn-vcap--soft { font-weight: 400; letter-spacing: 0; }
     /* A caption or a heading sits exactly --bn-capgap above the media it names - the same gap
        "Shift management" has above its screenshot. For a recording the distance is measured to the
        OUTSIDE of its frame, not to the video inside it, so the frame's padding is not subtracted
@@ -400,7 +406,7 @@
       <a class="bn-rail__dot" href="#problem" aria-label="The problem"></a>
       <a class="bn-rail__dot" href="#dashboard" aria-label="Dashboard"></a>
       <a class="bn-rail__dot" href="#operations" aria-label="Order products"></a>
-      <a class="bn-rail__dot" href="#staff" aria-label="Shift management and staff management"></a>
+      <a class="bn-rail__dot" href="#staff" aria-label="Staff management and shift management"></a>
       <a class="bn-rail__dot" href="#impact" aria-label="Impact"></a>
       <span class="bn-rail__dot bn-rail__cap" aria-hidden="true"></span>
     </span>
@@ -580,12 +586,15 @@
 
     <!-- ===== SHIFT MANAGEMENT ===== -->
     <section class="bn-section bn-wrap" id="staff">
-      <h2 class="bn-subhead reveal">Shift management - Staff management</h2>
+      <h2 class="bn-subhead reveal">Staff management - Shift management</h2>
       <p class="bn-body reveal">Centralizes all HR operations into an intuitive interface, making it
         effortless for managers to view, track, and edit staff information at a glance.</p>
       <!-- names the screen directly under it, the way the recording captions higher up do. .bn-shot
-           already carries --bn-capgap, so the caption sits the page's one gap above its picture. -->
-      <p class="bn-vcap reveal">Daily view. Alerts for staff shortages and unexpected early employee departures.</p>
+           already carries --bn-capgap, so the caption sits the page's one gap above its picture.
+           --soft: this is the one caption on the page with a body paragraph ABOVE it, and at the
+           caption's usual 700 it came out heavier than the copy it followed - the eye landed on the
+           caption first and read the paragraph second. Light weight puts it back in its place. -->
+      <p class="bn-vcap bn-vcap--soft reveal">Alerts for staff shortages and unexpected early employee departures.</p>
       <figure class="bn-shot reveal">
         <img src="bianca-shifts.jpg" width="2200" height="1564" alt="Bianca shift management: the morning shift team for one day, with a worker-missing flag" loading="lazy" />
       </figure>
