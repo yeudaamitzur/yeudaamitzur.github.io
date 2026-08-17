@@ -112,34 +112,17 @@
          lived in the hero) and work-cards-concept.html.bak (the sticky-stacking cards before that). -->
     <section class="pstack" id="work" aria-label="Selected work">
       <div class="pstack__pin">
-        <article class="reveal pcard pcard--talmind">
-          <a class="pcard__inner" href="/talmind" aria-label="Talmind - open the case study">
-            <div class="pcard__media" aria-hidden="true">
-              <span class="pcard__veil"></span>
-            </div>
-            
-            <!-- The project's own screens, side by side, arriving one after another -->
-            <div class="pcard__strip" aria-hidden="true">
-                <figure class="shot"><img src="talmind-lesson.jpg?v=147" alt="" width="1280" height="800" loading="lazy" /></figure>
-                <figure class="shot"><img src="talmind-quiz.jpg?v=147" alt="" width="1280" height="800" loading="lazy" /></figure>
-                <figure class="shot"><img src="talmind-game.jpg?v=147" alt="" width="3840" height="2400" loading="lazy" /></figure>
-            </div>
-            <div class="pcard__body">
-              <span class="pcard__chip">Case study</span>
-              <span class="pcard__name">Talmind</span>
-              <h3 class="pcard__value">Built a real pilot that answers a huge need in Korean classrooms</h3>
-              <p class="pcard__kind">Learning app</p>
-            </div>
-            <span class="pcard__view">View</span>
-          </a>
-        </article>
-
+        <!-- 17.08.2026: Bianca leads. The hero above promises "breaking down complex problems into
+             organized and clear information", and the dashboard is the card that proves that
+             sentence on sight - it was landing on the learning app instead. Order here is the only
+             thing that decides the stack: the arc is driven off DOM order (script.js, .pstack) and
+             each card's tint rides on its own class, so swapping the two blocks is the whole edit. -->
         <article class="reveal pcard pcard--bianca">
           <a class="pcard__inner" href="/bianca" aria-label="Bianca - open the case study">
             <div class="pcard__media" aria-hidden="true">
               <span class="pcard__veil"></span>
             </div>
-            
+
             <!-- The project's own screens, side by side, arriving one after another -->
             <div class="pcard__strip" aria-hidden="true">
                 <figure class="shot"><img src="bianca-staff-1.jpg?v=147" alt="" width="2724" height="1937" loading="lazy" /></figure>
@@ -151,6 +134,31 @@
               <span class="pcard__name">Bianca</span>
               <h3 class="pcard__value">Saved restaurant managers hours of work and frustration every week</h3>
               <p class="pcard__kind">Management dashboard</p>
+            </div>
+            <span class="pcard__view">View</span>
+          </a>
+        </article>
+
+        <article class="reveal pcard pcard--talmind">
+          <a class="pcard__inner" href="/talmind" aria-label="Talmind - open the case study">
+            <div class="pcard__media" aria-hidden="true">
+              <span class="pcard__veil"></span>
+            </div>
+
+            <!-- The project's own screens, side by side, arriving one after another -->
+            <div class="pcard__strip" aria-hidden="true">
+                <figure class="shot"><img src="talmind-lesson.jpg?v=147" alt="" width="1280" height="800" loading="lazy" /></figure>
+                <figure class="shot"><img src="talmind-quiz.jpg?v=147" alt="" width="1280" height="800" loading="lazy" /></figure>
+                <figure class="shot"><img src="talmind-game.jpg?v=147" alt="" width="3840" height="2400" loading="lazy" /></figure>
+            </div>
+            <div class="pcard__body">
+              <span class="pcard__chip">Case study</span>
+              <span class="pcard__name">Talmind</span>
+              <!-- "real" came out on 17.08.2026: the pilot has not run. The case study itself was
+                   always careful about this ("it WILL serve as a classroom pilot", "we are currently
+                   EXPLORING a pilot program") - this card was the one place claiming otherwise. -->
+              <h3 class="pcard__value">Built a pilot that answers a huge need in Korean classrooms</h3>
+              <p class="pcard__kind">Learning app</p>
             </div>
             <span class="pcard__view">View</span>
           </a>
