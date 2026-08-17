@@ -13,7 +13,7 @@
   <meta property="og:url" content="https://yehudaamitzur.com/bianca" />
   <meta property="og:title" content="Bianca case study · Yehuda Amitzur" />
   <meta property="og:description" content="Bianca is a restaurant management dashboard built around the decisions a manager has to make first thing in the morning. A UX/UI case study by Yehuda Amitzur." />
-  <meta property="og:image" content="https://yehudaamitzur.com/tile-bianca.jpg?v=145" />
+  <meta property="og:image" content="https://yehudaamitzur.com/tile-bianca.jpg?v=146" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="750" />
@@ -21,7 +21,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Bianca case study · Yehuda Amitzur" />
   <meta name="twitter:description" content="Bianca is a restaurant management dashboard built around the decisions a manager has to make first thing in the morning. A UX/UI case study by Yehuda Amitzur." />
-  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-bianca.jpg?v=145" />
+  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-bianca.jpg?v=146" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -32,7 +32,7 @@
   <!-- The hero dashboard is the largest thing on the first screen. It is a recording now, so what
        gets preloaded is its poster - the first frame paints while the mp4 is still arriving. -->
   <link rel="preload" as="image" href="bianca-critical-poster.jpg" fetchpriority="high" />
-  <link rel="stylesheet" href="styles.css?v=145" />
+  <link rel="stylesheet" href="styles.css?v=146" />
 
   <style>
     /* =========================================================
@@ -132,10 +132,15 @@
        the wire SVG is inset:0 inside this element, so nothing else escapes. */
     .bn-flow { position: relative; padding-block: clamp(2rem, 5vw, 3.75rem); }
     .bn-flow__wires { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-    .bn-flow__wires svg { width: 100%; height: 100%; display: block; }
-    .bn-wire { fill: none; vector-effect: non-scaling-stroke; stroke-linecap: round; }
-    .bn-wire--line { stroke: #e08a2b; stroke-width: 2.2; opacity: .8; }
-    .bn-wire--soft { stroke: #e6a869; stroke-width: 12; opacity: .16; }
+    .bn-flow__wires svg { width: 100%; height: 100%; display: block; overflow: visible; }
+    /* One hairline with a soft halo bloomed around it - the reference curves, not the old
+       line-plus-thick-band pair. The halo is a blurred copy of the same path; the hairline rides on
+       top of it. Both fade out at the two ends through a gradient stroke, so a curve arrives and
+       leaves rather than being cut by the screen edge. */
+    .bn-wire { fill: none; stroke-linecap: round; stroke: url(#bnWireFade); }
+    .bn-wire--line { stroke-width: 2; vector-effect: non-scaling-stroke; }
+    .bn-wire--halo { stroke-width: 9; opacity: .5; filter: url(#bnWireBlur); }
+    .bn-wiredefs { position: absolute; width: 0; height: 0; overflow: hidden; }
 
     /* glass frame - every video on the page sits in this one frame, the hero included.
        17.08.2026: the border was halved (was clamp(16px, 2.6vw, 40px)) so the frame reads as a rim
@@ -148,12 +153,14 @@
       background: linear-gradient(308deg, rgba(65, 65, 65, 0.014) -65.63%, rgba(167, 167, 167, 0.20) 147.78%);
       box-shadow: 0 -4px 29.4px 10px rgba(217, 130, 43, 0.10);
       -webkit-backdrop-filter: blur(13.72px); backdrop-filter: blur(13.72px); }
-    /* The pane is one set of values, but it does not READ the same everywhere: over the hero's bright
-       veil the grey wash disappears, while over the flat cream of the page it lands as a visible grey
-       mat around the recording. The frames below the hero get the wash thinned to about a third so
-       they read as transparent as the hero's does. */
+    /* The pane never read the same in both places. Over the hero's bright veil the grey wash
+       disappears and the card is pure glass; over the flat cream of the page the same wash lands as
+       a visible grey mat. So the frames inside the study drop the wash entirely - what is left is the
+       rim, the orange glow, the backdrop blur, and the hero's own drop shadow. Same card, everywhere. */
     .bn-videoframe:not(.bn-videoframe--hero) {
-      background: linear-gradient(308deg, rgba(65, 65, 65, 0.006) -65.63%, rgba(167, 167, 167, 0.07) 147.78%); }
+      background: none;
+      box-shadow: 0 -4px 29.4px 10px rgba(217, 130, 43, 0.10),
+        0 40px 92px -52px rgba(40, 37, 30, 0.40); }
 
     /* hero only: it floats over the pinned restaurant video, so it keeps a drop under it.
        17.08.2026: back to the page's near-black after a pass in orange, but at the softer weight
@@ -354,6 +361,24 @@
     </span>
   </nav>
 
+  <!-- Shared paint for every wire on the page: the halo blur, and the stroke gradient that lets a
+       curve fade in and out instead of being chopped off at the screen edge. Deeper burnt orange on
+       the left, lighter toward the right, exactly like the reference curves. -->
+  <svg class="bn-wiredefs" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="bnWireBlur" x="-20%" y="-300%" width="140%" height="700%">
+        <feGaussianBlur stdDeviation="7" />
+      </filter>
+      <linearGradient id="bnWireFade" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0"    stop-color="#c07434" stop-opacity="0" />
+        <stop offset="0.14" stop-color="#c07434" stop-opacity="0.85" />
+        <stop offset="0.55" stop-color="#dd8f3f" stop-opacity="0.9" />
+        <stop offset="0.86" stop-color="#f0ad70" stop-opacity="0.75" />
+        <stop offset="1"    stop-color="#f0ad70" stop-opacity="0" />
+      </linearGradient>
+    </defs>
+  </svg>
+
   <main>
     <!-- ===== HERO ===== -->
     <h1 class="sr-only">Bianca, a restaurant management dashboard</h1>
@@ -373,8 +398,10 @@
              page script). Same box, same entrance, same cursor parallax the still export had.
              bianca-hero.webp / .jpg are still on disk as the previous hero. -->
         <figure class="bn-videoframe bn-videoframe--hero">
-          <video class="bn-video" data-rate="2" style="--ar: 1600 / 1144"
-                 autoplay muted loop playsinline preload="metadata"
+          <!-- no autoplay: the page script starts it from frame 0 when the card has finished
+               arriving (see data-start-after), so the first cycle is never spent off-screen -->
+          <video class="bn-video" data-rate="2" data-start-after="tablet" style="--ar: 1600 / 1144"
+                 muted loop playsinline preload="metadata"
                  poster="bianca-critical-poster.jpg" width="1600" height="1144"
                  aria-label="The Bianca dashboard: a manager clearing two critical alerts">
             <source src="bianca-critical.mp4" type="video/mp4" />
@@ -439,16 +466,19 @@
     <!-- full-bleed: the wires must reach both screen edges, so this sits OUTSIDE .bn-wrap -->
     <div class="bn-flow bn-flow--tight" aria-label="Two critical alerts, cleared from the dashboard">
         <div class="bn-flow__wires" aria-hidden="true">
+          <!-- pair 1 of 3: both fall left to right - one plunges deep and crests back up, the other
+               only leans. Same journey, different amount of swing; they run together, they do not
+               cross in an X. -->
           <svg viewBox="0 0 1440 520" preserveAspectRatio="none">
-            <path class="bn-wire bn-wire--soft" d="M0,300 C 260,300 380,150 720,150 C 1060,150 1180,352 1440,352" />
-            <path class="bn-wire bn-wire--line" d="M0,300 C 260,300 380,150 720,150 C 1060,150 1180,352 1440,352" />
-            <path class="bn-wire bn-wire--soft" d="M0,344 C 260,344 380,198 720,198 C 1060,198 1180,398 1440,398" />
-            <path class="bn-wire bn-wire--line" d="M0,344 C 260,344 380,198 720,198 C 1060,198 1180,398 1440,398" />
+            <path class="bn-wire bn-wire--halo" d="M-60,45 C 240,45 380,430 690,442 C 880,449 930,282 1110,278 C 1280,274 1350,400 1500,470" />
+            <path class="bn-wire bn-wire--line" d="M-60,45 C 240,45 380,430 690,442 C 880,449 930,282 1110,278 C 1280,274 1350,400 1500,470" />
+            <path class="bn-wire bn-wire--halo" d="M-60,130 C 330,134 470,250 790,258 C 1000,263 1040,196 1206,192 C 1340,189 1414,250 1500,282" />
+            <path class="bn-wire bn-wire--line" d="M-60,130 C 330,134 470,250 790,258 C 1000,263 1040,196 1206,192 C 1340,189 1414,250 1500,282" />
           </svg>
         </div>
       <div class="bn-wrap">
         <figure class="bn-videoframe reveal">
-          <video class="bn-video" style="--ar: 1600 / 1144" autoplay muted loop playsinline
+          <video class="bn-video" style="--ar: 1600 / 1144" muted loop playsinline
                  preload="none" poster="bianca-critical-poster.jpg" width="1600" height="1144"
                  aria-label="Two critical alerts cleared from the Bianca dashboard">
             <source src="bianca-critical.mp4" type="video/mp4" />
@@ -463,16 +493,17 @@
 
     <div class="bn-flow bn-flow--tight" aria-label="An important alert, handled from the dashboard">
         <div class="bn-flow__wires" aria-hidden="true">
+          <!-- pair 2 of 3: the same idea mirrored - both climb left to right, one hard, one lazily -->
           <svg viewBox="0 0 1440 520" preserveAspectRatio="none">
-            <path class="bn-wire bn-wire--soft" d="M0,210 C 260,210 380,392 720,392 C 1060,392 1180,180 1440,180" />
-            <path class="bn-wire bn-wire--line" d="M0,210 C 260,210 380,392 720,392 C 1060,392 1180,180 1440,180" />
-            <path class="bn-wire bn-wire--soft" d="M0,254 C 260,254 380,436 720,436 C 1060,436 1180,224 1440,224" />
-            <path class="bn-wire bn-wire--line" d="M0,254 C 260,254 380,436 720,436 C 1060,436 1180,224 1440,224" />
+            <path class="bn-wire bn-wire--halo" d="M-60,470 C 240,470 380,90 690,78 C 880,71 930,238 1110,242 C 1280,246 1350,120 1500,50" />
+            <path class="bn-wire bn-wire--line" d="M-60,470 C 240,470 380,90 690,78 C 880,71 930,238 1110,242 C 1280,246 1350,120 1500,50" />
+            <path class="bn-wire bn-wire--halo" d="M-60,386 C 330,382 470,266 790,258 C 1000,253 1040,320 1206,324 C 1340,327 1414,266 1500,234" />
+            <path class="bn-wire bn-wire--line" d="M-60,386 C 330,382 470,266 790,258 C 1000,253 1040,320 1206,324 C 1340,327 1414,266 1500,234" />
           </svg>
         </div>
       <div class="bn-wrap">
         <figure class="bn-videoframe reveal">
-          <video class="bn-video" style="--ar: 1600 / 1146" autoplay muted loop playsinline
+          <video class="bn-video" style="--ar: 1600 / 1146" muted loop playsinline
                  preload="none" poster="bianca-important-poster.jpg" width="1600" height="1146"
                  aria-label="An important alert handled from the Bianca dashboard">
             <source src="bianca-important.mp4" type="video/mp4" />
@@ -488,16 +519,17 @@
 
     <div class="bn-flow bn-flow--tight" aria-label="Ordering products in Bianca">
         <div class="bn-flow__wires" aria-hidden="true">
+          <!-- pair 3 of 3: falling again, but on a later rhythm - the drop holds off, the flat runs long -->
           <svg viewBox="0 0 1440 520" preserveAspectRatio="none">
-            <path class="bn-wire bn-wire--soft" d="M0,168 C 300,168 400,330 720,330 C 1040,330 1160,140 1440,140" />
-            <path class="bn-wire bn-wire--line" d="M0,168 C 300,168 400,330 720,330 C 1040,330 1160,140 1440,140" />
-            <path class="bn-wire bn-wire--soft" d="M0,212 C 300,212 400,374 720,374 C 1040,374 1160,184 1440,184" />
-            <path class="bn-wire bn-wire--line" d="M0,212 C 300,212 400,374 720,374 C 1040,374 1160,184 1440,184" />
+            <path class="bn-wire bn-wire--halo" d="M-60,110 C 320,108 520,392 830,400 C 1010,405 1070,300 1200,296 C 1330,292 1410,368 1500,412" />
+            <path class="bn-wire bn-wire--line" d="M-60,110 C 320,108 520,392 830,400 C 1010,405 1070,300 1200,296 C 1330,292 1410,368 1500,412" />
+            <path class="bn-wire bn-wire--halo" d="M-60,196 C 360,198 560,300 880,306 C 1050,309 1100,238 1230,235 C 1350,232 1430,278 1500,300" />
+            <path class="bn-wire bn-wire--line" d="M-60,196 C 360,198 560,300 880,306 C 1050,309 1100,238 1230,235 C 1350,232 1430,278 1500,300" />
           </svg>
         </div>
       <div class="bn-wrap">
         <figure class="bn-videoframe reveal">
-          <video class="bn-video" style="--ar: 1600 / 1122" autoplay muted loop playsinline
+          <video class="bn-video" style="--ar: 1600 / 1122" muted loop playsinline
                  preload="none" poster="bianca-orders-poster.jpg" width="1600" height="1122"
                  aria-label="Ordering products from the Bianca operations screen">
             <source src="bianca-orders.mp4" type="video/mp4" />
@@ -536,7 +568,7 @@
             <span class="nxt__desc"><b>TALMIND</b> a tablet learning app for Korean classrooms</span>
           </span>
           <span class="nxt__frame">
-            <img class="nxt__img" src="tile-talmind.jpg?v=145" width="1200" height="750" alt="" loading="lazy" />
+            <img class="nxt__img" src="tile-talmind.jpg?v=146" width="1200" height="750" alt="" loading="lazy" />
           </span>
         </a>
       </div>
@@ -558,7 +590,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=145"></script>
+  <script src="script.js?v=146"></script>
   <script>
     /* ---- Bianca case-study interactions (page-scoped) ---- */
     (function () {
@@ -683,31 +715,60 @@
         (hero || tablet).addEventListener('pointerleave', () => { if (!ready) return; tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(apply); });
       }
 
-      // ---- Product recordings: silent, endless, and only running while you can see them ----
+      // ---- Product recordings: silent, endless, and never spending their first cycle unseen ----
+      // None of them carry `autoplay`. Each one waits for its own cue, then starts at frame 0:
+      //   - the hero (data-start-after="tablet") waits for its card to finish arriving, so the
+      //     first cycle begins the moment the dashboard has actually landed on screen;
+      //   - every other one waits until it is 70% into the viewport, i.e. until you have scrolled
+      //     to it on purpose.
       // data-rate carries a playback multiplier (the hero runs at 2x). Browsers reset the rate on
       // some source changes, so it is re-applied on metadata and on every play.
       const vids = Array.from(document.querySelectorAll('.bn-video'));
+      const START_AT = 0.7;
+      const play = (v) => { const p = v.play(); if (p && p.catch) p.catch(() => {}); };
       vids.forEach((v) => {
-        v.muted = true;                       // belt and braces: autoplay is refused with sound
+        v.muted = true;                       // belt and braces: playback is refused with sound
         const rate = parseFloat(v.dataset.rate || '1');
         const setRate = () => { if (v.playbackRate !== rate) v.playbackRate = rate; };
         setRate();
         v.addEventListener('loadedmetadata', setRate);
         v.addEventListener('play', setRate);
       });
-      // Offscreen recordings are paused - four looping videos decoding at once is real battery for
-      // nothing. They pick up where they left off when they scroll back in.
-      if ('IntersectionObserver' in window && !reduce) {
+
+      // The hero: start it when the entrance animation on its card ends. animationend is the honest
+      // signal; the timeout is the fallback for a browser that never fires it (or a cached-CSS race).
+      const heroVid = document.querySelector('.bn-video[data-start-after="tablet"]');
+      if (heroVid) {
+        let launched = false;
+        const launch = () => { if (launched) return; launched = true; heroVid.currentTime = 0; play(heroVid); };
+        const card = heroVid.closest('.bn-tablet');
+        if (card) card.addEventListener('animationend', launch, { once: true });
+        setTimeout(launch, 3600);             // 2.2s delay + 1.15s entrance, rounded up
+        if (reduce) launch();                 // no entrance to wait for
+      }
+
+      // Everything else: hold at the poster until 70% of the recording is inside the viewport, then
+      // run from the top. After that first start it behaves like before - paused off-screen so four
+      // looping videos are not decoding at once, resumed where it left off when it comes back.
+      if ('IntersectionObserver' in window) {
+        const started = new WeakSet();
         const vio = new IntersectionObserver((entries) => {
           entries.forEach((e) => {
             const v = e.target;
-            if (e.isIntersecting) { const p = v.play(); if (p && p.catch) p.catch(() => {}); }
-            // unconditional: pausing before the first frame also clears the element's autoplay
-            // flag, which is what stops an offscreen recording from pulling its mp4 on load
+            // a recording taller than the viewport can never reach 70% of ITSELF, so the gate also
+            // opens once it covers 70% of the screen
+            const covers = e.rootBounds ? (e.intersectionRect.height / e.rootBounds.height) : 0;
+            const inView = e.intersectionRatio >= START_AT || covers >= START_AT;
+            if (!started.has(v)) {
+              if (inView) { started.add(v); v.currentTime = 0; play(v); }
+              else v.pause();                 // also clears the autoplay flag, so nothing preloads
+            } else if (e.intersectionRatio > 0.05) play(v);
             else v.pause();
           });
-        }, { rootMargin: '200px 0px', threshold: 0.05 });
-        vids.forEach((v) => vio.observe(v));
+        }, { threshold: [0, 0.05, 0.25, 0.5, 0.7, 0.9, 1] });
+        vids.forEach((v) => { if (v !== heroVid) vio.observe(v); });
+      } else {
+        vids.forEach((v) => { if (v !== heroVid) play(v); });
       }
 
       onScroll();

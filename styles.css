@@ -295,13 +295,20 @@ ul, ol { list-style: none; padding: 0; }
 /* ---- Mobile + tablet: the floating pill expands into ONE connected menu card ---- */
 @media (max-width: 1024px) {
   .hdr--float .hdr__nav, .hdr--float .hdr__cta { display: none; }
-  .hdr--float .hdr__expand, .hdr--float.is-scrolled .hdr__expand { max-width: none; opacity: 1; padding: 5px .3rem 5px .55rem; }
+  .hdr--float .hdr__expand { max-width: none; opacity: 1; padding: 5px .3rem 5px .55rem; }
   .hdr--float .hdr__status, .hdr--float.is-scrolled .hdr__status { max-width: 0; opacity: 0; padding: 0; margin-right: 0; }
-  /* Nothing inside the pill changes on scroll at this width - the nav and the status are both
-     out - so the pill must not change either. Without this it inherited the desktop scrolled
-     padding (10px → 20px on the right) and quietly grew 10px sideways as you scrolled. */
-  .hdr--float .hdr__pill, .hdr--float.is-scrolled .hdr__pill { padding: 8px 10px; }
+  .hdr--float .hdr__pill { padding: 8px 10px; }
   .hdr--float .hdr__menu { display: flex; width: 40px; height: 40px; }
+
+  /* Scrolling DOWN closes the bar onto the avatar, exactly as it does on desktop: the hamburger is
+     the only thing left inside .hdr__expand at this width, so collapsing that one box is the whole
+     move. Scrolling up by a couple of pixels drops .is-scrolled and the two bars come back, which is
+     how the menu stays reachable. pointer-events go with it so the collapsed sliver is not tappable.
+     (Until 17.08.2026 this width pinned .hdr__expand open and the hamburger never left.) */
+  .hdr--float.is-scrolled .hdr__expand { max-width: 0; opacity: 0; padding-inline: 0; pointer-events: none; }
+  .hdr--float.is-scrolled .hdr__pill { padding: 8px; }
+  /* an open menu is never collapsed out from under the reader's finger */
+  .hdr--float.menu-open.is-scrolled .hdr__expand { max-width: none; opacity: 1; padding: 5px .3rem 5px .55rem; pointer-events: auto; }
 
   /* when the menu is open, the pill gives way so the card reads as the bar expanded (one unit) */
   .hdr--float.menu-open .hdr__pill { opacity: 0; visibility: hidden; pointer-events: none; }
