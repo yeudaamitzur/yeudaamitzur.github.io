@@ -148,10 +148,11 @@
       background: linear-gradient(308deg, rgba(65, 65, 65, 0.014) -65.63%, rgba(167, 167, 167, 0.20) 147.78%);
       box-shadow: 0 -4px 29.4px 10px rgba(217, 130, 43, 0.10);
       -webkit-backdrop-filter: blur(13.72px); backdrop-filter: blur(13.72px); }
-    /* hero only: it floats over the pinned restaurant video, so it keeps the deep drop the
-       dashboard still had before it became a recording */
+    /* hero only: it floats over the pinned restaurant video, so it keeps a deep drop under it.
+       17.08.2026: that drop was the page's near-black (40,37,30) - it now casts in Bianca's own
+       orange, so the card sits in the warm band instead of punching a grey hole in it. */
     .bn-videoframe--hero { box-shadow: 0 -4px 29.4px 10px rgba(217, 130, 43, 0.10),
-      0 44px 90px -46px rgba(40,37,30,0.55); }
+      0 44px 90px -46px rgba(191, 96, 8, 0.62); }
     /* --ar is set per instance from the file's real pixel size, so the box is reserved before
        the first frame arrives and nothing is cropped */
     .bn-video { display: block; width: 100%; height: auto; aspect-ratio: var(--ar, 1600 / 1122);
