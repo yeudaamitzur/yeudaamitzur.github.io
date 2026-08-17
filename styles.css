@@ -739,8 +739,8 @@ ul, ol { list-style: none; padding: 0; }
    where the video gives way to the card. */
 .pcard--talmind { --pc-top: rgba(173, 179, 197, .88); --pc-soft: #EEF1F8; }
 .pcard--bianca  { --pc-top: rgba(243, 178, 112, .82); --pc-soft: #FCF2E7; }
-/* .pcard--ds (green) retired 13.08.2026 with the Design System case study.
-   The fourth card's teal rule came out on 14.08.2026 with the card itself; it is in the backup. */
+.pcard--traildesk { --pc-top: rgba(110, 205, 214, .78); --pc-soft: #E5F5F7; }
+/* .pcard--ds (green) retired 13.08.2026 with the Design System case study. */
 
 /* Only the card in the middle answers a pointer - the two parked ones are scenery, and a hover
    state on a card at 0.7 opacity, tilted and half off screen, reads as a bug. */
