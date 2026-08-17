@@ -148,6 +148,13 @@
       background: linear-gradient(308deg, rgba(65, 65, 65, 0.014) -65.63%, rgba(167, 167, 167, 0.20) 147.78%);
       box-shadow: 0 -4px 29.4px 10px rgba(217, 130, 43, 0.10);
       -webkit-backdrop-filter: blur(13.72px); backdrop-filter: blur(13.72px); }
+    /* The pane is one set of values, but it does not READ the same everywhere: over the hero's bright
+       veil the grey wash disappears, while over the flat cream of the page it lands as a visible grey
+       mat around the recording. The frames below the hero get the wash thinned to about a third so
+       they read as transparent as the hero's does. */
+    .bn-videoframe:not(.bn-videoframe--hero) {
+      background: linear-gradient(308deg, rgba(65, 65, 65, 0.006) -65.63%, rgba(167, 167, 167, 0.07) 147.78%); }
+
     /* hero only: it floats over the pinned restaurant video, so it keeps a drop under it.
        17.08.2026: back to the page's near-black after a pass in orange, but at the softer weight
        that pass arrived at - 0.40 alpha and a deeper negative spread, not the original 0.55/-46px. */
@@ -366,9 +373,9 @@
              page script). Same box, same entrance, same cursor parallax the still export had.
              bianca-hero.webp / .jpg are still on disk as the previous hero. -->
         <figure class="bn-videoframe bn-videoframe--hero">
-          <video class="bn-video" data-rate="2" style="--ar: 1600 / 1142"
+          <video class="bn-video" data-rate="2" style="--ar: 1600 / 1144"
                  autoplay muted loop playsinline preload="metadata"
-                 poster="bianca-critical-poster.jpg" width="1600" height="1142"
+                 poster="bianca-critical-poster.jpg" width="1600" height="1144"
                  aria-label="The Bianca dashboard: a manager clearing two critical alerts">
             <source src="bianca-critical.mp4" type="video/mp4" />
           </video>
@@ -441,8 +448,8 @@
         </div>
       <div class="bn-wrap">
         <figure class="bn-videoframe reveal">
-          <video class="bn-video" style="--ar: 1600 / 1142" autoplay muted loop playsinline
-                 preload="none" poster="bianca-critical-poster.jpg" width="1600" height="1142"
+          <video class="bn-video" style="--ar: 1600 / 1144" autoplay muted loop playsinline
+                 preload="none" poster="bianca-critical-poster.jpg" width="1600" height="1144"
                  aria-label="Two critical alerts cleared from the Bianca dashboard">
             <source src="bianca-critical.mp4" type="video/mp4" />
           </video>
