@@ -48,7 +48,8 @@
              frame's own padding is subtracted from the flow block's, or a video would sit that much
              lower than a screenshot under the same heading. */
           --bn-capgap:   clamp(1.6rem, 3.2vw, 2.4rem);
-          --bn-framepad: clamp(8px, 1.3vw, 20px);
+          --bn-framepad: clamp(8px, 1.3vw, 20px);          /* hero */
+          --bn-framepad-in: clamp(15px, 2.3vw, 34px);      /* the three inside the study */
           --bn-shadow:  0 30px 60px -34px rgba(40,37,30,0.4);
           --bn-shadow-lift: 0 46px 84px -40px rgba(40,37,30,0.5);
           --bn-mut: rgba(40,37,30,0.55);
@@ -144,8 +145,12 @@
        top of it. Both fade out at the two ends through a gradient stroke, so a curve arrives and
        leaves rather than being cut by the screen edge. */
     .bn-wire { fill: none; stroke-linecap: round; stroke: url(#bnWireFade); }
-    .bn-wire--line { stroke-width: 2; vector-effect: non-scaling-stroke; }
-    .bn-wire--halo { stroke-width: 9; opacity: .5; filter: url(#bnWireBlur); }
+    .bn-wire--line { stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+    /* 17.08.2026: the halo was bloomed over 9px at half opacity and pulled the eye off the work.
+       Tighter around the line now, and lighter. Second pass the same day: the bloom was still wide
+       enough to read as a glow rather than a hairline's edge, so the blur went 3.5 -> 1.8 and the
+       halo 7 -> 4.5 at .16. The wires are a texture behind the recordings, not a thing to look at. */
+    .bn-wire--halo { stroke-width: 4.5; opacity: .16; filter: url(#bnWireBlur); }
     .bn-wiredefs { position: absolute; width: 0; height: 0; overflow: hidden; }
 
     /* glass frame - every video on the page sits in this one frame, the hero included.
@@ -165,13 +170,16 @@
        rim, a 2px backdrop blur. Fully invisible was a step too far: the recording lost its card and
        just sat on the cream. These values are about a fifth of the hero's, which is what keeps the
        hero reading as glass over its photograph while these read as barely-there over flat colour.
-       Their shadow is orange rather than the page near-black, at a little over half the hero's weight. */
+       17.08.2026: their shadow was two orange layers, one thrown up and one thrown down, so the card
+       was lit from a direction. It is the page's near-black now, both layers at zero offset - the
+       same soft edge on all four sides, which is what a card resting flat on the page looks like. */
     .bn-videoframe:not(.bn-videoframe--hero) {
+      padding: var(--bn-framepad-in);
       background: linear-gradient(308deg, rgba(65, 65, 65, 0.004) -65.63%, rgba(167, 167, 167, 0.035) 147.78%);
       border-color: rgba(255, 255, 255, 0.14);
       -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
-      box-shadow: 0 -4px 29.4px 10px rgba(217, 130, 43, 0.055),
-        0 40px 92px -52px rgba(191, 96, 8, 0.22); }
+      box-shadow: 0 0 24px 2px rgba(40, 37, 30, 0.055),
+        0 0 64px 10px rgba(40, 37, 30, 0.045); }
 
     /* hero only: it floats over the pinned restaurant video, so it keeps a drop under it.
        17.08.2026: back to the page's near-black after a pass in orange, but at the softer weight
@@ -273,10 +281,10 @@
       font-size: clamp(1.15rem, 1.9vw, 1.5rem); line-height: 1.35; letter-spacing: -0.012em;
       margin-top: clamp(1.7rem, 3.2vw, 2.5rem); }
     /* A caption or a heading sits exactly --bn-capgap above the media it names - the same gap
-       "Shift management" has above its screenshot. The frame's own padding is already part of that
-       distance, so it comes off here; otherwise a video would sit a frame-padding lower than a
-       screenshot under an identically-spaced heading. */
-    .bn-flow--tight { padding-top: calc(var(--bn-capgap) - var(--bn-framepad)); }
+       "Shift management" has above its screenshot. For a recording the distance is measured to the
+       OUTSIDE of its frame, not to the video inside it, so the frame's padding is not subtracted
+       here: the box edge is what the eye lines up against. */
+    .bn-flow--tight { padding-top: var(--bn-capgap); }
     /* a section that ends on a heading hands straight over to the flow block below it */
     .bn-section--flush { padding-bottom: 0; }
 
@@ -383,13 +391,13 @@
   <svg class="bn-wiredefs" width="0" height="0" aria-hidden="true" focusable="false">
     <defs>
       <filter id="bnWireBlur" x="-20%" y="-300%" width="140%" height="700%">
-        <feGaussianBlur stdDeviation="7" />
+        <feGaussianBlur stdDeviation="1.8" />
       </filter>
       <linearGradient id="bnWireFade" x1="0" y1="0" x2="1" y2="0">
         <stop offset="0"    stop-color="#c07434" stop-opacity="0" />
-        <stop offset="0.14" stop-color="#c07434" stop-opacity="0.85" />
-        <stop offset="0.55" stop-color="#dd8f3f" stop-opacity="0.9" />
-        <stop offset="0.86" stop-color="#f0ad70" stop-opacity="0.75" />
+        <stop offset="0.14" stop-color="#c07434" stop-opacity="0.40" />
+        <stop offset="0.55" stop-color="#dd8f3f" stop-opacity="0.42" />
+        <stop offset="0.86" stop-color="#f0ad70" stop-opacity="0.32" />
         <stop offset="1"    stop-color="#f0ad70" stop-opacity="0" />
       </linearGradient>
     </defs>
@@ -482,15 +490,13 @@
     <!-- full-bleed: the wires must reach both screen edges, so this sits OUTSIDE .bn-wrap -->
     <div class="bn-flow bn-flow--tight" aria-label="Two critical alerts, cleared from the dashboard">
         <div class="bn-flow__wires" aria-hidden="true">
-          <!-- pair 1 of 3: both fall left to right - one swings deeper and crests back up, the other
-               only leans. They run together rather than crossing in an X, and both stay inside a
-               band around the middle of the block (the 520 box is centred on 260), so the travel
-               reads side to side across the recording, not corner to corner. -->
-          <svg viewBox="0 0 1440 520" preserveAspectRatio="none">
-            <path class="bn-wire bn-wire--halo" d="M-60,168 C 240,168 380,352 690,360 C 880,365 934,262 1112,258 C 1282,254 1352,322 1500,362" />
-            <path class="bn-wire bn-wire--line" d="M-60,168 C 240,168 380,352 690,360 C 880,365 934,262 1112,258 C 1282,254 1352,322 1500,362" />
-            <path class="bn-wire bn-wire--halo" d="M-60,226 C 330,228 476,290 792,295 C 1002,298 1044,252 1208,250 C 1342,248 1416,282 1500,300" />
-            <path class="bn-wire bn-wire--line" d="M-60,226 C 330,228 476,290 792,295 C 1002,298 1044,252 1208,250 C 1342,248 1416,282 1500,300" />
+          <!-- ONE wire per recording, drawn fresh on every page load by the generator at the foot of
+               this file: a lazy curve through five random points, inside a band centred on the middle
+               of the 520-tall box, so it crosses the card at its waist. The `d` below is only the
+               no-JS fallback and the shape the generator is modelled on. -->
+          <svg viewBox="0 0 1440 520" preserveAspectRatio="none" data-wire>
+            <path class="bn-wire bn-wire--halo" d="M-60,218 C 320,216 520,298 830,302 C 1010,304 1070,256 1200,254 C 1330,252 1410,282 1500,300" />
+            <path class="bn-wire bn-wire--line" d="M-60,218 C 320,216 520,298 830,302 C 1010,304 1070,256 1200,254 C 1330,252 1410,282 1500,300" />
           </svg>
         </div>
       <div class="bn-wrap">
@@ -510,12 +516,10 @@
 
     <div class="bn-flow bn-flow--tight" aria-label="An important alert, handled from the dashboard">
         <div class="bn-flow__wires" aria-hidden="true">
-          <!-- pair 2 of 3: the same idea mirrored - both climb left to right, one harder than the other -->
-          <svg viewBox="0 0 1440 520" preserveAspectRatio="none">
-            <path class="bn-wire bn-wire--halo" d="M-60,352 C 240,352 380,168 690,160 C 880,155 934,258 1112,262 C 1282,266 1352,198 1500,158" />
-            <path class="bn-wire bn-wire--line" d="M-60,352 C 240,352 380,168 690,160 C 880,155 934,258 1112,262 C 1282,266 1352,198 1500,158" />
-            <path class="bn-wire bn-wire--halo" d="M-60,294 C 330,292 476,230 792,225 C 1002,222 1044,268 1208,270 C 1342,272 1416,238 1500,220" />
-            <path class="bn-wire bn-wire--line" d="M-60,294 C 330,292 476,230 792,225 C 1002,222 1044,268 1208,270 C 1342,272 1416,238 1500,220" />
+          <!-- 2 of 3 - fallback only; the generator replaces this on load -->
+          <svg viewBox="0 0 1440 520" preserveAspectRatio="none" data-wire>
+            <path class="bn-wire bn-wire--halo" d="M-60,212 C 280,210 460,304 780,308 C 980,310 1044,256 1186,254 C 1320,252 1408,288 1500,306" />
+            <path class="bn-wire bn-wire--line" d="M-60,212 C 280,210 460,304 780,308 C 980,310 1044,256 1186,254 C 1320,252 1408,288 1500,306" />
           </svg>
         </div>
       <div class="bn-wrap">
@@ -536,13 +540,10 @@
 
     <div class="bn-flow bn-flow--tight" aria-label="Ordering products in Bianca">
         <div class="bn-flow__wires" aria-hidden="true">
-          <!-- pair 3 of 3: falling again, on a later rhythm - the drop holds off, the flat runs long,
-               and the band is a touch wider than the other two so the three blocks are not identical -->
-          <svg viewBox="0 0 1440 520" preserveAspectRatio="none">
-            <path class="bn-wire bn-wire--halo" d="M-60,190 C 320,188 520,344 830,350 C 1010,353 1070,286 1200,283 C 1330,280 1410,330 1500,356" />
-            <path class="bn-wire bn-wire--line" d="M-60,190 C 320,188 520,344 830,350 C 1010,353 1070,286 1200,283 C 1330,280 1410,330 1500,356" />
-            <path class="bn-wire bn-wire--halo" d="M-60,246 C 360,247 560,296 880,300 C 1050,302 1100,262 1230,260 C 1350,258 1430,286 1500,300" />
-            <path class="bn-wire bn-wire--line" d="M-60,246 C 360,247 560,296 880,300 C 1050,302 1100,262 1230,260 C 1350,258 1430,286 1500,300" />
+          <!-- 3 of 3 - fallback only; the generator replaces this on load -->
+          <svg viewBox="0 0 1440 520" preserveAspectRatio="none" data-wire>
+            <path class="bn-wire bn-wire--halo" d="M-60,208 C 340,206 560,306 870,312 C 1050,314 1104,260 1226,258 C 1348,256 1420,290 1500,310" />
+            <path class="bn-wire bn-wire--line" d="M-60,208 C 340,206 560,306 870,312 C 1050,314 1104,260 1226,258 C 1348,256 1420,290 1500,310" />
           </svg>
         </div>
       <div class="bn-wrap">
@@ -615,6 +616,54 @@
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
       const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+      /* ---- One random wire per recording ----
+         17.08.2026: the three flows carried hand-drawn curves, and after a pass at two-per-video
+         they are back to one each - but no longer the same one on every visit. Each load draws a
+         lazy curve through five points whose heights are random inside a LOW band (y 258-424 of the
+         520-tall box), so the wire travels under the recording rather than across the middle of it.
+         The x of the three inner points wobbles too, which is what keeps the crest from landing in
+         the same place twice. Catmull-Rom through the points, converted to cubics, so the result is
+         always smooth - randomness in where it goes, never in how it turns.
+         The `d` left in the markup is the no-JS fallback; this overwrites it. */
+      (function drawWires() {
+        const svgs = document.querySelectorAll('.bn-flow__wires svg[data-wire]');
+        if (!svgs.length) return;
+        const NS = 'http://www.w3.org/2000/svg';
+        const R = (a, b) => a + Math.random() * (b - a);
+        // The band the whole curve stays inside. Centred on 260 - the middle of the 520-tall box, so
+        // the wire crosses the card at its waist. It sat low (258-424) for one pass and read as a
+        // line running under the card rather than through it.
+        const LO = 200, HI = 320;
+        const STEP = 90;                   // most a node may rise or fall from the one before it
+
+        svgs.forEach((svg) => {
+          // five nodes: both ends sit off-canvas so the curve arrives and leaves the screen
+          const xs = [-60, R(250, 400), R(630, 800), R(1030, 1190), 1500];
+          // each node is drawn straight out of the window its neighbour allows, rather than drawn
+          // wide and then clamped - clamping piled the ends flat against the top of the band
+          const ys = [R(LO, HI)];
+          for (let i = 1; i < xs.length; i++) {
+            ys.push(R(Math.max(LO, ys[i - 1] - STEP), Math.min(HI, ys[i - 1] + STEP)));
+          }
+
+          let d = 'M' + xs[0].toFixed(1) + ',' + ys[0].toFixed(1);
+          for (let i = 0; i < xs.length - 1; i++) {
+            const a = Math.max(0, i - 1), b = Math.min(xs.length - 1, i + 2);
+            d += ' C ' + (xs[i] + (xs[i + 1] - xs[a]) / 6).toFixed(1) + ',' + (ys[i] + (ys[i + 1] - ys[a]) / 6).toFixed(1)
+               + ' ' + (xs[i + 1] - (xs[b] - xs[i]) / 6).toFixed(1) + ',' + (ys[i + 1] - (ys[b] - ys[i]) / 6).toFixed(1)
+               + ' ' + xs[i + 1].toFixed(1) + ',' + ys[i + 1].toFixed(1);
+          }
+
+          svg.textContent = '';
+          ['bn-wire--halo', 'bn-wire--line'].forEach((mod) => {
+            const p = document.createElementNS(NS, 'path');
+            p.setAttribute('class', 'bn-wire ' + mod);
+            p.setAttribute('d', d);
+            svg.appendChild(p);
+          });
+        });
+      })();
 
       // Wire the glass-menu close button to the shared hamburger toggle
       const menuBtn = document.querySelector('.hdr__menu');
