@@ -48,8 +48,10 @@
              frame's own padding is subtracted from the flow block's, or a video would sit that much
              lower than a screenshot under the same heading. */
           --bn-capgap:   clamp(1.6rem, 3.2vw, 2.4rem);
-          --bn-framepad: clamp(8px, 1.3vw, 20px);          /* hero */
-          --bn-framepad-in: clamp(15px, 2.3vw, 34px);      /* the three inside the study */
+          /* ONE frame padding for every recording on the page, the hero's own. The three inside the
+             study had a wider rim of their own (--bn-framepad-in, last at clamp(15px,2.3vw,34px));
+             17.08.2026 they were set back to the hero's, so a frame is a frame wherever it appears. */
+          --bn-framepad: clamp(8px, 1.3vw, 20px);
           --bn-shadow:  0 30px 60px -34px rgba(40,37,30,0.4);
           --bn-shadow-lift: 0 46px 84px -40px rgba(40,37,30,0.5);
           --bn-mut: rgba(40,37,30,0.55);
@@ -173,8 +175,9 @@
        17.08.2026: their shadow was two orange layers, one thrown up and one thrown down, so the card
        was lit from a direction. It is the page's near-black now, both layers at zero offset - the
        same soft edge on all four sides, which is what a card resting flat on the page looks like. */
+    /* Padding is NOT overridden here any more - these carry the hero's --bn-framepad, inherited from
+       the rule above. Only the paint differs between a hero frame and a study frame, never the rim. */
     .bn-videoframe:not(.bn-videoframe--hero) {
-      padding: var(--bn-framepad-in);
       background: linear-gradient(308deg, rgba(65, 65, 65, 0.004) -65.63%, rgba(167, 167, 167, 0.035) 147.78%);
       border-color: rgba(255, 255, 255, 0.14);
       -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
