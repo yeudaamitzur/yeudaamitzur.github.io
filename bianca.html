@@ -85,13 +85,14 @@
     /* dashboard - reduced to the Figma proportion, dropped well below the title; scrolls over the pinned video.
        17.08.2026: the still export was replaced by the critical-alerts recording, played at 2x. It sits in
        the same box, at the same moment, and keeps the same cursor parallax - only the media changed. */
-    .bn-tablet { position: relative; z-index: 2; width: min(782px, 100%);
+    .bn-tablet { position: relative; z-index: 2; width: min(880px, 100%);   /* was 782px */
       margin: clamp(3.5rem, 9vw, 7rem) auto 0;
       transform-style: preserve-3d; will-change: transform, opacity;
       animation: bnTabletIn 1.15s cubic-bezier(.2,.7,.2,1) 2.2s both; }
-    /* with the hero line gone there is nothing above the recording, so it does not need the drop
-       that used to clear a two-line title */
-    .bn-tablet--notitle { margin-top: clamp(1.5rem, 3.5vw, 3rem); }
+    /* with the hero line gone the recording does not need the full drop that used to clear a
+       two-line title, but it should still sit below the crest of the veil rather than right under
+       the header */
+    .bn-tablet--notitle { margin-top: clamp(2.75rem, 6vw, 5.25rem); }
     @keyframes bnTabletIn {
       from { opacity: 0; transform: translateY(72px) scale(1.1); }
       to   { opacity: 1; transform: translateY(0) scale(1); }
