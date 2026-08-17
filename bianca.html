@@ -166,7 +166,13 @@
        (0.29 -> 0.20 / 0.02 -> 0.014) so more of the page shows through. */
     .bn-videoframe { position: relative; z-index: 1; width: 100%; margin-inline: auto;
       padding: var(--bn-framepad);
-      border-radius: clamp(20px, 2.4vw, 34px);
+      /* 17.08.2026: the FLOOR came down, 20px -> 14px. Below ~700px the 2.4vw term is smaller than
+         the floor, so the floor was the radius - and a fixed 20px on a 335px card is 5.97% of its
+         width, against 3.14% on the 1084px desktop card. The corner was almost twice as round on a
+         phone and visibly ate into the recording. 14px lands at 4.2%, a deliberate step up from
+         desktop rather than double it: a phone card is small enough that a hairline corner reads as
+         an accident. Same reasoning for .bn-video and .bn-shot below - one factor, ~1.35x. */
+      border-radius: clamp(14px, 2.4vw, 34px);
       border: 1.055px solid rgba(255, 255, 255, 0.28);
       background: linear-gradient(308deg, rgba(65, 65, 65, 0.014) -65.63%, rgba(167, 167, 167, 0.20) 147.78%);
       box-shadow: 0 -4px 29.4px 10px rgba(217, 130, 43, 0.10);
@@ -200,7 +206,7 @@
     /* --ar is set per instance from the file's real pixel size, so the box is reserved before
        the first frame arrives and nothing is cropped */
     .bn-video { display: block; width: 100%; height: auto; aspect-ratio: var(--ar, 1600 / 1122);
-      object-fit: cover; border-radius: clamp(10px, 1.2vw, 16px); background: #eceae3; }
+      object-fit: cover; border-radius: clamp(7px, 1.2vw, 16px); background: #eceae3; }
 
     /* ---------- Cognitive-load note, and the Impact statement that closes the page ---------- */
     /* 1.1rem under the heading is the gap .bn-lead already holds under its own label - the page's
@@ -275,7 +281,7 @@
        flat on the page. Radius is still computed off the grid width, the way Talmind's .tl-shot does it. */
     .bn-shot { width: 100%; margin: 0; margin-top: var(--bn-capgap); }
     .bn-shot > img, .bn-shot > video { display: block; width: 100%; height: auto;
-      border-radius: max(18px, calc((min(100vw, 1180px) - var(--pad) * 2) * 0.024)); }
+      border-radius: max(11px, calc((min(100vw, 1180px) - var(--pad) * 2) * 0.024)); }
     /* the three screens that close the page stand apart, not stacked tight */
     .bn-shot + .bn-shot { margin-top: clamp(2.5rem, 5vw, 4rem); }
 
