@@ -12,7 +12,7 @@
   <meta property="og:url" content="https://yehudaamitzur.com/traildesk" />
   <meta property="og:title" content="TrailDesk case study · Yehuda Amitzur" />
   <meta property="og:description" content="TrailDesk is a map-first app that aggregates public workspaces and grades them on the conditions that decide whether you can actually work there. A UX/UI case study by Yehuda Amitzur." />
-  <meta property="og:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=151" />
+  <meta property="og:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=152" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="750" />
@@ -20,7 +20,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="TrailDesk case study · Yehuda Amitzur" />
   <meta name="twitter:description" content="TrailDesk is a map-first app that aggregates public workspaces and grades them on the conditions that decide whether you can actually work there. A UX/UI case study by Yehuda Amitzur." />
-  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=151" />
+  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=152" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -28,8 +28,8 @@
   <!-- favicon: the same ring as the site cursor - purple stroke, lighter purple fill -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
   <link rel="canonical" href="https://yehudaamitzur.com/traildesk" />
-  <link rel="preload" as="image" href="td-phone-hero.png?v=151" fetchpriority="high" />
-  <link rel="stylesheet" href="styles.css?v=151" />
+  <link rel="preload" as="image" href="td-phone-hero.png?v=152" fetchpriority="high" />
+  <link rel="stylesheet" href="styles.css?v=152" />
 
   <style>
     /* =========================================================
@@ -66,6 +66,11 @@
       font-size: clamp(1.06rem, 1.5vw, 1.32rem); line-height: 1.55; letter-spacing: -0.004em;
       margin-top: 1.1rem; max-width: 64rem; }
     .td-body .hl, .td-body b { color: var(--brand); font-weight: 600; }
+    /* Problem and Solution keep the weight but not the purple (18.08.2026) - the two of them are
+       one long read, and a highlight every other line was colouring the whole passage. */
+    #problem .td-body b, #solution .td-body b, #solution .td-body .hl { color: inherit; }
+    /* .td-insight went with the closing section on 18.08.2026; kept here because the CTA above
+       the footer still borrows its scale. */
     .td-insight { font-family: var(--f-display); font-weight: 500; color: var(--ink);
       font-size: clamp(1.5rem, 3vw, 2.15rem); line-height: 1.18; letter-spacing: -0.02em;
       margin-top: 1.1rem; max-width: 34ch; }
@@ -82,7 +87,7 @@
       padding-bottom: clamp(1rem, 3vw, 2rem); }
     .td-hero__bg { position: fixed; top: 0; left: 50%; transform: translateX(-50%);
       width: 100vw; height: clamp(560px, 54vw, 800px); z-index: 0; overflow: hidden; pointer-events: none;
-      background: var(--bg) url("td-hero-poster.jpg?v=151") center / cover no-repeat; }
+      background: var(--bg) url("td-hero-poster.jpg?v=152") center / cover no-repeat; }
     /* THE FOOTAGE (17.08.2026) - a park with the skyline behind it, which is the product's whole
        subject. It sits at the bottom of the band's three layers and everything else is painted over
        it, so the z-indexes here are explicit rather than left to DOM order. */
@@ -185,6 +190,26 @@
        (17 / 13 / 10 units of a 200 box) instead of sharing one stroke width. */
     .td-charts { margin-top: clamp(2.5rem, 5vw, 4rem); display: grid; grid-template-columns: 1fr 1fr;
       gap: clamp(2rem, 4vw, 3.5rem); }
+    /* Same entrance as the four rings above them, asked for on 18.08.2026: the figure rises on
+       tdStepIn, and inside it the three arcs wind in from the outside in - a small rotation
+       against the sweep, so each one reads as travelling to where it stops. */
+    .td-charts.reveal { opacity: 1; transform: none; transition: none; }
+    .td-chart { opacity: 0; }
+    .td-charts.is-in .td-chart { animation: tdStepIn 1.3s cubic-bezier(.22,.61,.36,1) both; }
+    .td-charts.is-in .td-chart:nth-child(1) { animation-delay: .04s; }
+    .td-charts.is-in .td-chart:nth-child(2) { animation-delay: .16s; }
+    .td-chart__svg path { opacity: 0; transform-origin: 50% 50%; }
+    .td-charts.is-in .td-chart__svg path { animation: tdArcIn 1.15s cubic-bezier(.22,.61,.36,1) both; }
+    .td-charts.is-in .td-chart:nth-child(1) path:nth-child(1) { animation-delay: .20s; }
+    .td-charts.is-in .td-chart:nth-child(1) path:nth-child(2) { animation-delay: .32s; }
+    .td-charts.is-in .td-chart:nth-child(1) path:nth-child(3) { animation-delay: .44s; }
+    .td-charts.is-in .td-chart:nth-child(2) path:nth-child(1) { animation-delay: .32s; }
+    .td-charts.is-in .td-chart:nth-child(2) path:nth-child(2) { animation-delay: .44s; }
+    .td-charts.is-in .td-chart:nth-child(2) path:nth-child(3) { animation-delay: .56s; }
+    @keyframes tdArcIn {
+      from { opacity: 0; transform: rotate(-26deg) scale(.955); }
+      to   { opacity: 1; transform: none; }
+    }
     .td-chart__q { font-family: var(--f-display); font-weight: 700; color: var(--ink);
       font-size: clamp(1rem, 1.25vw, 1.1rem); line-height: 1.35; max-width: 22ch; }
     .td-chart__body { margin-top: clamp(1.1rem, 2.4vw, 1.8rem); display: flex; align-items: center;
@@ -204,7 +229,9 @@
        again. The text column simply sits beside it. */
     .td-market { display: grid; grid-template-columns: 1fr 1fr;
       gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center; }
-    .td-market__img { display: block; width: 100%; height: auto; }
+    /* He asked for the plate to sit back rather than land on the page (18.08.2026) - it is his
+       artwork, but at full strength it out-shouted the sentence beside it. */
+    .td-market__img { display: block; width: 100%; height: auto; opacity: .58; }
 
     /* ---------- Branding ----------
        Three plates cut out of his branding board: the wordmark across the top, then the logo on its
@@ -231,7 +258,7 @@
        MOBILE is the same three phones turned into a swipeable strip - see the block further down. */
     .td-band { position: relative; margin-top: clamp(1.9rem, 3.6vw, 2.6rem);
       aspect-ratio: 3576 / 2595;
-      background: url("td-band.jpg?v=151") center / cover no-repeat;
+      background: url("td-band.jpg?v=152") center / cover no-repeat;
       border-radius: clamp(20px, 2.4vw, 34px); box-shadow: var(--td-card); overflow: hidden; }
     .td-band__track { position: absolute; inset: 0; }
     .td-band__ph { position: absolute; width: auto; transform: translateX(-50%);
@@ -239,11 +266,8 @@
     .td-band__ph--mid   { left: 50%;  top: 13.3%; height: 74.6%; z-index: 2; }
     .td-band__ph--left  { left: 21%;  top: 22.8%; height: 62.6%; }
     .td-band__ph--right { left: 79%;  top: 22.8%; height: 62.6%; }
-    .td-mark { margin-top: clamp(1rem, 2vw, 1.6rem);
-      background: linear-gradient(180deg, #FAFDFE, #EAF6F8); border: 1px solid var(--p3);
-      border-radius: clamp(16px, 2vw, 26px); padding: clamp(1.5rem, 4vw, 3rem) 1rem; text-align: center; }
-    .td-mark span { font-family: var(--f-display); font-weight: 800; color: var(--p6);
-      font-size: clamp(1.7rem, 6vw, 4rem); letter-spacing: .1em; text-transform: uppercase; }
+    /* The big TRAIL DESK box under the band came out on 18.08.2026 - "already did it in the
+       picture, so it is redundant". The branding board that follows carries the wordmark now. */
 
     /* ---------- CTA ---------- */
     .td-cta { margin-top: clamp(1.75rem, 4vw, 3.25rem);
@@ -306,6 +330,7 @@
       .td-phone { transform: none !important; animation: none !important; opacity: 1 !important; }
       .td-donuts .td-donut { opacity: 1; animation: none !important; }
       .td-donut__ring { transition: none; --sweep: var(--end); }
+      .td-charts .td-chart, .td-chart__svg path { opacity: 1; animation: none !important; transform: none; }
       /* fall back to a normal scrolling hero (no pinned band / sticky title), and the footage holds
          on its first frame - the poster - instead of playing */
       .td-hero__bg { position: absolute; }
@@ -351,9 +376,9 @@
     <span class="td-rail__dots">
       <a class="td-rail__dot" href="#research" aria-label="Research"></a>
       <a class="td-rail__dot" href="#market" aria-label="Market overview"></a>
-      <a class="td-rail__dot" href="#brand" aria-label="Branding"></a>
       <a class="td-rail__dot" href="#architecture" aria-label="Information architecture"></a>
       <a class="td-rail__dot" href="#ui" aria-label="UI design"></a>
+      <a class="td-rail__dot" href="#brand" aria-label="Branding"></a>
       <span class="td-rail__dot td-rail__cap" aria-hidden="true"></span>
     </span>
   </nav>
@@ -364,8 +389,8 @@
     <section class="td-hero td-wrap">
       <div class="td-hero__bg" aria-hidden="true">
         <video class="td-hero__vid" autoplay muted loop playsinline preload="metadata"
-               poster="td-hero-poster.jpg?v=151">
-          <source src="td-hero.mp4?v=151" type="video/mp4" />
+               poster="td-hero-poster.jpg?v=152">
+          <source src="td-hero.mp4?v=152" type="video/mp4" />
         </video>
       </div>
 
@@ -375,7 +400,7 @@
       </div>
 
       <div class="td-phone" data-phone>
-        <img src="td-phone-hero.png?v=151" width="576" height="1188" fetchpriority="high" decoding="async"
+        <img src="td-phone-hero.png?v=152" width="576" height="1188" fetchpriority="high" decoding="async"
              alt="A TrailDesk place card: Chess House, 350 meters away, scored for Wi-Fi, power, noise, seating and parking" />
       </div>
     </section>
@@ -495,25 +520,11 @@
           <p class="td-body">All of these and more focus on <b>very expensive coworking spaces</b> or
             <b>generic coffee shops</b>.</p>
         </div>
-        <img class="td-market__img" src="td-competitors.png?v=151" width="1200" height="1139" loading="lazy" decoding="async"
+        <img class="td-market__img" src="td-competitors.png?v=152" width="1200" height="1139" loading="lazy" decoding="async"
              alt="The three apps in the space today - Pluria, Spacing and a cafe-finder - shown as app icons on a tilted card" />
       </div>
     </section>
 
-    <!-- ===== BRANDING ===== -->
-    <section class="td-section td-wrap" id="brand">
-      <h2 class="td-h2 reveal">Branding</h2>
-      <div class="td-brand reveal">
-        <img src="td-brand-word.png?v=151" width="2360" height="485" loading="lazy" decoding="async"
-             alt="The TRAIL DESK wordmark" />
-        <div class="td-brand__pair">
-          <img src="td-brand-logo.png?v=151" width="1160" height="1318" loading="lazy" decoding="async"
-               alt="The TrailDesk mark on its construction grid" />
-          <img src="td-brand-icon.png?v=151" width="1160" height="1318" loading="lazy" decoding="async"
-               alt="The TrailDesk app icon on an iPhone home screen" />
-        </div>
-      </div>
-    </section>
 
 
     <!-- ===== INFORMATION ARCHITECTURE ===== -->
@@ -521,7 +532,7 @@
       <h2 class="td-h2 reveal">Information architecture</h2>
 
       <figure class="td-dia reveal">
-        <img class="td-dia__img" src="td-ia.png?v=151" width="2400" height="2095" loading="lazy" decoding="async"
+        <img class="td-dia__img" src="td-ia.png?v=152" width="2400" height="2095" loading="lazy" decoding="async"
              alt="TrailDesk information architecture: Splash to Walk through to Onboarding, which splits into Sign in and Sign up and leads to Home (Map). Home branches into Categories, Favorites, Messages and Profile, each with up to three further levels." />
       </figure>
     </section>
@@ -531,37 +542,41 @@
       <h2 class="td-h2 reveal">User flow</h2>
 
       <figure class="td-dia reveal">
-        <img class="td-dia__img" src="td-flow.png?v=151" width="2200" height="2560" loading="lazy" decoding="async"
+        <img class="td-dia__img" src="td-flow.png?v=152" width="2200" height="2560" loading="lazy" decoding="async"
              alt="TrailDesk user flow: onboarding runs from Start through Splash and Logo, App Walkthrough and Sign in or Sign up to the Home Screen. The main flow goes from the Home Screen through Category Selection or Search to the Places List and the Place Properties Filter, into a decision about finding an interesting place, then Place Details, a decision about suitability, and finally Initiate Navigation, with a branch through User Reviews, Ask Someone, Member Profile and Direct Messaging." />
       </figure>
     </section>
 
     <!-- ===== UI DESIGN ===== -->
     <section class="td-section td-wrap" id="ui">
-      <h2 class="td-h2 reveal">UI design</h2>
-
       <!-- On a phone this strip is swipeable: the three screens travel together and whichever one
            reaches the middle is the one shown large. The order here is the order on screen. -->
       <div class="td-band reveal">
         <div class="td-band__track" data-band>
-          <img class="td-band__ph td-band__ph--left" src="td-ui-left.png?v=151" width="270" height="544" loading="lazy" decoding="async"
+          <img class="td-band__ph td-band__ph--left" src="td-ui-left.png?v=152" width="270" height="544" loading="lazy" decoding="async"
                alt="TrailDesk: the map filtered to parks, with a place preview card at the bottom" />
-          <img class="td-band__ph td-band__ph--mid" src="td-ui-mid.png?v=151" width="332" height="664" loading="lazy" decoding="async"
+          <img class="td-band__ph td-band__ph--mid" src="td-ui-mid.png?v=152" width="332" height="664" loading="lazy" decoding="async"
                alt="TrailDesk home screen: a map of nearby public workspaces with colour-coded category pins" />
-          <img class="td-band__ph td-band__ph--right" src="td-ui-right.png?v=151" width="268" height="546" loading="lazy" decoding="async"
+          <img class="td-band__ph td-band__ph--right" src="td-ui-right.png?v=152" width="268" height="546" loading="lazy" decoding="async"
                alt="TrailDesk place detail: Dawn Cloud Park with its conditions scored out of ten" />
         </div>
       </div>
-      <div class="td-mark reveal"><span>Trail Desk</span></div>
     </section>
 
-    <!-- ===== IMPACT ===== -->
-    <section class="td-section td-wrap" id="impact">
-      <p class="td-insight reveal">Choosing where to work stops being a gamble
-        and becomes <span class="hl">a decision.</span></p>
-      <p class="td-body reveal">The information people were missing already existed — it was just never gathered
-        anywhere. TrailDesk puts it on one map, scores it on the five things that decide whether a place works,
-        and lets the people who have already been there answer the rest.</p>
+
+    <!-- ===== BRANDING ===== -->
+    <section class="td-section td-wrap" id="brand">
+      <h2 class="td-h2 reveal">Branding</h2>
+      <div class="td-brand reveal">
+        <img src="td-brand-word.png?v=152" width="2360" height="485" loading="lazy" decoding="async"
+             alt="The TRAIL DESK wordmark" />
+        <div class="td-brand__pair">
+          <img src="td-brand-logo.png?v=152" width="1400" height="1591" loading="lazy" decoding="async"
+               alt="The TrailDesk mark on its construction grid" />
+          <img src="td-brand-icon.png?v=152" width="1400" height="1591" loading="lazy" decoding="async"
+               alt="The TrailDesk app icon on an iPhone home screen" />
+        </div>
+      </div>
     </section>
 
     <!-- ===== NEXT PROJECT - the loop, handed over before the contact ask ===== -->
@@ -575,7 +590,7 @@
             <span class="nxt__desc"><b>BIANCA</b> restaurant management dashboard</span>
           </span>
           <span class="nxt__frame">
-            <img class="nxt__img" src="tile-bianca.jpg?v=151" width="1200" height="750" alt="" loading="lazy" />
+            <img class="nxt__img" src="tile-bianca.jpg?v=152" width="1200" height="750" alt="" loading="lazy" />
           </span>
         </a>
       </div>
@@ -597,7 +612,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=151"></script>
+  <script src="script.js?v=152"></script>
   <script>
     /* ---- TrailDesk case-study interactions (page-scoped) ----
          Same three moves as Bianca: the right-side rail, the hero title dissolve, and a cursor
