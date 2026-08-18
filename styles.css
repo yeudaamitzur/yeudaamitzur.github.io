@@ -383,14 +383,11 @@ ul, ol { list-style: none; padding: 0; }
   padding: calc(var(--hdr-h) + 2rem) 0;
   overflow: clip; overflow-clip-margin: 480px;   /* let the dots fly on past the hero, down through the stats bar */
 }
-.hero__glow {
-  position: absolute; inset: 0; z-index: 0; pointer-events: none;
-  background:
-    radial-gradient(52% 48% at 64% 42%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 60%),
-    radial-gradient(46% 40% at 60% 44%, rgba(119, 63, 156, 0.12) 0%, transparent 62%),
-    radial-gradient(70% 60% at 50% 30%, rgba(0,0,0,0.03) 0%, transparent 65%);
-  animation: glowIn 1.6s ease .1s both;
-}
+/* .hero__glow is GONE (18.08.2026). It was three stacked radials behind the hero - a white one, a
+   violet one and a soft black one - and together they read as a second halo sitting behind the pink
+   one: "אני לא רוצה שיהיה עוד הילה חוץ ממנה". The only halo on the homepage now is the rose one the
+   greeting draws for itself (.hero--dots .hero__line--1::before in hero-dots.css). The element came
+   out of both homepage variants with it; nothing else ever used the class. */
 
 /* The case-study heroes all wear the same veil over their pinned video: a grey top that gives way
    to white and lands on the page colour. The homepage has no video behind it, so it wears the veil
@@ -1226,7 +1223,7 @@ a.case__inner:hover .case__open span { transform: translateX(3px); }
 
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
-  .hero__rev, .hdr, .hero__glow { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .hero__rev, .hdr { animation: none !important; opacity: 1 !important; transform: none !important; }
   .hero__line, .hero__sub { transform: none !important; }
   .pill::before { animation: none !important; }
   .hdr__drawer:not([hidden]) { animation: none !important; clip-path: none !important; opacity: 1 !important; }

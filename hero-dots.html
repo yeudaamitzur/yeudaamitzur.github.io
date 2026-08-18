@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Yehuda Amitzur · UX/UI Designer</title>
+  <title>Dot hero · Yehuda Amitzur · UX/UI Designer</title>
   <meta name="description" content="Yehuda Amitzur is a UX/UI designer specializing in B2B systems, complex workflows, and conversion-driven experiences." />
 
   <!-- Link previews - Mail, iMessage, Slack, WhatsApp, LinkedIn. With no og:image at all, every
@@ -37,7 +37,7 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
   <link rel="canonical" href="https://yehudaamitzur.com/" />
   <link rel="stylesheet" href="styles.css?v=163" />
-  <link rel="stylesheet" href="hero-dots.css?v=163" />
+  <link rel="stylesheet" href="hero-dots.css?v=7" />
 </head>
 <body>
   <a class="skip-link" href="#work">Skip to work</a>
@@ -111,17 +111,34 @@
          lived in the hero) and work-cards-concept.html.bak (the sticky-stacking cards before that). -->
     <section class="pstack" id="work" aria-label="Selected work">
       <div class="pstack__pin">
-        <!-- 17.08.2026: Bianca leads. The hero above promises "breaking down complex problems into
-             organized and clear information", and the dashboard is the card that proves that
-             sentence on sight - it was landing on the learning app instead. Order here is the only
-             thing that decides the stack: the arc is driven off DOM order (script.js, .pstack) and
-             each card's tint rides on its own class, so swapping the two blocks is the whole edit. -->
+        <article class="reveal pcard pcard--talmind">
+          <a class="pcard__inner" href="/talmind" aria-label="Talmind - open the case study">
+            <div class="pcard__media" aria-hidden="true">
+              <span class="pcard__veil"></span>
+            </div>
+            
+            <!-- The project's own screens, side by side, arriving one after another -->
+            <div class="pcard__strip" aria-hidden="true">
+                <figure class="shot"><img src="talmind-lesson.jpg?v=163" alt="" width="1280" height="800" loading="lazy" /></figure>
+                <figure class="shot"><img src="talmind-quiz.jpg?v=163" alt="" width="1280" height="800" loading="lazy" /></figure>
+                <figure class="shot"><img src="talmind-game.jpg?v=163" alt="" width="3840" height="2400" loading="lazy" /></figure>
+            </div>
+            <div class="pcard__body">
+              <span class="pcard__chip">Case study</span>
+              <span class="pcard__name">Talmind</span>
+              <h3 class="pcard__value">Built a real pilot that answers a huge need in Korean classrooms</h3>
+              <p class="pcard__kind">Learning app</p>
+            </div>
+            <span class="pcard__view">View</span>
+          </a>
+        </article>
+
         <article class="reveal pcard pcard--bianca">
           <a class="pcard__inner" href="/bianca" aria-label="Bianca - open the case study">
             <div class="pcard__media" aria-hidden="true">
               <span class="pcard__veil"></span>
             </div>
-
+            
             <!-- The project's own screens, side by side, arriving one after another -->
             <div class="pcard__strip" aria-hidden="true">
                 <figure class="shot"><img src="bianca-staff-1.jpg?v=163" alt="" width="2724" height="1937" loading="lazy" /></figure>
@@ -138,55 +155,6 @@
           </a>
         </article>
 
-        <article class="reveal pcard pcard--talmind">
-          <a class="pcard__inner" href="/talmind" aria-label="Talmind - open the case study">
-            <div class="pcard__media" aria-hidden="true">
-              <span class="pcard__veil"></span>
-            </div>
-
-            <!-- The project's own screens, side by side, arriving one after another -->
-            <div class="pcard__strip" aria-hidden="true">
-                <figure class="shot"><img src="talmind-lesson.jpg?v=163" alt="" width="1280" height="800" loading="lazy" /></figure>
-                <figure class="shot"><img src="talmind-quiz.jpg?v=163" alt="" width="1280" height="800" loading="lazy" /></figure>
-                <figure class="shot"><img src="talmind-game.jpg?v=163" alt="" width="3840" height="2400" loading="lazy" /></figure>
-            </div>
-            <div class="pcard__body">
-              <span class="pcard__chip">Case study</span>
-              <span class="pcard__name">Talmind</span>
-              <!-- "real" came out on 17.08.2026: the pilot has not run. The case study itself was
-                   always careful about this ("it WILL serve as a classroom pilot", "we are currently
-                   EXPLORING a pilot program") - this card was the one place claiming otherwise. -->
-              <h3 class="pcard__value">Built a pilot that answers a huge need in Korean classrooms</h3>
-              <p class="pcard__kind">Learning app</p>
-            </div>
-            <span class="pcard__view">View</span>
-          </a>
-        </article>
-
-        <!-- Off the live site 14.08 - 17.08.2026 at Yehuda's request, then back verbatim from the
-             backup folder for that date. It stays last: the reorder above put Bianca first, and the
-             loop on the case studies follows this stack, Bianca -> Talmind -> TrailDesk -> Bianca. -->
-        <article class="reveal pcard pcard--traildesk">
-          <a class="pcard__inner" href="/traildesk" aria-label="TrailDesk - open the case study">
-            <div class="pcard__media" aria-hidden="true">
-              <span class="pcard__veil"></span>
-            </div>
-
-            <!-- The project's own screens, side by side, arriving one after another -->
-            <div class="pcard__strip" aria-hidden="true">
-                <figure class="shot"><img src="td-shot-1.jpg?v=163" alt="" width="1190" height="808" loading="lazy" /></figure>
-                <figure class="shot"><img src="td-shot-2.jpg?v=163" alt="" width="640" height="400" loading="lazy" /></figure>
-                <figure class="shot"><img src="td-shot-3.jpg?v=163" alt="" width="1188" height="873" loading="lazy" /></figure>
-            </div>
-            <div class="pcard__body">
-              <span class="pcard__chip">Case study</span>
-              <span class="pcard__name">TrailDesk</span>
-              <h3 class="pcard__value">Turned "is this place any good?" into a decision you make before you leave</h3>
-              <p class="pcard__kind">Workspace discovery app</p>
-            </div>
-            <span class="pcard__view">View</span>
-          </a>
-        </article>
       </div>
     </section>
 
@@ -246,13 +214,13 @@
     </section>
   </main>
 
-  <footer class="foot" data-rings>
+  <footer class="foot">
     <div class="wrap foot__inner">
       <span>© 2026 Yehuda Amitzur</span>
       <a href="#top">Back to top ↑</a>
     </div>
   </footer>
 
-  <script src="hero-dots.js?v=163"></script>
+  <script src="hero-dots.js?v=8"></script>
 </body>
 </html>
