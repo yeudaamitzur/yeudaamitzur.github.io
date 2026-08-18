@@ -26,8 +26,12 @@
   content: ""; position: absolute; z-index: -1; pointer-events: none;
   left: 50%; top: 50%; transform: translate(-50%, -50%);
   width: max(300px, 190%); aspect-ratio: 1.55; border-radius: 50%;
+  /* ONE hue all the way out (18.08.2026). It used to fall from the rose core into a violet at 40%
+     and fade out violet, which put a purple rim around the pink - "התפשטות סגולה פחות יפה בעיניי".
+     Same rose, same three stops, so the pulse keeps its size and its softness and simply stops
+     changing colour on the way out. */
   background: radial-gradient(circle at 50% 50%,
-    rgba(221, 129, 178, 0.34) 0%, rgba(181, 117, 223, 0.20) 40%, rgba(181, 117, 223, 0) 70%);
+    rgba(221, 129, 178, 0.34) 0%, rgba(221, 129, 178, 0.19) 40%, rgba(221, 129, 178, 0) 70%);
   filter: blur(46px);
   animation: glowIn 1.4s ease .05s both;
 }
