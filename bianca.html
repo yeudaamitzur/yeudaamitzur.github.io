@@ -295,17 +295,15 @@
     .bn-subhead { font-family: var(--f-display); font-weight: 700; color: var(--ink);
       font-size: clamp(1.4rem, 2.6vw, 2rem); line-height: 1.12; letter-spacing: -0.02em; }
 
-    /* Video caption - the line that names the flow you are about to watch. Bianca's own orange,
-       heavier than body copy, so it reads as the label on the recording under it. */
-    .bn-vcap { font-family: var(--f-display); font-weight: 700; color: var(--bn-orange);
-      font-size: clamp(1.15rem, 1.9vw, 1.5rem); line-height: 1.35; letter-spacing: -0.012em;
+    /* Video caption - the line that names the flow you are about to watch. Bianca's own orange at
+       the page's own body weight: 400, the same as .bn-body, so the caption never out-weighs the
+       copy above it. The orange and the size are what mark it as a caption instead of more copy.
+       There WAS a 700 cut and a --soft 400 cut; on 18.08.2026 Yehuda levelled all three captions
+       onto the light one, so the modifier had nothing left to modify and went. Tracking is 0 - the
+       -0.012em existed only to hold a bold line together, and at 400 it closes the text up. */
+    .bn-vcap { font-family: var(--f-display); font-weight: 400; color: var(--bn-orange);
+      font-size: clamp(1.15rem, 1.9vw, 1.5rem); line-height: 1.35; letter-spacing: 0;
       margin-top: clamp(1.7rem, 3.2vw, 2.5rem); }
-    /* The light cut of the same caption, for the one that follows a paragraph rather than a heading.
-       400 is the page's own body weight (.bn-body), so the caption stops out-weighing the copy above
-       it; the orange and the size stay, which is what still marks it as a caption and not more copy.
-       Its letter-spacing is eased back to 0 - the -0.012em was there to hold a bold line together,
-       and at 400 the same tracking closes the text up. */
-    .bn-vcap--soft { font-weight: 400; letter-spacing: 0; }
     /* A caption or a heading sits exactly --bn-capgap above the media it names - the same gap
        "Shift management" has above its screenshot. For a recording the distance is measured to the
        OUTSIDE of its frame, not to the video inside it, so the frame's padding is not subtracted
@@ -596,7 +594,7 @@
            --soft: this is the one caption on the page with a body paragraph ABOVE it, and at the
            caption's usual 700 it came out heavier than the copy it followed - the eye landed on the
            caption first and read the paragraph second. Light weight puts it back in its place. -->
-      <p class="bn-vcap bn-vcap--soft reveal">Alerts for staff shortages and unexpected early employee departures.</p>
+      <p class="bn-vcap reveal">Alerts for staff shortages and unexpected early employee departures.</p>
       <figure class="bn-shot reveal">
         <img src="bianca-shifts.jpg" width="2200" height="1564" alt="Bianca shift management: the morning shift team for one day, with a worker-missing flag" loading="lazy" />
       </figure>
