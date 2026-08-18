@@ -12,7 +12,7 @@
   <meta property="og:url" content="https://yehudaamitzur.com/traildesk" />
   <meta property="og:title" content="TrailDesk case study · Yehuda Amitzur" />
   <meta property="og:description" content="TrailDesk is a map-first app that aggregates public workspaces and grades them on the conditions that decide whether you can actually work there. A UX/UI case study by Yehuda Amitzur." />
-  <meta property="og:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=150" />
+  <meta property="og:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=151" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="750" />
@@ -20,7 +20,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="TrailDesk case study · Yehuda Amitzur" />
   <meta name="twitter:description" content="TrailDesk is a map-first app that aggregates public workspaces and grades them on the conditions that decide whether you can actually work there. A UX/UI case study by Yehuda Amitzur." />
-  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=150" />
+  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=151" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -28,8 +28,8 @@
   <!-- favicon: the same ring as the site cursor - purple stroke, lighter purple fill -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
   <link rel="canonical" href="https://yehudaamitzur.com/traildesk" />
-  <link rel="preload" as="image" href="td-phone-hero.png?v=150" fetchpriority="high" />
-  <link rel="stylesheet" href="styles.css?v=150" />
+  <link rel="preload" as="image" href="td-phone-hero.png?v=151" fetchpriority="high" />
+  <link rel="stylesheet" href="styles.css?v=151" />
 
   <style>
     /* =========================================================
@@ -82,7 +82,7 @@
       padding-bottom: clamp(1rem, 3vw, 2rem); }
     .td-hero__bg { position: fixed; top: 0; left: 50%; transform: translateX(-50%);
       width: 100vw; height: clamp(560px, 54vw, 800px); z-index: 0; overflow: hidden; pointer-events: none;
-      background: var(--bg) url("td-hero-poster.jpg?v=150") center / cover no-repeat; }
+      background: var(--bg) url("td-hero-poster.jpg?v=151") center / cover no-repeat; }
     /* THE FOOTAGE (17.08.2026) - a park with the skyline behind it, which is the product's whole
        subject. It sits at the bottom of the band's three layers and everything else is painted over
        it, so the z-indexes here are explicit rather than left to DOM order. */
@@ -137,23 +137,23 @@
     .td-meta dt { font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; color: var(--brand); font-weight: 600; }
     .td-meta dd { font-family: var(--f-display); font-weight: 500; font-size: .98rem; color: var(--ink); }
 
-    /* ---------- Two mirrored columns (problem / goal) ---------- */
-    .td-cols2 { margin-top: clamp(1.75rem, 3.5vw, 2.5rem); display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.5rem, 5vw, 4rem); }
-    .td-collabel { display: block; font-family: var(--f-display); font-weight: 700; color: var(--brand);
-      font-size: clamp(1.1rem, 1.6vw, 1.3rem); margin-bottom: 1.1rem; }
-    .td-col p { color: var(--ink); font-family: var(--f-display); font-weight: 400;
-      font-size: clamp(1rem, 1.35vw, 1.15rem); line-height: 1.58; }
-    .td-col p + p { margin-top: .9rem; }
-    .td-col b { color: var(--brand); font-weight: 600; }
+    /* The two mirrored columns (What people run into / Main goal) came out on 18.08.2026 with the
+       text they held: Problem is one black title and two running paragraphs now. Their CSS went with
+       them - .td-cols2, .td-collabel and .td-col had no other user on the page. */
 
     /* The four-step Process row (research → UI → prototype → testing) and the three research
        theme cards were both removed on 17.08.2026, with their CSS. tdStepIn stays: the donut row
        below is the last thing still riding on it. */
     @keyframes tdStepIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 
-    /* ---------- Survey donuts ----------
-       Drawn in the project's teal since 17.08.2026. The ring grows from zero when the row
-       enters, and the number counts up with it via the shared .stat__val hook in script.js. */
+    /* ---------- Survey figures ----------
+       Rebuilt 18.08.2026 to be Yehuda's own chart, not an interpretation of it. Every number here
+       was MEASURED off his Figma export (TrailDesk 1 copy.png) rather than eyeballed: the ring runs
+       from 12 o'clock clockwise for exactly pct% of the circle, its inner edge sits at 67.7% of the
+       outer radius, and the colour walks the arc from #009CAF at the start to #D4E7EA at the end.
+       A conic-gradient gives that angular walk for free; the radial mask cuts the disc into a ring.
+       The number has to be a SIBLING of the ring, not a child - the mask would eat it otherwise. */
+    @property --sweep { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
     .td-donuts { margin-top: clamp(2.25rem, 4.5vw, 3.5rem); display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(1.5rem, 3.2vw, 2.6rem); }
     .td-donuts.reveal { opacity: 1; transform: none; transition: none; }
     .td-donut { display: flex; flex-direction: column; align-items: center; text-align: center; opacity: 0; }
@@ -162,61 +162,64 @@
     .td-donuts.is-in .td-donut:nth-child(2) { animation-delay: .16s; }
     .td-donuts.is-in .td-donut:nth-child(3) { animation-delay: .28s; }
     .td-donuts.is-in .td-donut:nth-child(4) { animation-delay: .40s; }
-    .td-donut__ring { position: relative; display: block; width: min(160px, 42vw); aspect-ratio: 1; }
-    .td-donut__ring svg { width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
-    .td-donut__track { fill: none; stroke: var(--p2); stroke-width: 11; }
-    .td-donut__val { fill: none; stroke-width: 11; stroke-linecap: round;
-      stroke-dasharray: 327; stroke-dashoffset: 327;
-      transition: stroke-dashoffset 1.5s cubic-bezier(.22,.61,.36,1) .15s; }
-    .td-donuts.is-in .td-donut__val { stroke-dashoffset: calc(327 - 327 * var(--pct) / 100); }
+    .td-donut__dial { position: relative; display: block; width: min(172px, 44vw); aspect-ratio: 1; }
+    .td-donut__ring { position: absolute; inset: 0; --sweep: 0deg;
+      background: conic-gradient(from 0deg, #009CAF 0deg, #D4E7EA var(--sweep), #D4E7EA00 var(--sweep));
+      -webkit-mask: radial-gradient(circle closest-side at 50% 50%, #0000 67.4%, #000 67.8%, #000 99.4%, #0000 99.8%);
+              mask: radial-gradient(circle closest-side at 50% 50%, #0000 67.4%, #000 67.8%, #000 99.4%, #0000 99.8%);
+      transition: --sweep 1.5s cubic-bezier(.22,.61,.36,1) .15s; }
+    .td-donuts.is-in .td-donut__ring { --sweep: var(--end); }
     /* flex, not grid: with `place-items` the bare "%" text node became its own grid row and
        dropped under the number */
     .td-donut__n { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-      font-family: var(--f-display); font-weight: 700; color: var(--p6);
+      font-family: var(--f-display); font-weight: 500; color: var(--ink);
       font-size: clamp(1.5rem, 2.6vw, 2rem); letter-spacing: -0.02em; }
     .td-donut__n i { font-style: normal; }
     .td-donut p { margin-top: 1rem; color: var(--td-mut); font-family: var(--f-display); font-weight: 400;
-      font-size: clamp(.9rem, 1.1vw, 1rem); line-height: 1.5; max-width: 24ch; }
+      font-size: clamp(.9rem, 1.1vw, 1rem); line-height: 1.5; max-width: min(24ch, 100%); }
+
+    /* ---------- The two radial-bar charts (ages / days from home) ----------
+       Three concentric arcs, each starting at 12 o'clock and running clockwise for its own value.
+       The path data is generated, not drawn by hand: radii, band thickness, corner radius and sweep
+       are all read straight off the export, which is why the three bands get thinner as they go in
+       (17 / 13 / 10 units of a 200 box) instead of sharing one stroke width. */
+    .td-charts { margin-top: clamp(2.5rem, 5vw, 4rem); display: grid; grid-template-columns: 1fr 1fr;
+      gap: clamp(2rem, 4vw, 3.5rem); }
+    .td-chart__q { font-family: var(--f-display); font-weight: 700; color: var(--ink);
+      font-size: clamp(1rem, 1.25vw, 1.1rem); line-height: 1.35; max-width: 22ch; }
+    .td-chart__body { margin-top: clamp(1.1rem, 2.4vw, 1.8rem); display: flex; align-items: center;
+      gap: clamp(1rem, 2.5vw, 2rem); }
+    .td-legend { display: grid; gap: .7rem; flex: 0 0 auto; }
+    .td-legend li { display: flex; align-items: center; gap: .6rem;
+      font-family: var(--f-display); font-weight: 600; font-size: clamp(.85rem, 1vw, .95rem); color: var(--ink); }
+    .td-legend i { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+    .td-chart__svg { flex: 1 1 auto; width: 100%; max-width: 250px; height: auto; margin-inline: auto; }
 
     /* The "And this is how TrailDesk was born" display line came out on 17.08.2026 - the
        Solution section is a plain title and a paragraph now, sitting straight after the problem. */
 
-    /* ---------- User journey map ---------- */
-    .td-journey { margin-top: clamp(1.9rem, 3.6vw, 2.6rem);
-      background: linear-gradient(180deg, #FAFDFE, #EAF6F8);
-      border: 1px solid var(--p3); border-radius: clamp(20px, 2.4vw, 30px);
-      padding: clamp(1.1rem, 2.6vw, 2.1rem); }
-    .td-jscroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .td-jinner { min-width: 760px; }
-    /* Three shared rows - number, action, quote - not six independent columns. Each step spans the
-       same three grid rows (subgrid), so a step whose action runs to three lines pushes EVERY quote
-       down with it and the two rules stay two straight lines across the map. Before this the columns
-       sized themselves and every divider sat at its own height. The fallback for a browser without
-       subgrid is the old behaviour, which is only ever worse by a few pixels. */
-    .td-jrow { display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: auto auto auto;
-      gap: 0 clamp(.6rem, 1.4vw, 1.1rem); align-items: start; }
-    .td-jstep { text-align: center; display: grid; grid-row: span 3; grid-template-rows: subgrid; row-gap: 0; }
-    .td-jnum { justify-self: center; display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
-      background: #fff; border: 1.5px solid var(--p4); color: var(--p6);
-      font-family: var(--f-display); font-weight: 700; font-size: .88rem; }
-    /* the rule belongs to the row, so it is drawn at the row's foot rather than under the text */
-    .td-jact { margin-top: .85rem; padding-bottom: .85rem; border-bottom: 1px solid var(--p3);
-      font-family: var(--f-display); font-weight: 600; color: var(--ink); font-size: .95rem; line-height: 1.35;
-      align-self: stretch; }
-    .td-jsay { margin-top: .85rem; padding-bottom: .85rem; border-bottom: 1px solid var(--p3);
-      font-family: var(--f-display); font-weight: 400; color: var(--td-mut); font-size: .92rem; line-height: 1.4;
-      align-self: stretch; }
-    /* the mood curve. The emoji are positioned on the SAME six points the path is drawn through,
-       so they sit exactly on the line at any width (the svg stretches, the percentages don't). */
-    .td-jcurve { position: relative; height: clamp(120px, 15vw, 190px); margin-top: 1.1rem; }
-    .td-jcurve svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-    .td-jface { position: absolute; transform: translate(-50%, -50%); font-size: clamp(1.35rem, 2.4vw, 1.75rem); line-height: 1; }
+    /* ---------- Market overview ----------
+       The competitor plate is Yehuda's own artwork - the tilted card, its gradient box and the
+       dotted vectors underneath are all baked into td-competitors.png, so nothing here draws them
+       again. The text column simply sits beside it. */
+    .td-market { display: grid; grid-template-columns: 1fr 1fr;
+      gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center; }
+    .td-market__img { display: block; width: 100%; height: auto; }
+
+    /* ---------- Branding ----------
+       Three plates cut out of his branding board: the wordmark across the top, then the logo on its
+       construction grid and the app icon on a home screen, side by side. Each plate already carries
+       its own corner radius, so the page adds no card of its own. The gap is the SAME proportion as
+       the source board (96 of 3576), which is why the trio still reads as one composition. */
+    .td-brand { margin-top: clamp(1.9rem, 3.6vw, 2.6rem); display: grid; gap: clamp(10px, 2.7vw, 32px); }
+    .td-brand__pair { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(10px, 2.7vw, 32px); }
+    .td-brand img { display: block; width: 100%; height: auto; }
 
     /* ---------- Diagrams (IA + user flow) ----------
        Yehuda's own exports from Figma, dropped in as flat pictures on 18.08.2026 - they replace the
        versions that were drawn here in SVG. Deliberately UNDRESSED: no card, no border, no radius,
-       no shadow. The artwork already carries its own off-white ground, so anything wrapped around it
-       would only read as a second frame inside the first. It simply scales to the column width. */
+       no shadow, twice asked for. They are TRANSPARENT PNGs, so the page's own ground shows through
+       and the drawing never arrives carrying a rectangle of its own. It scales to the column width. */
     .td-dia { margin: clamp(1.9rem, 3.6vw, 2.6rem) 0 0; }
     .td-dia__img { display: block; width: 100%; height: auto; border-radius: 0; box-shadow: none; }
 
@@ -228,7 +231,7 @@
        MOBILE is the same three phones turned into a swipeable strip - see the block further down. */
     .td-band { position: relative; margin-top: clamp(1.9rem, 3.6vw, 2.6rem);
       aspect-ratio: 3576 / 2595;
-      background: url("td-band.jpg?v=150") center / cover no-repeat;
+      background: url("td-band.jpg?v=151") center / cover no-repeat;
       border-radius: clamp(20px, 2.4vw, 34px); box-shadow: var(--td-card); overflow: hidden; }
     .td-band__track { position: absolute; inset: 0; }
     .td-band__ph { position: absolute; width: auto; transform: translateX(-50%);
@@ -270,9 +273,12 @@
     @media (max-width: 1024px) { .td-rail { display: none; } }
     @media (max-width: 860px) {
       .td-donuts { grid-template-columns: repeat(2, 1fr); row-gap: 2.4rem; }
+      .td-charts { grid-template-columns: 1fr; }
+      .td-market { grid-template-columns: 1fr; }
+      .td-brand__pair { grid-template-columns: 1fr; }
     }
     @media (max-width: 760px) {
-      .td-cols2 { grid-template-columns: 1fr; }
+      .td-chart__svg { max-width: 210px; }
       .td-insight { max-width: none; }
       .td-meta { gap: 1rem 1.5rem; }
       .td-meta div { min-width: 40%; }
@@ -299,7 +305,7 @@
     @media (prefers-reduced-motion: reduce) {
       .td-phone { transform: none !important; animation: none !important; opacity: 1 !important; }
       .td-donuts .td-donut { opacity: 1; animation: none !important; }
-      .td-donut__val { transition: none; stroke-dashoffset: calc(327 - 327 * var(--pct) / 100); }
+      .td-donut__ring { transition: none; --sweep: var(--end); }
       /* fall back to a normal scrolling hero (no pinned band / sticky title), and the footage holds
          on its first frame - the poster - instead of playing */
       .td-hero__bg { position: absolute; }
@@ -344,7 +350,8 @@
     <span class="td-rail__bar"><span class="td-rail__fill"></span></span>
     <span class="td-rail__dots">
       <a class="td-rail__dot" href="#research" aria-label="Research"></a>
-      <a class="td-rail__dot" href="#journey" aria-label="User journey"></a>
+      <a class="td-rail__dot" href="#market" aria-label="Market overview"></a>
+      <a class="td-rail__dot" href="#brand" aria-label="Branding"></a>
       <a class="td-rail__dot" href="#architecture" aria-label="Information architecture"></a>
       <a class="td-rail__dot" href="#ui" aria-label="UI design"></a>
       <span class="td-rail__dot td-rail__cap" aria-hidden="true"></span>
@@ -357,18 +364,18 @@
     <section class="td-hero td-wrap">
       <div class="td-hero__bg" aria-hidden="true">
         <video class="td-hero__vid" autoplay muted loop playsinline preload="metadata"
-               poster="td-hero-poster.jpg?v=150">
-          <source src="td-hero.mp4?v=150" type="video/mp4" />
+               poster="td-hero-poster.jpg?v=151">
+          <source src="td-hero.mp4?v=151" type="video/mp4" />
         </video>
       </div>
 
       <div class="td-hero__head" data-hero-head>
-        <p class="td-hero__title reveal"><b>70% of remote workers</b> face difficulties working from home.
-          <span class="hl">No one could tell them where else to go.</span></p>
+        <p class="td-hero__title reveal"><b>70% of remote workers</b> face difficulties while working
+          from home</p>
       </div>
 
       <div class="td-phone" data-phone>
-        <img src="td-phone-hero.png?v=150" width="576" height="1188" fetchpriority="high" decoding="async"
+        <img src="td-phone-hero.png?v=151" width="576" height="1188" fetchpriority="high" decoding="async"
              alt="A TrailDesk place card: Chess House, 350 meters away, scored for Wi-Fi, power, noise, seating and parking" />
       </div>
     </section>
@@ -388,163 +395,133 @@
 
     <!-- ===== THE PROBLEM / THE GOAL ===== -->
     <section class="td-section td-wrap" id="problem">
-      <h2 class="td-h2 reveal">Everyone wants to get out of the house. Nobody knows where to go.</h2>
-      <div class="td-cols2 reveal">
-        <div class="td-col">
-          <span class="td-collabel">What people run into</span>
-          <p>Most remote workers face difficulties working from home because of <b>noise</b>, <b>distractions</b>,
-            and a <b>lack of separation between work and personal life</b>.</p>
-          <p>Many want to work outside the home but <b>avoid it</b> because of <b>uncertainty</b> about the conditions
-            in public workspaces. There is no solution that aggregates a wide range of public spaces with reliable,
-            up-to-date information on what they are actually like.</p>
-        </div>
-        <div class="td-col">
-          <span class="td-collabel">Main goal</span>
-          <p>TrailDesk's main goal is to provide a platform that <b>aggregates a wide range of public workspaces</b>
-            with reliable, up-to-date information on their conditions — including comfortable
-            <b>seating, Wi-Fi quality, power availability, noise levels, parking, and more</b>.</p>
-          <p>Choosing where to work should be a decision, not a gamble.</p>
-        </div>
-      </div>
-
+      <h2 class="td-h2 reveal">Problem</h2>
+      <p class="td-body reveal">Most remote workers face difficulties while working from home due to
+        <b>noise</b>, <b>distractions</b>, and a <b>lack of separation between work and personal life</b>.</p>
+      <p class="td-body reveal">Many want to work outside the home but avoid it due to <b>uncertainty about
+        conditions</b> in public workspaces. Currently, there is no solution that aggregates a wide range of
+        public spaces with reliable, up-to-date information on their conditions.</p>
     </section>
 
     <!-- ===== THE SOLUTION =====
          Moved up here on 17.08.2026, straight off the back of the problem: the answer is stated
          before the research that backs it, so the page never asks the reader to hold a question
-         for four sections. The display "born" line it used to open with is gone. -->
+         for four sections. -->
     <section class="td-section td-wrap" id="solution">
       <h2 class="td-h2 reveal">Solution</h2>
-      <p class="td-body reveal">TrailDesk is a map-first app that puts every public workspace nearby on one
-        screen and grades each one on the things that actually decide whether you can work there —
-        <span class="hl">Wi-Fi, power, noise, seating and parking</span>, scored out of ten by the people who
-        have already worked there. The whole point is that the decision gets made before you pack up and go,
-        instead of after you have already sat down.</p>
+      <p class="td-body reveal">Provide a platform that <b>aggregates a wide range of public workspaces</b>
+        with reliable, up-to-date information on conditions — including comfortable
+        <span class="hl">seating, Wi-Fi quality, power availability, noise levels, parking, and more</span>.</p>
     </section>
 
-    <!-- ===== USER RESEARCH ===== -->
+    <!-- ===== USER RESEARCH =====
+         The figures are HIS, down to the wording under each ring - the captions are the survey's own
+         sentences, copied across rather than rewritten. The four headline percentages come FIRST and
+         the two breakdown charts sit under them: that is the order he asked for, and it is the right
+         one, because the four are the finding and the two are the sample it came from. -->
     <section class="td-section td-wrap" id="research">
-      <h2 class="td-h2 reveal">Research</h2>
-      <p class="td-body reveal">To make sure TrailDesk solved a problem people actually have, I ran in-depth
-        qualitative research with remote workers — <span class="hl">three long-form interviews</span>, a survey, and
-        user-journey mapping. The three people worked in different fields and on different schedules, and still
-        described the same loop back to me.</p>
+      <h2 class="td-h2 reveal">The insights came from surveys and interviews.</h2>
 
       <div class="td-donuts reveal">
         <div class="td-donut">
-          <span class="td-donut__ring">
-            <svg viewBox="0 0 120 120" aria-hidden="true">
-              <circle class="td-donut__track" cx="60" cy="60" r="52" />
-              <circle class="td-donut__val" cx="60" cy="60" r="52" style="--pct: 82; stroke: #14717F;" />
-            </svg>
+          <span class="td-donut__dial">
+            <span class="td-donut__ring" style="--end: 295.2deg;"></span>
             <b class="td-donut__n"><i class="stat__val" data-count="82">82</i>%</b>
           </span>
-          <p>often seek a change in their work location to feel more productive and creative</p>
+          <p>Participants report that they often seek a change in their work location to feel more productive and creative</p>
         </div>
         <div class="td-donut">
-          <span class="td-donut__ring">
-            <svg viewBox="0 0 120 120" aria-hidden="true">
-              <circle class="td-donut__track" cx="60" cy="60" r="52" />
-              <circle class="td-donut__val" cx="60" cy="60" r="52" style="--pct: 74; stroke: #14717F;" />
-            </svg>
+          <span class="td-donut__dial">
+            <span class="td-donut__ring" style="--end: 266.4deg;"></span>
             <b class="td-donut__n"><i class="stat__val" data-count="74">74</i>%</b>
           </span>
-          <p>take intentional breaks very often to cope with distractions</p>
+          <p>Participants report taking intentional breaks very often to cope with distractions</p>
         </div>
         <div class="td-donut">
-          <span class="td-donut__ring">
-            <svg viewBox="0 0 120 120" aria-hidden="true">
-              <circle class="td-donut__track" cx="60" cy="60" r="52" />
-              <circle class="td-donut__val" cx="60" cy="60" r="52" style="--pct: 68; stroke: #14717F;" />
-            </svg>
+          <span class="td-donut__dial">
+            <span class="td-donut__ring" style="--end: 244.8deg;"></span>
             <b class="td-donut__n"><i class="stat__val" data-count="68">68</i>%</b>
           </span>
-          <p>don't use any platform to find public remote workspaces, because so little is available</p>
+          <p>Participants report not using platforms to find public remote workspaces due to limited availability</p>
         </div>
         <div class="td-donut">
-          <span class="td-donut__ring">
-            <svg viewBox="0 0 120 120" aria-hidden="true">
-              <circle class="td-donut__track" cx="60" cy="60" r="52" />
-              <circle class="td-donut__val" cx="60" cy="60" r="52" style="--pct: 59; stroke: #14717F;" />
-            </svg>
+          <span class="td-donut__dial">
+            <span class="td-donut__ring" style="--end: 212.4deg;"></span>
             <b class="td-donut__n"><i class="stat__val" data-count="59">59</i>%</b>
           </span>
-          <p>ask friends or search social media to find a public workspace instead</p>
+          <p>Participants report asking friends or searching for public workspaces on social media</p>
+        </div>
+      </div>
+
+      <div class="td-charts reveal">
+      <figure class="td-chart">
+        <figcaption class="td-chart__q">What are the ages of the participants?</figcaption>
+        <div class="td-chart__body">
+          <ul class="td-legend">
+            <li><i style="background: #009CAF;"></i>18 - 24</li>
+            <li><i style="background: #49CEE0;"></i>25 - 34</li>
+            <li><i style="background: #A7EBF3;"></i>35 - 44</li>
+          </ul>
+          <svg class="td-chart__svg" viewBox="0 0 200 200" role="img" aria-label="Ages of the survey participants, shown as three arcs: 18 to 24 the longest, then 25 to 34, then 35 to 44">
+            <path fill="#009CAF" d="M104.7,0.11 A100 100 0 1 1 9.52,57.41 A4.7 4.7 0 0 1 15.78,55.41 L22.42,58.92 A4.7 4.7 0 0 1 24.49,65.34 A83.08 83.08 0 1 0 104.7,17.05 A4.7 4.7 0 0 1 100,12.22 L100,4.7 A4.7 4.7 0 0 1 104.7,0.11 Z" />
+            <path fill="#49CEE0" d="M103.6,23.47 A76.62 76.62 0 1 1 38.97,146.31 A3.6 3.6 0 0 1 39.82,141.36 L44.55,138.11 A3.6 3.6 0 0 1 49.64,138.98 A63.68 63.68 0 1 0 103.6,36.42 A3.6 3.6 0 0 1 100,32.72 L100,26.98 A3.6 3.6 0 0 1 103.6,23.47 Z" />
+            <path fill="#A7EBF3" d="M102.8,42.36 A57.71 57.71 0 0 1 142.67,138.86 A2.8 2.8 0 0 1 138.76,138.9 L135.69,135.81 A2.8 2.8 0 0 1 135.64,131.8 A47.76 47.76 0 0 0 102.8,52.32 A2.8 2.8 0 0 1 100,49.44 L100,45.09 A2.8 2.8 0 0 1 102.8,42.36 Z" />
+          </svg>
+        </div>
+      </figure>
+      <figure class="td-chart">
+        <figcaption class="td-chart__q">How many days per week do you work from home?</figcaption>
+        <div class="td-chart__body">
+          <ul class="td-legend">
+            <li><i style="background: #009CAF;"></i>5</li>
+            <li><i style="background: #49CEE0;"></i>2</li>
+            <li><i style="background: #A7EBF3;"></i>3</li>
+          </ul>
+          <svg class="td-chart__svg" viewBox="0 0 200 200" role="img" aria-label="Days worked from home per week, shown as three arcs: five days the longest, then two days, then three days">
+            <path fill="#009CAF" d="M104.7,0.11 A100 100 0 1 1 26.52,32.17 A4.7 4.7 0 0 1 33.08,32.14 L38.36,37.5 A4.7 4.7 0 0 1 38.41,44.23 A83.08 83.08 0 1 0 104.7,17.05 A4.7 4.7 0 0 1 100,12.22 L100,4.7 A4.7 4.7 0 0 1 104.7,0.11 Z" />
+            <path fill="#49CEE0" d="M103.6,23.47 A76.62 76.62 0 1 1 23.44,103.06 A3.6 3.6 0 0 1 26.98,99.49 L32.72,99.53 A3.6 3.6 0 0 1 36.4,103.15 A63.68 63.68 0 1 0 103.6,36.42 A3.6 3.6 0 0 1 100,32.72 L100,26.98 A3.6 3.6 0 0 1 103.6,23.47 Z" />
+            <path fill="#A7EBF3" d="M102.8,42.36 A57.71 57.71 0 0 1 154.7,81.61 A2.8 2.8 0 0 1 152.84,85.05 L148.65,86.23 A2.8 2.8 0 0 1 145.12,84.33 A47.76 47.76 0 0 0 102.8,52.32 A2.8 2.8 0 0 1 100,49.44 L100,45.09 A2.8 2.8 0 0 1 102.8,42.36 Z" />
+          </svg>
+        </div>
+      </figure>
+      </div>
+    </section>
+
+    <!-- ===== MARKET OVERVIEW ===== -->
+    <section class="td-section td-wrap" id="market">
+      <div class="td-market reveal">
+        <div>
+          <h2 class="td-h2">Market overview</h2>
+          <p class="td-body">All of these and more focus on <b>very expensive coworking spaces</b> or
+            <b>generic coffee shops</b>.</p>
+        </div>
+        <img class="td-market__img" src="td-competitors.png?v=151" width="1200" height="1139" loading="lazy" decoding="async"
+             alt="The three apps in the space today - Pluria, Spacing and a cafe-finder - shown as app icons on a tilted card" />
+      </div>
+    </section>
+
+    <!-- ===== BRANDING ===== -->
+    <section class="td-section td-wrap" id="brand">
+      <h2 class="td-h2 reveal">Branding</h2>
+      <div class="td-brand reveal">
+        <img src="td-brand-word.png?v=151" width="2360" height="485" loading="lazy" decoding="async"
+             alt="The TRAIL DESK wordmark" />
+        <div class="td-brand__pair">
+          <img src="td-brand-logo.png?v=151" width="1160" height="1318" loading="lazy" decoding="async"
+               alt="The TrailDesk mark on its construction grid" />
+          <img src="td-brand-icon.png?v=151" width="1160" height="1318" loading="lazy" decoding="async"
+               alt="The TrailDesk app icon on an iPhone home screen" />
         </div>
       </div>
     </section>
 
-    <!-- ===== USER JOURNEY MAP ===== -->
-    <section class="td-section td-wrap" id="journey">
-      <h2 class="td-h2 reveal">User journey</h2>
-
-      <div class="td-journey reveal">
-        <div class="td-jscroll">
-          <div class="td-jinner">
-            <ol class="td-jrow">
-              <li class="td-jstep">
-                <span class="td-jnum">1</span>
-                <p class="td-jact">Noise at home. Looking for a solution</p>
-                <p class="td-jsay">"Unable to focus. Needs a change"</p>
-              </li>
-              <li class="td-jstep">
-                <span class="td-jnum">2</span>
-                <p class="td-jact">Asks friends about quiet places</p>
-                <p class="td-jsay">"Does anyone know a quiet place to work?"</p>
-              </li>
-              <li class="td-jstep">
-                <span class="td-jnum">3</span>
-                <p class="td-jact">Discovers the app in the store</p>
-                <p class="td-jsay">"Wow, this app is perfect for me"</p>
-              </li>
-              <li class="td-jstep">
-                <span class="td-jnum">4</span>
-                <p class="td-jact">Starts exploring the app</p>
-                <p class="td-jsay">"Loving how precise the filters are"</p>
-              </li>
-              <li class="td-jstep">
-                <span class="td-jnum">5</span>
-                <p class="td-jact">Arrives at the place, satisfied</p>
-                <p class="td-jsay">"Finally, a quiet and productive place to work"</p>
-              </li>
-              <li class="td-jstep">
-                <span class="td-jnum">6</span>
-                <p class="td-jact">Rates and shares</p>
-                <p class="td-jsay">"I can help other users with my knowledge"</p>
-              </li>
-            </ol>
-
-            <div class="td-jcurve">
-              <svg viewBox="0 0 1200 260" preserveAspectRatio="none" aria-hidden="true">
-                <defs>
-                  <linearGradient id="tdJfill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0" stop-color="#3EA3B4" stop-opacity=".28" />
-                    <stop offset="1" stop-color="#3EA3B4" stop-opacity="0" />
-                  </linearGradient>
-                </defs>
-                <path fill="url(#tdJfill)" stroke="none"
-                      d="M0,224 L100,220 C166.7,215 233.3,201.3 300,190 C366.7,178.7 433.3,165.3 500,152 C566.7,138.7 633.3,123 700,110 C766.7,97 833.3,83.7 900,74 C966.7,64.3 1033.3,55.7 1100,52 L1200,50 L1200,260 L0,260 Z" />
-                <path fill="none" stroke="#3EA3B4" stroke-width="2" vector-effect="non-scaling-stroke"
-                      d="M0,224 L100,220 C166.7,215 233.3,201.3 300,190 C366.7,178.7 433.3,165.3 500,152 C566.7,138.7 633.3,123 700,110 C766.7,97 833.3,83.7 900,74 C966.7,64.3 1033.3,55.7 1100,52 L1200,50" />
-              </svg>
-              <span class="td-jface" style="left: 8.33%;  top: 84.6%;">😫</span>
-              <span class="td-jface" style="left: 25%;    top: 73.1%;">🤔</span>
-              <span class="td-jface" style="left: 41.67%; top: 58.5%;">🙂</span>
-              <span class="td-jface" style="left: 58.33%; top: 42.3%;">😊</span>
-              <span class="td-jface" style="left: 75%;    top: 28.5%;">😌</span>
-              <span class="td-jface" style="left: 91.67%; top: 20%;">🤗</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <!-- ===== INFORMATION ARCHITECTURE ===== -->
     <section class="td-section td-wrap" id="architecture">
       <h2 class="td-h2 reveal">Information architecture</h2>
 
       <figure class="td-dia reveal">
-        <img class="td-dia__img" src="td-ia.jpg?v=150" width="2400" height="1786" loading="lazy" decoding="async"
+        <img class="td-dia__img" src="td-ia.png?v=151" width="2400" height="2095" loading="lazy" decoding="async"
              alt="TrailDesk information architecture: Splash to Walk through to Onboarding, which splits into Sign in and Sign up and leads to Home (Map). Home branches into Categories, Favorites, Messages and Profile, each with up to three further levels." />
       </figure>
     </section>
@@ -554,7 +531,7 @@
       <h2 class="td-h2 reveal">User flow</h2>
 
       <figure class="td-dia reveal">
-        <img class="td-dia__img" src="td-flow.jpg?v=150" width="2338" height="2400" loading="lazy" decoding="async"
+        <img class="td-dia__img" src="td-flow.png?v=151" width="2200" height="2560" loading="lazy" decoding="async"
              alt="TrailDesk user flow: onboarding runs from Start through Splash and Logo, App Walkthrough and Sign in or Sign up to the Home Screen. The main flow goes from the Home Screen through Category Selection or Search to the Places List and the Place Properties Filter, into a decision about finding an interesting place, then Place Details, a decision about suitability, and finally Initiate Navigation, with a branch through User Reviews, Ask Someone, Member Profile and Direct Messaging." />
       </figure>
     </section>
@@ -567,11 +544,11 @@
            reaches the middle is the one shown large. The order here is the order on screen. -->
       <div class="td-band reveal">
         <div class="td-band__track" data-band>
-          <img class="td-band__ph td-band__ph--left" src="td-ui-left.png?v=150" width="270" height="544" loading="lazy" decoding="async"
+          <img class="td-band__ph td-band__ph--left" src="td-ui-left.png?v=151" width="270" height="544" loading="lazy" decoding="async"
                alt="TrailDesk: the map filtered to parks, with a place preview card at the bottom" />
-          <img class="td-band__ph td-band__ph--mid" src="td-ui-mid.png?v=150" width="332" height="664" loading="lazy" decoding="async"
+          <img class="td-band__ph td-band__ph--mid" src="td-ui-mid.png?v=151" width="332" height="664" loading="lazy" decoding="async"
                alt="TrailDesk home screen: a map of nearby public workspaces with colour-coded category pins" />
-          <img class="td-band__ph td-band__ph--right" src="td-ui-right.png?v=150" width="268" height="546" loading="lazy" decoding="async"
+          <img class="td-band__ph td-band__ph--right" src="td-ui-right.png?v=151" width="268" height="546" loading="lazy" decoding="async"
                alt="TrailDesk place detail: Dawn Cloud Park with its conditions scored out of ten" />
         </div>
       </div>
@@ -598,7 +575,7 @@
             <span class="nxt__desc"><b>BIANCA</b> restaurant management dashboard</span>
           </span>
           <span class="nxt__frame">
-            <img class="nxt__img" src="tile-bianca.jpg?v=150" width="1200" height="750" alt="" loading="lazy" />
+            <img class="nxt__img" src="tile-bianca.jpg?v=151" width="1200" height="750" alt="" loading="lazy" />
           </span>
         </a>
       </div>
@@ -620,7 +597,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=150"></script>
+  <script src="script.js?v=151"></script>
   <script>
     /* ---- TrailDesk case-study interactions (page-scoped) ----
          Same three moves as Bianca: the right-side rail, the hero title dissolve, and a cursor
