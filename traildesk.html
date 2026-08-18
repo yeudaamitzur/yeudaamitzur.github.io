@@ -12,7 +12,7 @@
   <meta property="og:url" content="https://yehudaamitzur.com/traildesk" />
   <meta property="og:title" content="TrailDesk case study · Yehuda Amitzur" />
   <meta property="og:description" content="TrailDesk is a map-first app that aggregates public workspaces and grades them on the conditions that decide whether you can actually work there. A UX/UI case study by Yehuda Amitzur." />
-  <meta property="og:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=157" />
+  <meta property="og:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=158" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="750" />
@@ -20,7 +20,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="TrailDesk case study · Yehuda Amitzur" />
   <meta name="twitter:description" content="TrailDesk is a map-first app that aggregates public workspaces and grades them on the conditions that decide whether you can actually work there. A UX/UI case study by Yehuda Amitzur." />
-  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=157" />
+  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=158" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -28,8 +28,8 @@
   <!-- favicon: the same ring as the site cursor - purple stroke, lighter purple fill -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
   <link rel="canonical" href="https://yehudaamitzur.com/traildesk" />
-  <link rel="preload" as="image" href="td-phone-hero.png?v=157" fetchpriority="high" />
-  <link rel="stylesheet" href="styles.css?v=157" />
+  <link rel="preload" as="image" href="td-phone-hero.png?v=158" fetchpriority="high" />
+  <link rel="stylesheet" href="styles.css?v=158" />
 
   <style>
     /* =========================================================
@@ -89,7 +89,7 @@
       padding-bottom: clamp(1rem, 3vw, 2rem); }
     .td-hero__bg { position: fixed; top: 0; left: 50%; transform: translateX(-50%);
       width: 100vw; height: clamp(560px, 54vw, 800px); z-index: 0; overflow: hidden; pointer-events: none;
-      background: var(--bg) url("td-hero-poster.jpg?v=157") center / cover no-repeat; }
+      background: var(--bg) url("td-hero-poster.jpg?v=158") center / cover no-repeat; }
     /* THE FOOTAGE (17.08.2026) - a park with the skyline behind it, which is the product's whole
        subject. It sits at the bottom of the band's three layers and everything else is painted over
        it, so the z-indexes here are explicit rather than left to DOM order. */
@@ -244,13 +244,13 @@
        Three plates cut out of his branding board: the wordmark across the top, then the logo on its
        construction grid and the app icon on a home screen, side by side. Each plate already carries
        its own corner radius, so the page adds no card of its own.
-       The gap is `clamp(1.5rem, 5vw, 4rem)` because that is what the SITE uses between a pair of
-       media plates - it is Talmind's own `.tl-brand`, the same section on the neighbouring case
-       study, and Bianca's `.bn-cols2`. It used to be 96/3576 of the width, copied off the source
-       board, which came out at 10px on a phone: faithful to the artwork and wrong for the portfolio
-       ("לפי מה שמקובל בתיק שלי ולא להמציא", 18.08.2026). */
-    .td-brand { margin-top: clamp(1.9rem, 3.6vw, 2.6rem); display: grid; gap: clamp(1.5rem, 5vw, 4rem); }
-    .td-brand__pair { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.5rem, 5vw, 4rem); }
+       ON DESKTOP the gap is 96/3576 of the width, the source board's own proportion, which is what
+       keeps the trio reading as one composition - and he asked for that back after I changed it.
+       ON A PHONE, where the pair stacks, that proportion collapses to 10px; there the site's own
+       media-pair gap takes over (`clamp(1.5rem, 5vw, 4rem)` - Talmind's `.tl-brand`, the same
+       section next door, and Bianca's `.bn-cols2`). See the 860px block. */
+    .td-brand { margin-top: clamp(1.9rem, 3.6vw, 2.6rem); display: grid; gap: clamp(10px, 2.7vw, 32px); }
+    .td-brand__pair { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(10px, 2.7vw, 32px); }
     .td-brand img { display: block; width: 100%; height: auto; }
 
     /* ---------- Diagrams (IA + user flow) ----------
@@ -269,7 +269,7 @@
        MOBILE is the same three phones turned into a swipeable strip - see the block further down. */
     .td-band { position: relative; margin-top: clamp(1.9rem, 3.6vw, 2.6rem);
       aspect-ratio: 3576 / 2595;
-      background: url("td-band.jpg?v=157") center / cover no-repeat;
+      background: url("td-band.jpg?v=158") center / cover no-repeat;
       /* No shadow (18.08.2026, asked for). The corners are cut by THIS radius alone: td-band.jpg used
          to arrive with its own rounded corners already baked against white, and the two curves never
          agreed - a white sliver sat in each corner. The picture's own edge colour has been stretched
@@ -277,8 +277,10 @@
          there is no white left to peek through. */
       border-radius: clamp(20px, 2.4vw, 34px); overflow: hidden; }
     .td-band__track { position: absolute; inset: 0; }
+    /* His shadow, everywhere: X 4, Y 4, blur 10, spread 0, #76DFEC at 50%. The near-black one this
+       replaces was the page's own invention. drop-shadow has no spread and his spread is 0. */
     .td-band__ph { position: absolute; width: auto; transform: translateX(-50%);
-      filter: drop-shadow(0 22px 34px rgba(8, 42, 48, 0.30)); }
+      filter: drop-shadow(4px 4px 10px rgba(118, 223, 236, 0.5)); }
     .td-band__ph--mid   { left: 50%;  top: 13.3%; height: 74.6%; z-index: 2; }
     .td-band__ph--left  { left: 21%;  top: 22.8%; height: 62.6%; }
     .td-band__ph--right { left: 79%;  top: 22.8%; height: 62.6%; }
@@ -312,9 +314,15 @@
     /* ---------- Responsive ---------- */
     @media (max-width: 1024px) { .td-rail { display: none; } }
     @media (max-width: 860px) {
+      /* the rings were filling their whole column on a phone and shouting over everything under
+         them - 66% of the column reads as a figure again rather than as a poster */
       .td-donuts { grid-template-columns: repeat(2, 1fr); row-gap: 2.4rem; }
+      .td-donut__dial { width: min(172px, 66%); }
+      .td-charts { margin-top: clamp(3.25rem, 9vw, 4.5rem); }
       .td-charts { grid-template-columns: 1fr; }
       .td-market { grid-template-columns: 1fr; }
+      /* stacked: the board's own proportion would be 10px here, so the site's media-pair gap runs */
+      .td-brand, .td-brand__pair { gap: clamp(1.5rem, 5vw, 4rem); }
       .td-brand__pair { grid-template-columns: 1fr; }
     }
     @media (max-width: 760px) {
@@ -336,18 +344,19 @@
         --td-slide: 58vw;
         background: none; border-radius: 0; overflow: visible;
         margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw); }
+      /* padding-block is not decoration: `overflow-x: auto` makes the OTHER axis a clipping box too,
+         so without room inside it the phones' drop shadow was sliced off top and bottom. 4px offset
+         plus 10px blur needs 14; 18 leaves a margin. */
       .td-band__track { position: static; display: flex; align-items: center; gap: clamp(.5rem, 3vw, 1rem);
         overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory;
+        padding-block: 18px;
         padding-inline: calc(50% - var(--td-slide) / 2);
         scrollbar-width: none; -ms-overflow-style: none; }
       .td-band__track::-webkit-scrollbar { display: none; }
       .td-band__ph { position: static; flex: 0 0 var(--td-slide); width: var(--td-slide); height: auto;
         top: auto; left: auto; scroll-snap-align: center;
         transform: scale(var(--td-s, .8)); transform-origin: center bottom;
-        transition: transform .18s linear;
-        /* his own value, to the number: X 4, Y 4, blur 10, spread 0, #76DFEC at 50%.
-           drop-shadow has no spread parameter, and the spread he set is 0, so nothing is lost. */
-        filter: drop-shadow(4px 4px 10px rgba(118, 223, 236, 0.5)); }
+        transition: transform .18s linear; }
     }
     @media (prefers-reduced-motion: reduce) {
       .td-phone { transform: none !important; animation: none !important; opacity: 1 !important; }
@@ -413,8 +422,8 @@
     <section class="td-hero td-wrap">
       <div class="td-hero__bg" aria-hidden="true">
         <video class="td-hero__vid" autoplay muted loop playsinline preload="metadata"
-               poster="td-hero-poster.jpg?v=157">
-          <source src="td-hero.mp4?v=157" type="video/mp4" />
+               poster="td-hero-poster.jpg?v=158">
+          <source src="td-hero.mp4?v=158" type="video/mp4" />
         </video>
       </div>
 
@@ -424,7 +433,7 @@
       </div>
 
       <div class="td-phone" data-phone>
-        <img src="td-phone-hero.png?v=157" width="576" height="1188" fetchpriority="high" decoding="async"
+        <img src="td-phone-hero.png?v=158" width="576" height="1188" fetchpriority="high" decoding="async"
              alt="A TrailDesk place card: Chess House, 350 meters away, scored for Wi-Fi, power, noise, seating and parking" />
       </div>
     </section>
@@ -458,7 +467,7 @@
     <section class="td-section td-wrap" id="solution">
       <h2 class="td-h2 reveal">Solution</h2>
       <p class="td-body reveal">Provide a platform that aggregates a wide range of public workspaces with
-        reliable, up-to-date information on conditions — including comfortable seating, Wi-Fi quality,
+        reliable, up-to-date information on conditions - including comfortable seating, Wi-Fi quality,
         power availability, noise levels, parking, and more.</p>
     </section>
 
@@ -529,7 +538,7 @@
           <p class="td-body">All of these and more focus on <b>very expensive coworking spaces</b> or
             <b>generic coffee shops</b>.</p>
         </div>
-        <img class="td-market__img" src="td-competitors.png?v=157" width="1340" height="1272" loading="lazy" decoding="async"
+        <img class="td-market__img" src="td-competitors.png?v=158" width="1340" height="1272" loading="lazy" decoding="async"
              alt="The three apps in the space today - Pluria, Spacing and a cafe-finder - shown as app icons on a tilted card" />
       </div>
     </section>
@@ -541,7 +550,7 @@
       <h2 class="td-h2 reveal">Information architecture</h2>
 
       <figure class="td-dia reveal">
-        <img class="td-dia__img" src="td-ia.png?v=157" width="2400" height="2095" loading="lazy" decoding="async"
+        <img class="td-dia__img" src="td-ia.png?v=158" width="2400" height="2095" loading="lazy" decoding="async"
              alt="TrailDesk information architecture: Splash to Walk through to Onboarding, which splits into Sign in and Sign up and leads to Home (Map). Home branches into Categories, Favorites, Messages and Profile, each with up to three further levels." />
       </figure>
     </section>
@@ -551,7 +560,7 @@
       <h2 class="td-h2 reveal">User flow</h2>
 
       <figure class="td-dia reveal">
-        <img class="td-dia__img" src="td-flow.png?v=157" width="2200" height="2560" loading="lazy" decoding="async"
+        <img class="td-dia__img" src="td-flow.png?v=158" width="2200" height="2560" loading="lazy" decoding="async"
              alt="TrailDesk user flow: onboarding runs from Start through Splash and Logo, App Walkthrough and Sign in or Sign up to the Home Screen. The main flow goes from the Home Screen through Category Selection or Search to the Places List and the Place Properties Filter, into a decision about finding an interesting place, then Place Details, a decision about suitability, and finally Initiate Navigation, with a branch through User Reviews, Ask Someone, Member Profile and Direct Messaging." />
       </figure>
     </section>
@@ -562,11 +571,11 @@
            reaches the middle is the one shown large. The order here is the order on screen. -->
       <div class="td-band reveal">
         <div class="td-band__track" data-band>
-          <img class="td-band__ph td-band__ph--left" src="td-ui-left.png?v=157" width="270" height="544" loading="lazy" decoding="async"
+          <img class="td-band__ph td-band__ph--left" src="td-ui-left.png?v=158" width="270" height="544" loading="lazy" decoding="async"
                alt="TrailDesk: the map filtered to parks, with a place preview card at the bottom" />
-          <img class="td-band__ph td-band__ph--mid" src="td-ui-mid.png?v=157" width="332" height="664" loading="lazy" decoding="async"
+          <img class="td-band__ph td-band__ph--mid" src="td-ui-mid.png?v=158" width="332" height="664" loading="lazy" decoding="async"
                alt="TrailDesk home screen: a map of nearby public workspaces with colour-coded category pins" />
-          <img class="td-band__ph td-band__ph--right" src="td-ui-right.png?v=157" width="268" height="546" loading="lazy" decoding="async"
+          <img class="td-band__ph td-band__ph--right" src="td-ui-right.png?v=158" width="268" height="546" loading="lazy" decoding="async"
                alt="TrailDesk place detail: Dawn Cloud Park with its conditions scored out of ten" />
         </div>
       </div>
@@ -577,12 +586,12 @@
     <section class="td-section td-wrap" id="brand">
       <h2 class="td-h2 reveal">Branding</h2>
       <div class="td-brand reveal">
-        <img src="td-brand-word.png?v=157" width="2360" height="485" loading="lazy" decoding="async"
+        <img src="td-brand-word.png?v=158" width="2360" height="485" loading="lazy" decoding="async"
              alt="The TRAIL DESK wordmark" />
         <div class="td-brand__pair">
-          <img src="td-brand-logo.png?v=157" width="1400" height="1591" loading="lazy" decoding="async"
+          <img src="td-brand-logo.png?v=158" width="1400" height="1591" loading="lazy" decoding="async"
                alt="The TrailDesk mark on its construction grid" />
-          <img src="td-brand-icon.png?v=157" width="1400" height="1591" loading="lazy" decoding="async"
+          <img src="td-brand-icon.png?v=158" width="1400" height="1591" loading="lazy" decoding="async"
                alt="The TrailDesk app icon on an iPhone home screen" />
         </div>
       </div>
@@ -599,7 +608,7 @@
             <span class="nxt__desc"><b>BIANCA</b> restaurant management dashboard</span>
           </span>
           <span class="nxt__frame">
-            <img class="nxt__img" src="tile-bianca.jpg?v=157" width="1200" height="750" alt="" loading="lazy" />
+            <img class="nxt__img" src="tile-bianca.jpg?v=158" width="1200" height="750" alt="" loading="lazy" />
           </span>
         </a>
       </div>
@@ -621,7 +630,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=157"></script>
+  <script src="script.js?v=158"></script>
   <script>
     /* ---- TrailDesk case-study interactions (page-scoped) ----
          Same three moves as Bianca: the right-side rail, the hero title dissolve, and a cursor
