@@ -12,7 +12,7 @@
   <meta property="og:url" content="https://yehudaamitzur.com/traildesk" />
   <meta property="og:title" content="TrailDesk case study · Yehuda Amitzur" />
   <meta property="og:description" content="TrailDesk is a map-first app that aggregates public workspaces and grades them on the conditions that decide whether you can actually work there. A UX/UI case study by Yehuda Amitzur." />
-  <meta property="og:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=159" />
+  <meta property="og:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=161" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="750" />
@@ -20,7 +20,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="TrailDesk case study · Yehuda Amitzur" />
   <meta name="twitter:description" content="TrailDesk is a map-first app that aggregates public workspaces and grades them on the conditions that decide whether you can actually work there. A UX/UI case study by Yehuda Amitzur." />
-  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=159" />
+  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=161" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -28,8 +28,8 @@
   <!-- favicon: the same ring as the site cursor - purple stroke, lighter purple fill -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
   <link rel="canonical" href="https://yehudaamitzur.com/traildesk" />
-  <link rel="preload" as="image" href="td-phone-hero.png?v=159" fetchpriority="high" />
-  <link rel="stylesheet" href="styles.css?v=159" />
+  <link rel="preload" as="image" href="td-hero-mock.png?v=161" fetchpriority="high" />
+  <link rel="stylesheet" href="styles.css?v=161" />
 
   <style>
     /* =========================================================
@@ -90,7 +90,7 @@
       padding-bottom: clamp(1rem, 3vw, 2rem); }
     .td-hero__bg { position: fixed; top: 0; left: 50%; transform: translateX(-50%);
       width: 100vw; height: clamp(560px, 54vw, 800px); z-index: 0; overflow: hidden; pointer-events: none;
-      background: var(--bg) url("td-hero-poster.jpg?v=159") center / cover no-repeat; }
+      background: var(--bg) url("td-hero-poster.jpg?v=161") center / cover no-repeat; }
     /* THE FOOTAGE (17.08.2026) - a park with the skyline behind it, which is the product's whole
        subject. It sits at the bottom of the band's three layers and everything else is painted over
        it, so the z-indexes here are explicit rather than left to DOM order. */
@@ -124,8 +124,22 @@
       margin: clamp(2.75rem, 7vw, 5rem) auto 0;
       transform-style: preserve-3d; will-change: transform, opacity;
       animation: tdPhoneIn 1.15s cubic-bezier(.2,.7,.2,1) 1.9s both; }
-    .td-phone img { display: block; width: 100%; height: auto;
+    .td-phone img { display: block; width: 100%; height: auto; }
+    /* The frame carries the shadow, not the box: a drop-shadow filter follows the cut-out's alpha,
+       so it hugs the phone's silhouette instead of squaring off around it. */
+    .td-mock { position: relative; aspect-ratio: 957 / 1971;
       filter: drop-shadow(0 40px 60px rgba(12, 52, 60, 0.34)) drop-shadow(0 6px 14px rgba(12, 52, 60, 0.18)); }
+    /* The frame is Yehuda's own empty iPhone mockup, whose display face is solid black - so the
+       film goes ON TOP of it, inside a box that clips it. That box was measured off his file: the
+       black face runs x 28..926, y 28..1947 of 957x1971 with a ~127 corner, and the film is inset
+       14px inside that. The inset is not decoration - it leaves the thin black bezel a real phone
+       has between the metal and the glass, AND it lands the opening on 871x1892 = 0.4604, which is
+       the film's own 660x1434 ratio to four decimals, so `cover` crops nothing. Anything the
+       clipping misses by a fraction of a pixel shows the black underneath, never the page. */
+    .td-mock__screen { position: absolute; z-index: 1; left: 4.389%; top: 2.131%;
+      width: 91.014%; height: 95.992%;
+      border-radius: 11.808% / 5.733%; overflow: hidden; background: #000; }
+    .td-mock__vid { display: block; width: 100%; height: 100%; object-fit: cover; }
     @keyframes tdPhoneIn {
       from { opacity: 0; transform: translateY(64px) scale(1.08); }
       to   { opacity: 1; transform: translateY(0) scale(1); }
@@ -270,7 +284,7 @@
        MOBILE is the same three phones turned into a swipeable strip - see the block further down. */
     .td-band { position: relative; margin-top: clamp(1.9rem, 3.6vw, 2.6rem);
       aspect-ratio: 3576 / 2595;
-      background: url("td-band.jpg?v=159") center / cover no-repeat;
+      background: url("td-band.jpg?v=161") center / cover no-repeat;
       /* No shadow (18.08.2026, asked for). The corners are cut by THIS radius alone: td-band.jpg used
          to arrive with its own rounded corners already baked against white, and the two curves never
          agreed - a white sliver sat in each corner. The picture's own edge colour has been stretched
@@ -365,11 +379,17 @@
       .td-donut__ring { transition: none; --sweep: var(--end); }
       .td-charts .td-chart { opacity: 1; animation: none !important; }
       .td-bars__t i { transition: none; width: var(--w); }
+      /* the mock holds its first frame too: the poster becomes the screen's own background, so
+         hiding the film leaves a still phone rather than a black rectangle */
+      .td-mock__vid { display: none; }
+      .td-mock__screen { background: #0B0F10 url("td-hero-screen-poster.jpg?v=161") center / cover no-repeat; }
       /* fall back to a normal scrolling hero (no pinned band / sticky title), and the footage holds
          on its first frame - the poster - instead of playing */
       .td-hero__bg { position: absolute; }
       .td-hero__head { position: static; }
       .td-hero__vid { display: none; }
+      /* the mock keeps its screen - the poster is the video element's own background here */
+
     }
   </style>
 </head>
@@ -423,8 +443,8 @@
     <section class="td-hero td-wrap">
       <div class="td-hero__bg" aria-hidden="true">
         <video class="td-hero__vid" autoplay muted loop playsinline preload="metadata"
-               poster="td-hero-poster.jpg?v=159">
-          <source src="td-hero.mp4?v=159" type="video/mp4" />
+               poster="td-hero-poster.jpg?v=161">
+          <source src="td-hero.mp4?v=161" type="video/mp4" />
         </video>
       </div>
 
@@ -433,9 +453,20 @@
           from home</p>
       </div>
 
+      <!-- The hero phone is a MOCKUP: the film plays behind the frame, not on top of it, and the
+           frame's screen has been punched out of the PNG so the bezel's own inner edge covers the
+           join. Nothing here has to line up to the pixel because nothing here has a visible seam. -->
       <div class="td-phone" data-phone>
-        <img src="td-phone-hero.png?v=159" width="576" height="1188" fetchpriority="high" decoding="async"
-             alt="A TrailDesk place card: Chess House, 350 meters away, scored for Wi-Fi, power, noise, seating and parking" />
+        <div class="td-mock">
+          <img class="td-mock__frame" src="td-hero-mock.png?v=161" width="860" height="1771"
+               fetchpriority="high" decoding="async" alt="" />
+          <span class="td-mock__screen">
+            <video class="td-mock__vid" autoplay muted loop playsinline preload="metadata"
+                   poster="td-hero-screen-poster.jpg?v=161" aria-label="A walk through TrailDesk: the map, the filters and a place card">
+              <source src="td-hero-screen.mp4?v=161" type="video/mp4" />
+            </video>
+          </span>
+        </div>
       </div>
     </section>
 
@@ -539,7 +570,7 @@
           <p class="td-body">All of these and more focus on very expensive coworking spaces or
             generic coffee shops.</p>
         </div>
-        <img class="td-market__img" src="td-competitors.png?v=159" width="1340" height="1272" loading="lazy" decoding="async"
+        <img class="td-market__img" src="td-competitors.png?v=161" width="1340" height="1272" loading="lazy" decoding="async"
              alt="The three apps in the space today - Pluria, Spacing and a cafe-finder - shown as app icons on a tilted card" />
       </div>
     </section>
@@ -551,7 +582,7 @@
       <h2 class="td-h2 reveal">Information architecture</h2>
 
       <figure class="td-dia reveal">
-        <img class="td-dia__img" src="td-ia.png?v=159" width="2400" height="2095" loading="lazy" decoding="async"
+        <img class="td-dia__img" src="td-ia.png?v=161" width="2400" height="2095" loading="lazy" decoding="async"
              alt="TrailDesk information architecture: Splash to Walk through to Onboarding, which splits into Sign in and Sign up and leads to Home (Map). Home branches into Categories, Favorites, Messages and Profile, each with up to three further levels." />
       </figure>
     </section>
@@ -561,7 +592,7 @@
       <h2 class="td-h2 reveal">User flow</h2>
 
       <figure class="td-dia reveal">
-        <img class="td-dia__img" src="td-flow.png?v=159" width="2200" height="2560" loading="lazy" decoding="async"
+        <img class="td-dia__img" src="td-flow.png?v=161" width="2200" height="2560" loading="lazy" decoding="async"
              alt="TrailDesk user flow: onboarding runs from Start through Splash and Logo, App Walkthrough and Sign in or Sign up to the Home Screen. The main flow goes from the Home Screen through Category Selection or Search to the Places List and the Place Properties Filter, into a decision about finding an interesting place, then Place Details, a decision about suitability, and finally Initiate Navigation, with a branch through User Reviews, Ask Someone, Member Profile and Direct Messaging." />
       </figure>
     </section>
@@ -572,11 +603,11 @@
            reaches the middle is the one shown large. The order here is the order on screen. -->
       <div class="td-band reveal">
         <div class="td-band__track" data-band>
-          <img class="td-band__ph td-band__ph--left" src="td-ui-left.png?v=159" width="270" height="544" loading="lazy" decoding="async"
+          <img class="td-band__ph td-band__ph--left" src="td-ui-left.png?v=161" width="270" height="544" loading="lazy" decoding="async"
                alt="TrailDesk: the map filtered to parks, with a place preview card at the bottom" />
-          <img class="td-band__ph td-band__ph--mid" src="td-ui-mid.png?v=159" width="332" height="664" loading="lazy" decoding="async"
+          <img class="td-band__ph td-band__ph--mid" src="td-ui-mid.png?v=161" width="332" height="664" loading="lazy" decoding="async"
                alt="TrailDesk home screen: a map of nearby public workspaces with colour-coded category pins" />
-          <img class="td-band__ph td-band__ph--right" src="td-ui-right.png?v=159" width="268" height="546" loading="lazy" decoding="async"
+          <img class="td-band__ph td-band__ph--right" src="td-ui-right.png?v=161" width="268" height="546" loading="lazy" decoding="async"
                alt="TrailDesk place detail: Dawn Cloud Park with its conditions scored out of ten" />
         </div>
       </div>
@@ -587,12 +618,12 @@
     <section class="td-section td-wrap" id="brand">
       <h2 class="td-h2 reveal">Branding</h2>
       <div class="td-brand reveal">
-        <img src="td-brand-word.png?v=159" width="2360" height="485" loading="lazy" decoding="async"
+        <img src="td-brand-word.png?v=161" width="2360" height="485" loading="lazy" decoding="async"
              alt="The TRAIL DESK wordmark" />
         <div class="td-brand__pair">
-          <img src="td-brand-logo.png?v=159" width="1400" height="1591" loading="lazy" decoding="async"
+          <img src="td-brand-logo.png?v=161" width="1400" height="1591" loading="lazy" decoding="async"
                alt="The TrailDesk mark on its construction grid" />
-          <img src="td-brand-icon.png?v=159" width="1400" height="1591" loading="lazy" decoding="async"
+          <img src="td-brand-icon.png?v=161" width="1400" height="1591" loading="lazy" decoding="async"
                alt="The TrailDesk app icon on an iPhone home screen" />
         </div>
       </div>
@@ -609,7 +640,7 @@
             <span class="nxt__desc"><b>BIANCA</b> restaurant management dashboard</span>
           </span>
           <span class="nxt__frame">
-            <img class="nxt__img" src="tile-bianca.jpg?v=159" width="1200" height="750" alt="" loading="lazy" />
+            <img class="nxt__img" src="tile-bianca.jpg?v=161" width="1200" height="750" alt="" loading="lazy" />
           </span>
         </a>
       </div>
@@ -631,7 +662,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=159"></script>
+  <script src="script.js?v=161"></script>
   <script>
     /* ---- TrailDesk case-study interactions (page-scoped) ----
          Same three moves as Bianca: the right-side rail, the hero title dissolve, and a cursor
