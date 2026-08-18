@@ -12,7 +12,7 @@
   <meta property="og:url" content="https://yehudaamitzur.com/traildesk" />
   <meta property="og:title" content="TrailDesk case study · Yehuda Amitzur" />
   <meta property="og:description" content="TrailDesk is a map-first app that aggregates public workspaces and grades them on the conditions that decide whether you can actually work there. A UX/UI case study by Yehuda Amitzur." />
-  <meta property="og:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=149" />
+  <meta property="og:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=150" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="750" />
@@ -20,7 +20,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="TrailDesk case study · Yehuda Amitzur" />
   <meta name="twitter:description" content="TrailDesk is a map-first app that aggregates public workspaces and grades them on the conditions that decide whether you can actually work there. A UX/UI case study by Yehuda Amitzur." />
-  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=149" />
+  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=150" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -28,8 +28,8 @@
   <!-- favicon: the same ring as the site cursor - purple stroke, lighter purple fill -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
   <link rel="canonical" href="https://yehudaamitzur.com/traildesk" />
-  <link rel="preload" as="image" href="td-phone-hero.png?v=149" fetchpriority="high" />
-  <link rel="stylesheet" href="styles.css?v=149" />
+  <link rel="preload" as="image" href="td-phone-hero.png?v=150" fetchpriority="high" />
+  <link rel="stylesheet" href="styles.css?v=150" />
 
   <style>
     /* =========================================================
@@ -82,7 +82,7 @@
       padding-bottom: clamp(1rem, 3vw, 2rem); }
     .td-hero__bg { position: fixed; top: 0; left: 50%; transform: translateX(-50%);
       width: 100vw; height: clamp(560px, 54vw, 800px); z-index: 0; overflow: hidden; pointer-events: none;
-      background: var(--bg) url("td-hero-poster.jpg?v=149") center / cover no-repeat; }
+      background: var(--bg) url("td-hero-poster.jpg?v=150") center / cover no-repeat; }
     /* THE FOOTAGE (17.08.2026) - a park with the skyline behind it, which is the product's whole
        subject. It sits at the bottom of the band's three layers and everything else is painted over
        it, so the z-indexes here are explicit rather than left to DOM order. */
@@ -213,33 +213,12 @@
     .td-jface { position: absolute; transform: translate(-50%, -50%); font-size: clamp(1.35rem, 2.4vw, 1.75rem); line-height: 1; }
 
     /* ---------- Diagrams (IA + user flow) ----------
-       STATIC PICTURES since 17.08.2026. They used to be wider than the card and scrolled sideways
-       inside it; now each one simply scales to the width it is given - one drawing, shrunk, at every
-       size. No min-width, no scroller, no separate mobile layout. The SVG is still inline rather than
-       a .png so the shrinking stays sharp instead of turning to mush on a phone.
-       The two cards' gradients are one continuous wash read top to bottom: the IA card ends on the
-       teal, the flow card PICKS THAT TEAL UP AT ITS TOP and fades to white at its foot. */
-    .td-diagram { margin-top: clamp(1.9rem, 3.6vw, 2.6rem);
-      background: linear-gradient(180deg, #FAFDFE, #DCF0F4);
-      border: 1px solid var(--p3); border-radius: clamp(20px, 2.4vw, 30px);
-      padding: clamp(1rem, 2.4vw, 2rem); }
-    .td-diagram--flow { background: linear-gradient(180deg, #DCF0F4, #FCFEFE); }
-    .td-dfit svg { display: block; width: 100%; height: auto; }
-    .td-node { fill: var(--p2); }
-    .td-node--home { fill: var(--p6); }
-    .td-node--goal { fill: var(--p4); }
-    .td-node--open { fill: #FDFCFE; stroke: var(--p3); stroke-width: 1.4; }
-    .td-node--start { fill: #1F4048; }
-    /* 17px in the viewBox, which lands at ~15px on screen once the 1200-wide diagram is scaled
-       into the 1080-wide card - the boxes are drawn generously so the labels can be read */
-    .td-t { font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 17px; font-weight: 500; fill: #123F48; text-anchor: middle; }
-    .td-t--on { fill: #fff; font-weight: 700; }
-    .td-t--start { fill: #fff; font-weight: 700; font-size: 17px; }
-    .td-t--ghost { font-size: 42px; font-weight: 800; fill: #D5EBEF; text-anchor: start; letter-spacing: -0.02em; }
-    .td-chip { fill: #1F4048; }
-    .td-chipt { font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 13px; font-weight: 600; fill: #fff; text-anchor: middle; }
-    .td-link { fill: none; stroke: #A6D6DE; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
-    .td-link--dash { stroke-dasharray: 7 7; }
+       Yehuda's own exports from Figma, dropped in as flat pictures on 18.08.2026 - they replace the
+       versions that were drawn here in SVG. Deliberately UNDRESSED: no card, no border, no radius,
+       no shadow. The artwork already carries its own off-white ground, so anything wrapped around it
+       would only read as a second frame inside the first. It simply scales to the column width. */
+    .td-dia { margin: clamp(1.9rem, 3.6vw, 2.6rem) 0 0; }
+    .td-dia__img { display: block; width: 100%; height: auto; border-radius: 0; box-shadow: none; }
 
     /* ---------- UI showcase - the three screens on Yehuda's own band ----------
        The band is his artwork (td-band.jpg, the mark watermarked into it), and the three phones are
@@ -249,7 +228,7 @@
        MOBILE is the same three phones turned into a swipeable strip - see the block further down. */
     .td-band { position: relative; margin-top: clamp(1.9rem, 3.6vw, 2.6rem);
       aspect-ratio: 3576 / 2595;
-      background: url("td-band.jpg?v=149") center / cover no-repeat;
+      background: url("td-band.jpg?v=150") center / cover no-repeat;
       border-radius: clamp(20px, 2.4vw, 34px); box-shadow: var(--td-card); overflow: hidden; }
     .td-band__track { position: absolute; inset: 0; }
     .td-band__ph { position: absolute; width: auto; transform: translateX(-50%);
@@ -378,8 +357,8 @@
     <section class="td-hero td-wrap">
       <div class="td-hero__bg" aria-hidden="true">
         <video class="td-hero__vid" autoplay muted loop playsinline preload="metadata"
-               poster="td-hero-poster.jpg?v=149">
-          <source src="td-hero.mp4?v=149" type="video/mp4" />
+               poster="td-hero-poster.jpg?v=150">
+          <source src="td-hero.mp4?v=150" type="video/mp4" />
         </video>
       </div>
 
@@ -389,7 +368,7 @@
       </div>
 
       <div class="td-phone" data-phone>
-        <img src="td-phone-hero.png?v=149" width="576" height="1188" fetchpriority="high" decoding="async"
+        <img src="td-phone-hero.png?v=150" width="576" height="1188" fetchpriority="high" decoding="async"
              alt="A TrailDesk place card: Chess House, 350 meters away, scored for Wi-Fi, power, noise, seating and parking" />
       </div>
     </section>
@@ -564,169 +543,20 @@
     <section class="td-section td-wrap" id="architecture">
       <h2 class="td-h2 reveal">Information architecture</h2>
 
-      <div class="td-diagram reveal">
-        <div class="td-dfit">
-          <svg viewBox="0 0 1200 1060" role="img" aria-label="TrailDesk information architecture: Splash to Walk through to Onboarding, which splits into Sign in and Sign up and leads to Home (Map). Home branches into Categories, Favorites, Messages and Profile, each with up to three further levels.">
-            <defs>
-              <marker id="tdArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                <path d="M0,1 L9,5 L0,9" fill="none" stroke="#A6D6DE" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-              </marker>
-            </defs>
-
-            <!-- top row -->
-            <path class="td-link" marker-end="url(#tdArrow)" d="M200,53 H430" />
-            <path class="td-link" marker-end="url(#tdArrow)" d="M600,53 H930" />
-            <!-- onboarding fork -->
-            <path class="td-link" marker-end="url(#tdArrow)" d="M1015,76 V95 H922 V120" />
-            <path class="td-link" marker-end="url(#tdArrow)" d="M1015,76 V95 H1062 V120" />
-            <!-- onboarding → home -->
-            <path class="td-link" marker-end="url(#tdArrow)" d="M1100,53 H1165 V205 H415 V230" />
-            <!-- home → four tabs -->
-            <path class="td-link" d="M415,278 V310" />
-            <path class="td-link" d="M115,310 H1015" />
-            <path class="td-link" marker-end="url(#tdArrow)" d="M115,310 V340" />
-            <path class="td-link" marker-end="url(#tdArrow)" d="M415,310 V340" />
-            <path class="td-link" marker-end="url(#tdArrow)" d="M715,310 V340" />
-            <path class="td-link" marker-end="url(#tdArrow)" d="M1015,310 V340" />
-            <!-- column chains -->
-            <path class="td-link" marker-end="url(#tdArrow)" d="M115,386 V430" />
-            <path class="td-link" marker-end="url(#tdArrow)" d="M115,476 V520" />
-            <path class="td-link" marker-end="url(#tdArrow)" d="M415,386 V430" />
-            <path class="td-link" marker-end="url(#tdArrow)" d="M415,476 V520" />
-            <path class="td-link" marker-end="url(#tdArrow)" d="M715,386 V430" />
-            <path class="td-link" marker-end="url(#tdArrow)" d="M715,476 V520" />
-            <path class="td-link" marker-end="url(#tdArrow)" d="M715,566 V610" />
-            <path class="td-link" marker-end="url(#tdArrow)" d="M1015,386 V430" />
-            <path class="td-link" marker-end="url(#tdArrow)" d="M1015,476 V520" />
-            <path class="td-link" marker-end="url(#tdArrow)" d="M1015,566 V610" />
-            <!-- activity fork + merge -->
-            <path class="td-link" marker-end="url(#tdArrow)" d="M1015,656 V678 H932 V700" />
-            <path class="td-link" marker-end="url(#tdArrow)" d="M1015,656 V678 H1062 V700" />
-            <path class="td-link" d="M932,746 V768 H1015" />
-            <path class="td-link" marker-end="url(#tdArrow)" d="M1062,746 V768 H1015 V790" />
-            <path class="td-link" marker-end="url(#tdArrow)" d="M1015,836 V880" />
-            <path class="td-link" marker-end="url(#tdArrow)" d="M1015,926 V970" />
-
-            <!-- nodes -->
-            <rect class="td-node" x="30"  y="30" width="170" height="52" rx="12" /><text class="td-t" x="115"  y="62">Splash</text>
-            <rect class="td-node" x="430" y="30" width="170" height="52" rx="12" /><text class="td-t" x="515"  y="62">Walk through</text>
-            <rect class="td-node" x="930" y="30" width="170" height="52" rx="12" /><text class="td-t" x="1015" y="62">Onboarding</text>
-
-            <rect class="td-node td-node--open" x="860"  y="120" width="125" height="52" rx="12" /><text class="td-t" x="922"  y="152">Sign in</text>
-            <rect class="td-node td-node--open" x="1000" y="120" width="125" height="52" rx="12" /><text class="td-t" x="1062" y="152">Sign up</text>
-
-            <rect class="td-node td-node--home" x="330" y="230" width="170" height="54" rx="13" /><text class="td-t td-t--on" x="415" y="263">Home (Map)</text>
-
-            <rect class="td-node" x="30"  y="340" width="170" height="52" rx="12" /><text class="td-t" x="115"  y="372">Categories</text>
-            <rect class="td-node" x="330" y="340" width="170" height="52" rx="12" /><text class="td-t" x="415"  y="372">Favorites</text>
-            <rect class="td-node" x="630" y="340" width="170" height="52" rx="12" /><text class="td-t" x="715"  y="372">Messages</text>
-            <rect class="td-node" x="930" y="340" width="170" height="52" rx="12" /><text class="td-t" x="1015" y="372">Profile</text>
-
-            <rect class="td-node td-node--open" x="30"  y="430" width="170" height="52" rx="12" /><text class="td-t" x="115"  y="462">Places List</text>
-            <rect class="td-node td-node--open" x="30"  y="520" width="170" height="52" rx="12" /><text class="td-t" x="115"  y="552">Place Detail</text>
-
-            <rect class="td-node td-node--open" x="330" y="430" width="170" height="52" rx="12" /><text class="td-t" x="415" y="462">Saved Places List</text>
-            <rect class="td-node td-node--open" x="330" y="520" width="170" height="52" rx="12" /><text class="td-t" x="415" y="552">Place Detail</text>
-
-            <rect class="td-node td-node--open" x="630" y="430" width="170" height="52" rx="12" /><text class="td-t" x="715" y="462">Messages List</text>
-            <rect class="td-node td-node--open" x="630" y="520" width="170" height="52" rx="12" /><text class="td-t" x="715" y="552">Direct Messages</text>
-            <rect class="td-node td-node--open" x="630" y="610" width="170" height="52" rx="12" /><text class="td-t" x="715" y="642">Member profile</text>
-
-            <rect class="td-node td-node--open" x="930" y="430" width="170" height="52" rx="12" /><text class="td-t" x="1015" y="462">Edit Profile</text>
-            <rect class="td-node td-node--open" x="930" y="520" width="170" height="52" rx="12" /><text class="td-t" x="1015" y="552">Preferences</text>
-            <rect class="td-node td-node--open" x="930" y="610" width="170" height="52" rx="12" /><text class="td-t" x="1015" y="642">Activity</text>
-            <rect class="td-node td-node--open" x="875" y="700" width="115" height="52" rx="12" /><text class="td-t" x="932"  y="732">Saved</text>
-            <rect class="td-node td-node--open" x="1000" y="700" width="125" height="52" rx="12" /><text class="td-t" x="1062" y="732">Recently</text>
-            <rect class="td-node td-node--open" x="930" y="790" width="170" height="52" rx="12" /><text class="td-t" x="1015" y="822">Settings</text>
-            <rect class="td-node td-node--open" x="930" y="880" width="170" height="52" rx="12" /><text class="td-t" x="1015" y="912">Notifications</text>
-            <rect class="td-node td-node--open" x="930" y="970" width="170" height="52" rx="12" /><text class="td-t" x="1015" y="1002">Help &amp; Support</text>
-          </svg>
-        </div>
-      </div>
+      <figure class="td-dia reveal">
+        <img class="td-dia__img" src="td-ia.jpg?v=150" width="2400" height="1786" loading="lazy" decoding="async"
+             alt="TrailDesk information architecture: Splash to Walk through to Onboarding, which splits into Sign in and Sign up and leads to Home (Map). Home branches into Categories, Favorites, Messages and Profile, each with up to three further levels." />
+      </figure>
     </section>
 
     <!-- ===== USER FLOW ===== -->
     <section class="td-section td-wrap" id="flow">
       <h2 class="td-h2 reveal">User flow</h2>
 
-      <div class="td-diagram td-diagram--flow reveal">
-        <div class="td-dfit">
-          <svg viewBox="0 0 1200 1160" role="img" aria-label="TrailDesk user flow: onboarding runs from Start through Splash and Logo, App Walkthrough and Sign in or Sign up to the Home Screen. The main flow goes from the Home Screen through Category Selection or Search to the Places List and the Place Properties Filter, into a decision about finding an interesting place, then Place Details, a decision about suitability, and finally Initiate Navigation, with a branch through User Reviews, Ask Someone, Member Profile and Direct Messaging.">
-            <defs>
-              <marker id="tdArrowF" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                <path d="M0,1 L9,5 L0,9" fill="none" stroke="#A6D6DE" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-              </marker>
-            </defs>
-
-            <!-- ghost group labels -->
-            <text class="td-t td-t--ghost" x="520" y="78">Onboarding</text>
-            <text class="td-t td-t--ghost" x="290" y="358">Main flow</text>
-
-            <!-- onboarding links -->
-            <path class="td-link" marker-end="url(#tdArrowF)" d="M168,148 H300" />
-            <path class="td-link" marker-end="url(#tdArrowF)" d="M470,148 H650" />
-            <path class="td-link" marker-end="url(#tdArrowF)" d="M820,148 H1000" />
-            <path class="td-link" marker-end="url(#tdArrowF)" d="M1085,224 V390" />
-
-            <!-- main-flow links: the row runs right to left, Home Screen back to the filter -->
-            <path class="td-link" marker-end="url(#tdArrowF)" d="M1000,428 H820" />
-            <path class="td-link" marker-end="url(#tdArrowF)" d="M650,428 H540" />
-            <path class="td-link" marker-end="url(#tdArrowF)" d="M370,428 H260" />
-            <path class="td-link" marker-end="url(#tdArrowF)" d="M880,428 V558 H820" />
-            <path class="td-link" marker-end="url(#tdArrowF)" d="M650,558 H595 V428 H540" />
-            <path class="td-link" marker-end="url(#tdArrowF)" d="M175,466 V642" />
-            <path class="td-link" marker-end="url(#tdArrowF)" d="M293,720 H370" />
-            <path class="td-link" marker-end="url(#tdArrowF)" d="M540,720 H617" />
-            <path class="td-link" marker-end="url(#tdArrowF)" d="M853,720 H1000" />
-            <path class="td-link" marker-end="url(#tdArrowF)" d="M735,642 V596" />
-            <path class="td-link" marker-end="url(#tdArrowF)" d="M735,798 V880" />
-            <path class="td-link" marker-end="url(#tdArrowF)" d="M650,918 H540" />
-            <path class="td-link" marker-end="url(#tdArrowF)" d="M370,918 H260" />
-            <path class="td-link" marker-end="url(#tdArrowF)" d="M175,956 V1040" />
-            <!-- the two dashed returns: nothing found → back to the filter, and a DM → navigate anyway -->
-            <path class="td-link td-link--dash" marker-end="url(#tdArrowF)" d="M57,720 H32 V428 H90" />
-            <path class="td-link td-link--dash" marker-end="url(#tdArrowF)" d="M260,1078 H1085 V758" />
-
-            <!-- onboarding nodes -->
-            <circle class="td-node--start" cx="100" cy="148" r="68" /><text class="td-t td-t--start" x="100" y="155">Start</text>
-            <rect class="td-node" x="300"  y="110" width="170" height="76" rx="16" /><text class="td-t" x="385"  y="154">Splash &amp; Logo</text>
-            <rect class="td-node" x="650"  y="110" width="170" height="76" rx="16" />
-              <text class="td-t" x="735" y="143">App</text><text class="td-t" x="735" y="166">Walkthrough</text>
-            <rect class="td-node" x="1000" y="110" width="170" height="76" rx="16" />
-              <text class="td-t" x="1085" y="143">Sign in /</text><text class="td-t" x="1085" y="166">Sign up</text>
-
-            <!-- main-flow nodes -->
-            <rect class="td-node td-node--home" x="1000" y="390" width="170" height="76" rx="16" /><text class="td-t td-t--on" x="1085" y="434">Home Screen</text>
-            <rect class="td-node" x="650" y="390" width="170" height="76" rx="16" />
-              <text class="td-t" x="735" y="423">Category</text><text class="td-t" x="735" y="446">Selection</text>
-            <rect class="td-node" x="370" y="390" width="170" height="76" rx="16" /><text class="td-t" x="455" y="434">Places List</text>
-            <rect class="td-node" x="90"  y="390" width="170" height="76" rx="16" />
-              <text class="td-t" x="175" y="423">Place Properties</text><text class="td-t" x="175" y="446">Filter</text>
-            <rect class="td-node" x="650" y="520" width="170" height="76" rx="16" /><text class="td-t" x="735" y="564">Search</text>
-
-            <polygon class="td-node--open" points="175,642 293,720 175,798 57,720" />
-              <text class="td-t" x="175" y="712">Found an</text><text class="td-t" x="175" y="734">interesting place?</text>
-            <rect class="td-node" x="370" y="682" width="170" height="76" rx="16" /><text class="td-t" x="455" y="726">Place Details</text>
-            <polygon class="td-node--open" points="735,642 853,720 735,798 617,720" />
-              <text class="td-t" x="735" y="712">Is it suitable</text><text class="td-t" x="735" y="734">for him?</text>
-            <rect class="td-node td-node--goal" x="1000" y="682" width="170" height="76" rx="16" />
-              <text class="td-t" x="1085" y="715">Initiate</text><text class="td-t" x="1085" y="738">Navigation</text>
-
-            <rect class="td-node td-node--open" x="650" y="880" width="170" height="76" rx="16" /><text class="td-t" x="735" y="924">User Reviews</text>
-            <rect class="td-node td-node--open" x="370" y="880" width="170" height="76" rx="16" /><text class="td-t" x="455" y="924">Ask Someone</text>
-            <rect class="td-node td-node--open" x="90"  y="880" width="170" height="76" rx="16" /><text class="td-t" x="175" y="924">Member Profile</text>
-            <rect class="td-node td-node--open" x="90"  y="1040" width="170" height="76" rx="16" />
-              <text class="td-t" x="175" y="1073">Direct</text><text class="td-t" x="175" y="1096">Messaging</text>
-
-            <!-- decision chips -->
-            <rect class="td-chip" x="309" y="706" width="46" height="28" rx="7" /><text class="td-chipt" x="332" y="725">yes</text>
-            <rect class="td-chip" x="880" y="706" width="46" height="28" rx="7" /><text class="td-chipt" x="903" y="725">yes</text>
-            <rect class="td-chip" x="712" y="606" width="46" height="28" rx="7" /><text class="td-chipt" x="735" y="625">no</text>
-            <rect class="td-chip" x="686" y="826" width="98" height="28" rx="7" /><text class="td-chipt" x="735" y="845">Hesitating</text>
-            <rect class="td-chip" x="9"   y="556" width="46" height="28" rx="7" /><text class="td-chipt" x="32"  y="575">no</text>
-          </svg>
-        </div>
-      </div>
+      <figure class="td-dia reveal">
+        <img class="td-dia__img" src="td-flow.jpg?v=150" width="2338" height="2400" loading="lazy" decoding="async"
+             alt="TrailDesk user flow: onboarding runs from Start through Splash and Logo, App Walkthrough and Sign in or Sign up to the Home Screen. The main flow goes from the Home Screen through Category Selection or Search to the Places List and the Place Properties Filter, into a decision about finding an interesting place, then Place Details, a decision about suitability, and finally Initiate Navigation, with a branch through User Reviews, Ask Someone, Member Profile and Direct Messaging." />
+      </figure>
     </section>
 
     <!-- ===== UI DESIGN ===== -->
@@ -737,11 +567,11 @@
            reaches the middle is the one shown large. The order here is the order on screen. -->
       <div class="td-band reveal">
         <div class="td-band__track" data-band>
-          <img class="td-band__ph td-band__ph--left" src="td-ui-left.png?v=149" width="270" height="544" loading="lazy" decoding="async"
+          <img class="td-band__ph td-band__ph--left" src="td-ui-left.png?v=150" width="270" height="544" loading="lazy" decoding="async"
                alt="TrailDesk: the map filtered to parks, with a place preview card at the bottom" />
-          <img class="td-band__ph td-band__ph--mid" src="td-ui-mid.png?v=149" width="332" height="664" loading="lazy" decoding="async"
+          <img class="td-band__ph td-band__ph--mid" src="td-ui-mid.png?v=150" width="332" height="664" loading="lazy" decoding="async"
                alt="TrailDesk home screen: a map of nearby public workspaces with colour-coded category pins" />
-          <img class="td-band__ph td-band__ph--right" src="td-ui-right.png?v=149" width="268" height="546" loading="lazy" decoding="async"
+          <img class="td-band__ph td-band__ph--right" src="td-ui-right.png?v=150" width="268" height="546" loading="lazy" decoding="async"
                alt="TrailDesk place detail: Dawn Cloud Park with its conditions scored out of ten" />
         </div>
       </div>
@@ -768,7 +598,7 @@
             <span class="nxt__desc"><b>BIANCA</b> restaurant management dashboard</span>
           </span>
           <span class="nxt__frame">
-            <img class="nxt__img" src="tile-bianca.jpg?v=149" width="1200" height="750" alt="" loading="lazy" />
+            <img class="nxt__img" src="tile-bianca.jpg?v=150" width="1200" height="750" alt="" loading="lazy" />
           </span>
         </a>
       </div>
@@ -790,7 +620,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=149"></script>
+  <script src="script.js?v=150"></script>
   <script>
     /* ---- TrailDesk case-study interactions (page-scoped) ----
          Same three moves as Bianca: the right-side rail, the hero title dissolve, and a cursor
