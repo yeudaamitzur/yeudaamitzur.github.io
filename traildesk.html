@@ -12,7 +12,7 @@
   <meta property="og:url" content="https://yehudaamitzur.com/traildesk" />
   <meta property="og:title" content="TrailDesk case study · Yehuda Amitzur" />
   <meta property="og:description" content="TrailDesk is a map-first app that aggregates public workspaces and grades them on the conditions that decide whether you can actually work there. A UX/UI case study by Yehuda Amitzur." />
-  <meta property="og:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=156" />
+  <meta property="og:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=157" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="750" />
@@ -20,7 +20,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="TrailDesk case study · Yehuda Amitzur" />
   <meta name="twitter:description" content="TrailDesk is a map-first app that aggregates public workspaces and grades them on the conditions that decide whether you can actually work there. A UX/UI case study by Yehuda Amitzur." />
-  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=156" />
+  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-traildesk.jpg?v=157" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -28,8 +28,8 @@
   <!-- favicon: the same ring as the site cursor - purple stroke, lighter purple fill -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23cbbad2' stroke='%23773f9c' stroke-width='3'/%3E%3C/svg%3E" />
   <link rel="canonical" href="https://yehudaamitzur.com/traildesk" />
-  <link rel="preload" as="image" href="td-phone-hero.png?v=156" fetchpriority="high" />
-  <link rel="stylesheet" href="styles.css?v=156" />
+  <link rel="preload" as="image" href="td-phone-hero.png?v=157" fetchpriority="high" />
+  <link rel="stylesheet" href="styles.css?v=157" />
 
   <style>
     /* =========================================================
@@ -89,7 +89,7 @@
       padding-bottom: clamp(1rem, 3vw, 2rem); }
     .td-hero__bg { position: fixed; top: 0; left: 50%; transform: translateX(-50%);
       width: 100vw; height: clamp(560px, 54vw, 800px); z-index: 0; overflow: hidden; pointer-events: none;
-      background: var(--bg) url("td-hero-poster.jpg?v=156") center / cover no-repeat; }
+      background: var(--bg) url("td-hero-poster.jpg?v=157") center / cover no-repeat; }
     /* THE FOOTAGE (17.08.2026) - a park with the skyline behind it, which is the product's whole
        subject. It sits at the bottom of the band's three layers and everything else is painted over
        it, so the z-indexes here are explicit rather than left to DOM order. */
@@ -171,7 +171,10 @@
     .td-donuts.is-in .td-donut:nth-child(2) { animation-delay: .16s; }
     .td-donuts.is-in .td-donut:nth-child(3) { animation-delay: .28s; }
     .td-donuts.is-in .td-donut:nth-child(4) { animation-delay: .40s; }
-    .td-donut__dial { position: relative; display: block; width: min(172px, 44vw); aspect-ratio: 1; }
+    /* 100%, not a vw: the dial has to answer to the COLUMN it is in, not to the window. At 375 the
+       44vw it used to carry came out 165px inside a 155px cell, so each ring hung over its own gutter
+       and the two columns stopped lining up. */
+    .td-donut__dial { position: relative; display: block; width: min(172px, 100%); aspect-ratio: 1; }
     .td-donut__ring { position: absolute; inset: 0; --sweep: 0deg;
       background: conic-gradient(from 0deg, #009CAF 0deg, #D4E7EA var(--sweep), #D4E7EA00 var(--sweep));
       -webkit-mask: var(--arc) center / 100% 100% no-repeat;
@@ -199,7 +202,7 @@
        "out of 100", and these are magnitudes, not shares of one whole. Corner radius is the same
        ratio the rings above carry, 0.278 of the band, so the whole section rounds the same way. */
     .td-charts { margin-top: clamp(2.5rem, 5vw, 4rem); display: grid; grid-template-columns: 1fr 1fr;
-      gap: clamp(2.25rem, 5vw, 4rem); --bh: clamp(17px, 2vw, 23px); }
+      gap: clamp(2.25rem, 5vw, 4rem); --bh: clamp(11px, 1.33vw, 15px); }   /* a third thinner, 18.08.2026 */
     .td-chart { opacity: 0; }
     .td-charts.is-in .td-chart { animation: tdStepIn 1.3s cubic-bezier(.22,.61,.36,1) both; }
     .td-charts.is-in .td-chart:nth-child(1) { animation-delay: .04s; }
@@ -232,17 +235,22 @@
     .td-market { display: grid; grid-template-columns: 1fr 1fr;
       gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center; }
     /* td-competitors.png is HIS FILE, as it is - "שים אותה כמו שהיא וזהו מה אתה מסתבך" (18.08.2026).
-       It was faded whole, then had the plate softened, then had the plate cut away entirely, and it
-       is back to the original with nothing but a resize on it. Don't touch its alpha again. */
+       It was faded whole, then had the plate softened, then had the plate cut away entirely, then
+       came back resized - and it is now his file BYTE FOR BYTE, not even scaled. Nothing is applied
+       to it here either: no opacity, no filter, no radius, no shadow. Leave it alone. */
     .td-market__img { display: block; width: 100%; height: auto; }
 
     /* ---------- Branding ----------
        Three plates cut out of his branding board: the wordmark across the top, then the logo on its
        construction grid and the app icon on a home screen, side by side. Each plate already carries
-       its own corner radius, so the page adds no card of its own. The gap is the SAME proportion as
-       the source board (96 of 3576), which is why the trio still reads as one composition. */
-    .td-brand { margin-top: clamp(1.9rem, 3.6vw, 2.6rem); display: grid; gap: clamp(10px, 2.7vw, 32px); }
-    .td-brand__pair { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(10px, 2.7vw, 32px); }
+       its own corner radius, so the page adds no card of its own.
+       The gap is `clamp(1.5rem, 5vw, 4rem)` because that is what the SITE uses between a pair of
+       media plates - it is Talmind's own `.tl-brand`, the same section on the neighbouring case
+       study, and Bianca's `.bn-cols2`. It used to be 96/3576 of the width, copied off the source
+       board, which came out at 10px on a phone: faithful to the artwork and wrong for the portfolio
+       ("לפי מה שמקובל בתיק שלי ולא להמציא", 18.08.2026). */
+    .td-brand { margin-top: clamp(1.9rem, 3.6vw, 2.6rem); display: grid; gap: clamp(1.5rem, 5vw, 4rem); }
+    .td-brand__pair { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.5rem, 5vw, 4rem); }
     .td-brand img { display: block; width: 100%; height: auto; }
 
     /* ---------- Diagrams (IA + user flow) ----------
@@ -261,7 +269,7 @@
        MOBILE is the same three phones turned into a swipeable strip - see the block further down. */
     .td-band { position: relative; margin-top: clamp(1.9rem, 3.6vw, 2.6rem);
       aspect-ratio: 3576 / 2595;
-      background: url("td-band.jpg?v=156") center / cover no-repeat;
+      background: url("td-band.jpg?v=157") center / cover no-repeat;
       /* No shadow (18.08.2026, asked for). The corners are cut by THIS radius alone: td-band.jpg used
          to arrive with its own rounded corners already baked against white, and the two curves never
          agreed - a white sliver sat in each corner. The picture's own edge colour has been stretched
@@ -320,9 +328,14 @@
          and whichever lands in the centre is the one that grows - the scale is written by the small
          script at the foot of the page, from each phone's distance to the centre, so a half-finished
          swipe reads as a half-finished growth instead of snapping. The padding on the track is what
-         lets the FIRST and LAST phone reach the middle at all. */
+         lets the first and last phone reach the middle at all.
+         18.08.2026: the teal picture behind them is GONE here, and the strip runs the full width of
+         the screen instead of stopping at the grid - the negative margins are the standard full-bleed
+         pair, and they resolve to exactly -var(--pad) whatever the page padding happens to be. */
       .td-band { aspect-ratio: auto; padding-block: clamp(1.5rem, 7vw, 2.4rem);
-        --td-slide: 58vw; }
+        --td-slide: 58vw;
+        background: none; border-radius: 0; overflow: visible;
+        margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw); }
       .td-band__track { position: static; display: flex; align-items: center; gap: clamp(.5rem, 3vw, 1rem);
         overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory;
         padding-inline: calc(50% - var(--td-slide) / 2);
@@ -331,7 +344,10 @@
       .td-band__ph { position: static; flex: 0 0 var(--td-slide); width: var(--td-slide); height: auto;
         top: auto; left: auto; scroll-snap-align: center;
         transform: scale(var(--td-s, .8)); transform-origin: center bottom;
-        transition: transform .18s linear; }
+        transition: transform .18s linear;
+        /* his own value, to the number: X 4, Y 4, blur 10, spread 0, #76DFEC at 50%.
+           drop-shadow has no spread parameter, and the spread he set is 0, so nothing is lost. */
+        filter: drop-shadow(4px 4px 10px rgba(118, 223, 236, 0.5)); }
     }
     @media (prefers-reduced-motion: reduce) {
       .td-phone { transform: none !important; animation: none !important; opacity: 1 !important; }
@@ -397,8 +413,8 @@
     <section class="td-hero td-wrap">
       <div class="td-hero__bg" aria-hidden="true">
         <video class="td-hero__vid" autoplay muted loop playsinline preload="metadata"
-               poster="td-hero-poster.jpg?v=156">
-          <source src="td-hero.mp4?v=156" type="video/mp4" />
+               poster="td-hero-poster.jpg?v=157">
+          <source src="td-hero.mp4?v=157" type="video/mp4" />
         </video>
       </div>
 
@@ -408,7 +424,7 @@
       </div>
 
       <div class="td-phone" data-phone>
-        <img src="td-phone-hero.png?v=156" width="576" height="1188" fetchpriority="high" decoding="async"
+        <img src="td-phone-hero.png?v=157" width="576" height="1188" fetchpriority="high" decoding="async"
              alt="A TrailDesk place card: Chess House, 350 meters away, scored for Wi-Fi, power, noise, seating and parking" />
       </div>
     </section>
@@ -513,7 +529,7 @@
           <p class="td-body">All of these and more focus on <b>very expensive coworking spaces</b> or
             <b>generic coffee shops</b>.</p>
         </div>
-        <img class="td-market__img" src="td-competitors.png?v=156" width="1200" height="1139" loading="lazy" decoding="async"
+        <img class="td-market__img" src="td-competitors.png?v=157" width="1340" height="1272" loading="lazy" decoding="async"
              alt="The three apps in the space today - Pluria, Spacing and a cafe-finder - shown as app icons on a tilted card" />
       </div>
     </section>
@@ -525,7 +541,7 @@
       <h2 class="td-h2 reveal">Information architecture</h2>
 
       <figure class="td-dia reveal">
-        <img class="td-dia__img" src="td-ia.png?v=156" width="2400" height="2095" loading="lazy" decoding="async"
+        <img class="td-dia__img" src="td-ia.png?v=157" width="2400" height="2095" loading="lazy" decoding="async"
              alt="TrailDesk information architecture: Splash to Walk through to Onboarding, which splits into Sign in and Sign up and leads to Home (Map). Home branches into Categories, Favorites, Messages and Profile, each with up to three further levels." />
       </figure>
     </section>
@@ -535,7 +551,7 @@
       <h2 class="td-h2 reveal">User flow</h2>
 
       <figure class="td-dia reveal">
-        <img class="td-dia__img" src="td-flow.png?v=156" width="2200" height="2560" loading="lazy" decoding="async"
+        <img class="td-dia__img" src="td-flow.png?v=157" width="2200" height="2560" loading="lazy" decoding="async"
              alt="TrailDesk user flow: onboarding runs from Start through Splash and Logo, App Walkthrough and Sign in or Sign up to the Home Screen. The main flow goes from the Home Screen through Category Selection or Search to the Places List and the Place Properties Filter, into a decision about finding an interesting place, then Place Details, a decision about suitability, and finally Initiate Navigation, with a branch through User Reviews, Ask Someone, Member Profile and Direct Messaging." />
       </figure>
     </section>
@@ -546,11 +562,11 @@
            reaches the middle is the one shown large. The order here is the order on screen. -->
       <div class="td-band reveal">
         <div class="td-band__track" data-band>
-          <img class="td-band__ph td-band__ph--left" src="td-ui-left.png?v=156" width="270" height="544" loading="lazy" decoding="async"
+          <img class="td-band__ph td-band__ph--left" src="td-ui-left.png?v=157" width="270" height="544" loading="lazy" decoding="async"
                alt="TrailDesk: the map filtered to parks, with a place preview card at the bottom" />
-          <img class="td-band__ph td-band__ph--mid" src="td-ui-mid.png?v=156" width="332" height="664" loading="lazy" decoding="async"
+          <img class="td-band__ph td-band__ph--mid" src="td-ui-mid.png?v=157" width="332" height="664" loading="lazy" decoding="async"
                alt="TrailDesk home screen: a map of nearby public workspaces with colour-coded category pins" />
-          <img class="td-band__ph td-band__ph--right" src="td-ui-right.png?v=156" width="268" height="546" loading="lazy" decoding="async"
+          <img class="td-band__ph td-band__ph--right" src="td-ui-right.png?v=157" width="268" height="546" loading="lazy" decoding="async"
                alt="TrailDesk place detail: Dawn Cloud Park with its conditions scored out of ten" />
         </div>
       </div>
@@ -561,12 +577,12 @@
     <section class="td-section td-wrap" id="brand">
       <h2 class="td-h2 reveal">Branding</h2>
       <div class="td-brand reveal">
-        <img src="td-brand-word.png?v=156" width="2360" height="485" loading="lazy" decoding="async"
+        <img src="td-brand-word.png?v=157" width="2360" height="485" loading="lazy" decoding="async"
              alt="The TRAIL DESK wordmark" />
         <div class="td-brand__pair">
-          <img src="td-brand-logo.png?v=156" width="1400" height="1591" loading="lazy" decoding="async"
+          <img src="td-brand-logo.png?v=157" width="1400" height="1591" loading="lazy" decoding="async"
                alt="The TrailDesk mark on its construction grid" />
-          <img src="td-brand-icon.png?v=156" width="1400" height="1591" loading="lazy" decoding="async"
+          <img src="td-brand-icon.png?v=157" width="1400" height="1591" loading="lazy" decoding="async"
                alt="The TrailDesk app icon on an iPhone home screen" />
         </div>
       </div>
@@ -583,7 +599,7 @@
             <span class="nxt__desc"><b>BIANCA</b> restaurant management dashboard</span>
           </span>
           <span class="nxt__frame">
-            <img class="nxt__img" src="tile-bianca.jpg?v=156" width="1200" height="750" alt="" loading="lazy" />
+            <img class="nxt__img" src="tile-bianca.jpg?v=157" width="1200" height="750" alt="" loading="lazy" />
           </span>
         </a>
       </div>
@@ -605,7 +621,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=156"></script>
+  <script src="script.js?v=157"></script>
   <script>
     /* ---- TrailDesk case-study interactions (page-scoped) ----
          Same three moves as Bianca: the right-side rail, the hero title dissolve, and a cursor
@@ -709,9 +725,32 @@
       // the offsets are measured once per resize and reused.
       const band = document.querySelector('[data-band]');
       if (band) {
-        const phones = Array.from(band.children);
+        const SET = 3;                                   // the three real screens
+        const originals = Array.from(band.children);
         const mq = window.matchMedia('(max-width: 760px)');
+        let phones = originals, looped = false;
         let centres = [], half = 0, bandRaf = null;
+
+        /* ---- an endless strip ----
+           A row of three ends, and a row that ends either stops or has to rewind in front of the
+           reader. So on mobile the three are cloned once before and once after, the reader is parked
+           in the MIDDLE set, and the moment a settle leaves that set the scroll jumps a whole set
+           sideways with no animation. The picture under the finger is identical either side of the
+           jump, so there is nothing to see - it just never runs out of screens, in either direction.
+           The clones come out again above 760px, where the phones are an absolutely-positioned
+           composition and a clone would simply stack on top of the original. */
+        function buildLoop() {
+          if (looped || !mq.matches) return;
+          const mark = (n) => { n.setAttribute('aria-hidden', 'true'); n.dataset.clone = '1'; return n; };
+          originals.slice().reverse().forEach((p) => band.insertBefore(mark(p.cloneNode(true)), band.firstChild));
+          originals.forEach((p) => band.appendChild(mark(p.cloneNode(true))));
+          phones = Array.from(band.children); looped = true;
+        }
+        function dropLoop() {
+          if (!looped) return;
+          Array.from(band.children).forEach((n) => { if (n.dataset.clone) n.remove(); });
+          phones = Array.from(band.children); looped = false;
+        }
 
         function measure() {
           half = band.clientWidth / 2;
@@ -727,64 +766,76 @@
           });
         }
         function schedule() { if (!bandRaf) bandRaf = requestAnimationFrame(paint); }
-        function enable() {
-          if (!mq.matches) { phones.forEach((p) => p.style.removeProperty('--td-s')); return; }
-          measure();
-          // open on the middle screen, without animating there in front of the reader
-          const midPhone = phones[1] || phones[0];
-          band.scrollLeft = midPhone.offsetLeft - (band.clientWidth - midPhone.offsetWidth) / 2;
-          paint();
-        }
-        band.addEventListener('scroll', schedule, { passive: true });
-        window.addEventListener('resize', enable);
-        mq.addEventListener('change', enable);
-        // the phones are lazy-loaded, so their boxes only exist once they have actually arrived
-        phones.forEach((p) => p.complete || p.addEventListener('load', enable, { once: true }));
-        enable();
-        window.addEventListener('load', enable);
 
-        /* ---- the strip carries itself along (18.08.2026) ----
-           It travels on its own AND still takes a swipe; a finger anywhere on it stops the timer,
-           and it picks the journey back up 3.5s after the last touch. It is deliberately NOT a
-           per-frame rAF nudge of scrollLeft: against `scroll-snap-type: x mandatory` that fights
-           the snap every frame and reads as a shudder. One smooth scroll per stop, with a rest in
-           between, is what makes it glide. It ping-pongs 0>1>2>1>0 rather than jumping home from
-           the last screen, which would drag the whole strip backwards in front of the reader.
-           It only runs while the band is actually on screen, and never under reduced motion. */
-        let step = 1, dir = 1, timer = null, idle = null, onScreen = false;
-        const HOLD = 2600;
-        /* Measured off the live rects, not offsetLeft: the phones are scaled on mobile and the
-           track carries a fractional inline padding, so the integer offsets land a few px off the
-           browser's own snap point - and mandatory snap then tugs it back the moment the smooth
-           scroll settles, which is the flicker. A transform with `transform-origin: center` does
-           not move a box's CENTRE, so the centre is safe to measure even mid-scale. */
-        function goTo(i) {
-          const p = phones[i]; if (!p) return;
+        /* Measured off the live rects, not offsetLeft: the phones are scaled on mobile and the track
+           carries a fractional inline padding, so the integer offsets land a few px off the browser's
+           own snap point - and mandatory snap then tugs it back the moment the smooth scroll settles,
+           which is the flicker. A transform with `transform-origin: center` does not move a box's
+           CENTRE, so the centre is safe to measure even mid-scale. */
+        function offsetOf(i) {
+          const p = phones[i]; if (!p) return band.scrollLeft;
           const pr = p.getBoundingClientRect(), br = band.getBoundingClientRect();
-          const delta = (pr.left + pr.width / 2) - (br.left + band.clientWidth / 2);
-          band.scrollTo({ left: band.scrollLeft + delta, behavior: 'smooth' });
+          return band.scrollLeft + (pr.left + pr.width / 2) - (br.left + band.clientWidth / 2);
         }
+        function nearest() {
+          const mid = band.scrollLeft + band.clientWidth / 2;
+          let best = 0, d = Infinity;
+          centres.forEach((c, i) => { const v = Math.abs(c - mid); if (v < d) { d = v; best = i; } });
+          return best;
+        }
+
+        let step = 1, timer = null, idle = null, settle = null, onScreen = false;
+        const HOLD = 2600;
+
+        function enable() {
+          if (!mq.matches) { dropLoop(); stop(); phones.forEach((p) => p.style.removeProperty('--td-s')); return; }
+          buildLoop();
+          measure();
+          step = looped ? SET + 1 : 1;                    // open on the middle screen of the middle set
+          band.scrollLeft = offsetOf(step);
+          paint();
+          if (onScreen) play();
+        }
+
         function tick() {
           if (!mq.matches || !onScreen) return;
-          if (step >= phones.length - 1) dir = -1;
-          if (step <= 0) dir = 1;
-          step += dir;
-          goTo(step);
+          step += 1;                                      // always forward; the wrap below does the rest
+          band.scrollTo({ left: offsetOf(step), behavior: 'smooth' });
         }
-        function play() { if (reduce) return; stop(); timer = setInterval(tick, HOLD); }
+        function play() { if (reduce || !mq.matches) return; stop(); timer = setInterval(tick, HOLD); }
         function stop() { if (timer) { clearInterval(timer); timer = null; } }
-        function handOver() {
+
+        /* ONE settle path for both kinds of scrolling - the auto step and the reader's own swipe end
+           in exactly the same place, which is what stops the two from fighting each other. */
+        function onSettle() {
+          if (!mq.matches) return;
+          measure();
+          step = nearest();
+          if (looped && (step < SET || step >= 2 * SET)) {
+            step = SET + (((step % SET) + SET) % SET);
+            band.scrollTo({ left: offsetOf(step), behavior: 'auto' });
+            measure(); paint();
+          }
+        }
+        band.addEventListener('scroll', () => {
+          schedule();
+          clearTimeout(settle); settle = setTimeout(onSettle, 140);
+        }, { passive: true });
+
+        function handOver() {                             // a finger anywhere on it takes it over
           stop(); clearTimeout(idle);
-          idle = setTimeout(() => {
-            // pick up from wherever the reader left it, so it never jumps on resuming
-            const mid = band.scrollLeft + band.clientWidth / 2;
-            let best = 0, d = Infinity;
-            centres.forEach((c, i) => { const v = Math.abs(c - mid); if (v < d) { d = v; best = i; } });
-            step = best; play();
-          }, 3500);
+          idle = setTimeout(() => { onSettle(); play(); }, 3500);
         }
         ['pointerdown', 'touchstart', 'wheel'].forEach((ev) =>
           band.addEventListener(ev, handOver, { passive: true }));
+
+        window.addEventListener('resize', enable);
+        mq.addEventListener('change', enable);
+        // the phones are lazy-loaded, so their boxes only exist once they have actually arrived
+        originals.forEach((p) => p.complete || p.addEventListener('load', enable, { once: true }));
+        enable();
+        window.addEventListener('load', enable);
+
         if ('IntersectionObserver' in window) {
           new IntersectionObserver((es) => {
             es.forEach((e) => { onScreen = e.isIntersecting; onScreen && mq.matches ? play() : stop(); });
