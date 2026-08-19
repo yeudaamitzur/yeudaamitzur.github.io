@@ -32,9 +32,10 @@
   /* ONE hue all the way out (18.08.2026). It used to fall from the rose core into a violet at 40%
      and fade out violet, which put a purple rim around the pink - "התפשטות סגולה פחות יפה בעיניי".
      Same rose, same three stops, so the pulse keeps its size and its softness and simply stops
-     changing colour on the way out. */
+     changing colour on the way out. Nudged up a touch on 19.08.2026 (.24/.13 -> .31/.17): only the
+     opacities move, so it reads a shade warmer behind the greeting without growing or hardening. */
   background: radial-gradient(circle at 50% 50%,
-    rgba(221, 129, 178, 0.24) 0%, rgba(221, 129, 178, 0.13) 40%, rgba(221, 129, 178, 0) 70%);
+    rgba(221, 129, 178, 0.31) 0%, rgba(221, 129, 178, 0.17) 40%, rgba(221, 129, 178, 0) 70%);
   filter: blur(46px);
   animation: glowIn 1.4s ease .05s both;
 }
@@ -85,10 +86,10 @@
 @media (max-width: 760px) {
   .hero--dots .hero__line--1 { font-size: clamp(21px, 7vw, 30px); }
   .hero--dots .hero__line--2 { margin-top: 12px; }
-  /* the dot line's box is only fs*1.04, so "Designer"'s descender sits right on its edge - the
-     sentence needs real clearance under it, not the 8px the desktop rule gives */
-  .hero--dots .hero__sub { margin-top: 24px; }
-  .hero--dots .hero__note { margin-top: 30px; }
+  /* The .hero__sub / .hero__note overrides that used to sit here were DEAD (found 19.08.2026):
+     their desktop rules are written further down this same file, at the same specificity, so the
+     later ones won and this block never moved either line. The phone spacing now lives at the foot
+     of the file, after those rules. */
 }
 
 /* The sentence below: one line, centred. `max-width` has to go with the left alignment - it was
@@ -144,4 +145,23 @@
 
 @media (prefers-reduced-motion: reduce) {
   .hero__orb--b, .hero--dots .hero__dots { animation: none; }
+}
+
+/* ---- 5. Phone spacing, after the rules it overrides. ----------------------------------
+   This block has to come LAST. Everything it touches is written earlier in this file at the same
+   specificity (`.hero--dots .hero__sub`), so an override placed up with the other phone rules is
+   simply outvoted by source order - which is exactly what had been happening.
+   On a phone the dot line solves to ~28px and its box is only fs*1.04 tall, so "Designer"'s
+   descender sits on the box's bottom edge and the 8px the desktop rule gives leaves the sentence
+   almost touching it. 6px is the number, settled by eye: 32, 20 and 12 were all tried and all read
+   as a gap rather than as breathing room. Only this one margin moves: the aside is
+   spaced off the sentence, so it travels down with it and the gap between the two stays as it was.
+   (19.08.2026) */
+@media (max-width: 760px) {
+  .hero--dots .hero__sub { margin-top: 6px; }
+  /* The reserved box for the typed aside. `min-height: 4.3em` in styles.css is three lines at this
+     line-height, which is what the sentence takes on a desktop - on a phone it wraps to four
+     (measured at both 375px and 320px), so the fourth one used to arrive mid-typing and shove the
+     whole centred hero up by a line. 5.7em is those four lines. */
+  .hero--dots .hero__typed { min-height: 5.7em; }
 }
