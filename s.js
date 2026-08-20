@@ -50,7 +50,10 @@
     var count = 0;
     function send(type, extra) {
       if (++count > 200) return;                      // a tab left open for a week stays cheap
-      var d = { s: sid, n: ++seq, t: type, p: page };
+      // `dev` rides along on every event. Sending it only on the first one left every
+      // click and end row saying "desktop", which quietly poisoned the raw data and the
+      // CSV export even though the session-level device happened to come out right.
+      var d = { s: sid, n: ++seq, t: type, p: page, d: dev };
       if (extra) for (var k in extra) if (extra[k] !== undefined && extra[k] !== '') d[k] = extra[k];
       if (ss) { try { ss.setItem('ya_n', seq); } catch (e) {} }
       var body = JSON.stringify(d);
@@ -79,30 +82,45 @@
       var delta = acc - flushed;
       if (delta < 500) return;                        // nothing worth a row
       flushed = acc;
-      send('end', { ms: delta, sc: deepest });
+      markSeen();
+      send('end', { ms: delta, sc: scrollPct() });
     }
 
     /* ---- scroll depth ---- *
-     * Measured off a cached page height and only inside a rAF, so scrolling never pays
-     * for a layout read. The height is re-measured at most once a second, which covers
-     * the images and videos that finish loading after the first paint. */
-    var docH = 0, measured = 0, deepest = 0, ticking = false;
-    function measure() {
-      docH = document.documentElement.scrollHeight - window.innerHeight;
-      measured = Date.now();
+     * Remembers the deepest PIXEL reached, never a percentage. Storing a percentage was
+     * wrong on mobile: the first scroll happens while the images are still loading, so the
+     * page is short, the maths says 100%, and because the value only ever grows it stays
+     * at 100% for the whole visit. Pixels are absolute - the height is read fresh at send
+     * time, when the page has settled.
+     *
+     * The number reported is how much of the page was actually SEEN - the bottom edge of
+     * the viewport, not the top - so a reader who never scrolls still gets credit for the
+     * first screenful instead of a flat 0%.
+     */
+    var deepestPx = 0, ticking = false;
+    function pageH() {
+      return Math.max(
+        document.documentElement.scrollHeight,
+        document.body ? document.body.scrollHeight : 0,
+        window.innerHeight
+      );
     }
-    measure();
-    window.addEventListener('resize', measure, { passive: true });
-    window.addEventListener('load', measure);
+    function markSeen() {
+      var p = Math.min(window.pageYOffset + window.innerHeight, pageH());
+      if (p > deepestPx) deepestPx = p;
+    }
+    function scrollPct() {
+      var h = pageH();
+      return h > 0 ? Math.max(1, Math.min(100, Math.round((deepestPx / h) * 100))) : 100;
+    }
+    markSeen();
+    window.addEventListener('resize', markSeen, { passive: true });
+    window.addEventListener('orientationchange', markSeen, { passive: true });
+    window.addEventListener('load', markSeen);
     window.addEventListener('scroll', function () {
       if (ticking) return;
       ticking = true;
-      requestAnimationFrame(function () {
-        ticking = false;
-        if (Date.now() - measured > 1000) measure();
-        var p = docH > 0 ? Math.round((window.pageYOffset / docH) * 100) : 100;
-        if (p > deepest) deepest = Math.min(100, p);
-      });
+      requestAnimationFrame(function () { ticking = false; markSeen(); });
     }, { passive: true });
 
     /* ---- clicks ---- *
@@ -140,14 +158,14 @@
     window.addEventListener('pageshow', function (ev) {
       mark = Date.now();
       visible = document.visibilityState !== 'hidden';
-      if (ev.persisted) send('view', { d: dev, b: 1 });
+      if (ev.persisted) send('view', { b: 1 });
     });
 
     // Safety net for the visit that ends in a crash or a shut lid.
     setInterval(function () { if (visible) flush(); }, 60000);
 
     /* ---- first event ---- */
-    var first = { d: dev };
+    var first = {};
     if (fresh) {
       try {
         if (document.referrer && document.referrer.indexOf(location.host) === -1) {
