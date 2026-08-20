@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="robots" content="noindex, nofollow" />
+<!-- A doorway, not a page. It exists so that a link can read "yehudaamitzur.com/Overview" with
+     nothing else attached - no question mark, no hash. It notes which link was used, hands
+     that note to the homepage through sessionStorage, and steps out of the way. The visitor
+     lands on a clean "yehudaamitzur.com" and never sees this file.
+
+     The meta refresh below is the no-JavaScript fallback: without it a reader with scripting
+     disabled would sit on a blank page. The background matches the site so the hand-off does
+     not flash white. -->
+<meta http-equiv="refresh" content="0; url=/" />
+<title>Yehuda Amitzur</title>
+<link rel="canonical" href="https://yehudaamitzur.com/" />
+<style>html,body{{margin:0;height:100%;background:#f0efe9}}</style>
+<script>
+  try {{ sessionStorage.setItem('ya_tag', 'Overview'); }} catch (e) {{}}
+  // replace, not assign - Back must go where the reader came from, not into a loop.
+  location.replace('/');
+</script>
+</head>
+<body><a href="/" style="position:absolute;left:-9999px">Yehuda Amitzur</a></body>
+</html>

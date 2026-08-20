@@ -215,9 +215,18 @@
           first.r = document.referrer.replace(/^https?:\/\//, '').split('/')[0].slice(0, 80);
         }
       } catch (e) {}
+      // A doorway page (yehudaamitzur.com/Home) leaves the tag here on its way out, so the
+      // link itself can carry nothing but the word. Read once and cleared, so it belongs to
+      // this visit only.
+      try {
+        if (ss) {
+          var handed = ss.getItem('ya_tag');
+          if (handed) { first.u = handed.slice(0, 40); ss.removeItem('ya_tag'); }
+        }
+      } catch (e) {}
       try {
         var u = new URLSearchParams(location.search);
-        var tag = u.get('utm') || u.get('utm_source') || u.get('ref') || u.get('r') || '';
+        var tag = first.u || u.get('utm') || u.get('utm_source') || u.get('ref') || u.get('r') || '';
         if (!tag) {
           // "?cedar" - no key, no equals sign, nothing that reads as tracking to anyone who
           // glances at the address bar while the page loads. The word means nothing on its
