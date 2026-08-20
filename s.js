@@ -19,11 +19,28 @@
     if (EP.indexOf('REPLACE_WITH') > -1) return;      // not wired up yet: do nothing at all
     if (navigator.webdriver) return;                  // automated browser, not a reader
 
+    // Tidies the address bar without reloading and without adding a history entry, so Back
+    // still goes where the reader expects. Called only AFTER the tag has been read and sent -
+    // a recruiter should see "yehudaamitzur.com", not the label that says which application
+    // they arrived from.
+    function tidyUrl() {
+      try {
+        if (!window.history || !history.replaceState || !window.URL) return;
+        var url = new URL(location.href);
+        var junk = ['utm', 'utm_source', 'utm_medium', 'utm_campaign', 'ref', 'r', 'me'];
+        var found = false;
+        for (var i = 0; i < junk.length; i++) {
+          if (url.searchParams.has(junk[i])) { url.searchParams.delete(junk[i]); found = true; }
+        }
+        if (found) history.replaceState(history.state, '', url.pathname + url.search + url.hash);
+      } catch (e) {}
+    }
+
     try {
       var q = location.search;
       if (q.indexOf('me=1') > -1) localStorage.setItem('ya_me', '1');
       if (q.indexOf('me=0') > -1) localStorage.removeItem('ya_me');
-      if (localStorage.getItem('ya_me')) return;
+      if (localStorage.getItem('ya_me')) { tidyUrl(); return; }
     } catch (e) {}
 
     /* ---- who and which visit ----
@@ -193,13 +210,14 @@
       } catch (e) {}
       try {
         var u = new URLSearchParams(location.search);
-        first.u = (u.get('utm') || u.get('utm_source') || u.get('ref') || '').slice(0, 40);
+        first.u = (u.get('utm') || u.get('utm_source') || u.get('ref') || u.get('r') || '').slice(0, 40);
       } catch (e) {}
       // A time zone is a free, precise region hint that costs no third-party call and
       // stores nothing personal - the country still comes from the edge.
       try { first.z = Intl.DateTimeFormat().resolvedOptions().timeZone.slice(0, 40); } catch (e) {}
     }
     send('view', first);
+    tidyUrl();
   } catch (e) {
     /* the site never notices */
   }
