@@ -26,9 +26,27 @@
       if (localStorage.getItem('ya_me')) return;
     } catch (e) {}
 
-    /* ---- session ---- */
+    /* ---- who and which visit ----
+     * Two ids, on purpose:
+     *   sid - one browsing session. Lives in sessionStorage, dies with the tab.
+     *   vid - the browser itself. Lives in localStorage so a visit next week joins up with
+     *         this one. A random number and nothing else: no name, no email, no IP, and
+     *         nothing derived from the device. It answers exactly one question - "is this
+     *         the same browser as before" - and it cannot follow anyone to another device
+     *         or to any other site.
+     * Both are optional. Private mode throws on storage access, and then the visit is
+     * simply counted as a brand new one rather than not counted at all. */
     var ss = null;
     try { ss = window.sessionStorage; ss.getItem('ya_s'); } catch (e) { ss = null; }
+
+    var vid = null;
+    try {
+      vid = localStorage.getItem('ya_v');
+      if (!vid) {
+        vid = (Math.random().toString(36).slice(2, 10) + Date.now().toString(36)).slice(0, 14);
+        localStorage.setItem('ya_v', vid);
+      }
+    } catch (e) { vid = null; }
 
     var sid = ss && ss.getItem('ya_s'), fresh = false;
     if (!sid) {
@@ -54,6 +72,7 @@
       // click and end row saying "desktop", which quietly poisoned the raw data and the
       // CSV export even though the session-level device happened to come out right.
       var d = { s: sid, n: ++seq, t: type, p: page, d: dev };
+      if (vid) d.v = vid;
       if (extra) for (var k in extra) if (extra[k] !== undefined && extra[k] !== '') d[k] = extra[k];
       if (ss) { try { ss.setItem('ya_n', seq); } catch (e) {} }
       var body = JSON.stringify(d);
