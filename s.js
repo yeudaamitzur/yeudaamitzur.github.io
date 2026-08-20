@@ -37,6 +37,8 @@
         var bare = [];
         url.searchParams.forEach(function (v, k) { if (!v) bare.push(k); });
         for (var j = 0; j < bare.length; j++) { url.searchParams.delete(bare[j]); found = true; }
+        var hash = (url.hash || '').replace(/^#/, '');
+        if (hash && !document.getElementById(hash)) { url.hash = ''; found = true; }
         if (found) history.replaceState(history.state, '', url.pathname + url.search + url.hash);
       } catch (e) {}
     }
@@ -223,6 +225,14 @@
           u.forEach(function (v, k) { if (!tag && !v && k !== 'me') tag = k; });
         }
         first.u = tag.slice(0, 40);
+      } catch (e) {}
+      // "#cedar" - no question mark, no equals sign. A hash reads as a link to a section of
+      // the page, the most ordinary thing a URL can carry, and it never even reaches a
+      // server. Anything that matches a real section here (#work, #about, #contact) is
+      // navigation and is left completely alone.
+      try {
+        var h = (location.hash || '').replace(/^#/, '');
+        if (!first.u && h && !document.getElementById(h)) first.u = h.slice(0, 40);
       } catch (e) {}
       // A time zone is a free, precise region hint that costs no third-party call and
       // stores nothing personal - the country still comes from the edge.
