@@ -32,6 +32,11 @@
         for (var i = 0; i < junk.length; i++) {
           if (url.searchParams.has(junk[i])) { url.searchParams.delete(junk[i]); found = true; }
         }
+        // A bare "?cedar" is a key with no value. Anything else - a real key=value that some
+        // future page might need - is left alone.
+        var bare = [];
+        url.searchParams.forEach(function (v, k) { if (!v) bare.push(k); });
+        for (var j = 0; j < bare.length; j++) { url.searchParams.delete(bare[j]); found = true; }
         if (found) history.replaceState(history.state, '', url.pathname + url.search + url.hash);
       } catch (e) {}
     }
@@ -210,7 +215,14 @@
       } catch (e) {}
       try {
         var u = new URLSearchParams(location.search);
-        first.u = (u.get('utm') || u.get('utm_source') || u.get('ref') || u.get('r') || '').slice(0, 40);
+        var tag = u.get('utm') || u.get('utm_source') || u.get('ref') || u.get('r') || '';
+        if (!tag) {
+          // "?cedar" - no key, no equals sign, nothing that reads as tracking to anyone who
+          // glances at the address bar while the page loads. The word means nothing on its
+          // own; the note saying which application it belongs to stays on Yehuda's machine.
+          u.forEach(function (v, k) { if (!tag && !v && k !== 'me') tag = k; });
+        }
+        first.u = tag.slice(0, 40);
       } catch (e) {}
       // A time zone is a free, precise region hint that costs no third-party call and
       // stores nothing personal - the country still comes from the edge.
