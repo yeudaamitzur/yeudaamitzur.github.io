@@ -78,7 +78,9 @@
     /* restaurant video - PINNED to the viewport (only the video stays put) */
     .bn-hero__bg { position: fixed; top: 0; left: 50%; transform: translateX(-50%);
       width: 100vw; height: clamp(600px, 56vw, 820px); z-index: 0; overflow: hidden; pointer-events: none; }
-    .bn-hero__video { width: 100%; height: 100%; object-fit: cover; object-position: center 42%; }
+    .bn-hero__video { width: 100%; height: 100%; object-fit: cover; object-position: center 42%;
+      /* poster painted behind the element too, so the poster-to-footage swap never blanks */
+      background: url("bianca-hero-poster.jpg") center 42% / cover no-repeat; }
 
     /* gradient veil - LOCKED onto the pinned video so the two never separate (no seam on scroll) */
     .bn-hero__bg::after { content: ""; position: absolute; inset: 0; pointer-events: none;
@@ -205,8 +207,14 @@
       0 40px 92px -52px rgba(40, 37, 30, 0.40); }
     /* --ar is set per instance from the file's real pixel size, so the box is reserved before
        the first frame arrives and nothing is cropped */
+    /* Each instance carries its own poster as background-image (set inline): the moment play()
+       is called the poster ATTRIBUTE is discarded, and until the first frame is decoded the element
+       paints whatever is behind it - which used to be this flat #eceae3, i.e. a cream flash on a
+       dark recording. With the same poster underneath, that gap paints the identical pixels and the
+       start is invisible. */
     .bn-video { display: block; width: 100%; height: auto; aspect-ratio: var(--ar, 1600 / 1122);
-      object-fit: cover; border-radius: clamp(7px, 1.2vw, 16px); background: #eceae3; }
+      object-fit: cover; border-radius: clamp(7px, 1.2vw, 16px);
+      background: #eceae3 center / cover no-repeat; }
 
     /* ---------- Cognitive-load note, and the Impact statement that closes the page ---------- */
     /* 1.1rem under the heading is the gap .bn-lead already holds under its own label - the page's
@@ -449,8 +457,9 @@
         <figure class="bn-videoframe bn-videoframe--hero">
           <!-- no autoplay: the page script starts it from frame 0 when the card has finished
                arriving (see data-start-after), so the first cycle is never spent off-screen -->
-          <video class="bn-video" data-rate="2" data-start-after="tablet" style="--ar: 1600 / 1144"
-                 muted loop playsinline preload="metadata"
+          <video class="bn-video" data-rate="2" data-start-after="tablet"
+                 style="--ar: 1600 / 1144; background-image: url('bianca-critical-poster.jpg')"
+                 muted loop playsinline preload="auto"
                  poster="bianca-critical-poster.jpg" width="1600" height="1144"
                  aria-label="The Bianca dashboard: a manager clearing two critical alerts">
             <source src="bianca-critical.mp4" type="video/mp4" />
@@ -528,7 +537,7 @@
         </div>
       <div class="bn-wrap">
         <figure class="bn-videoframe reveal">
-          <video class="bn-video" style="--ar: 1600 / 1144" muted loop playsinline
+          <video class="bn-video" style="--ar: 1600 / 1144; background-image: url('bianca-critical-poster.jpg')" muted loop playsinline
                  preload="none" poster="bianca-critical-poster.jpg" width="1600" height="1144"
                  aria-label="Two critical alerts cleared from the Bianca dashboard">
             <source src="bianca-critical.mp4" type="video/mp4" />
@@ -551,7 +560,7 @@
         </div>
       <div class="bn-wrap">
         <figure class="bn-videoframe reveal">
-          <video class="bn-video" style="--ar: 1600 / 1146" muted loop playsinline
+          <video class="bn-video" style="--ar: 1600 / 1146; background-image: url('bianca-important-poster.jpg')" muted loop playsinline
                  preload="none" poster="bianca-important-poster.jpg" width="1600" height="1146"
                  aria-label="An important alert handled from the Bianca dashboard">
             <source src="bianca-important.mp4" type="video/mp4" />
@@ -575,7 +584,7 @@
         </div>
       <div class="bn-wrap">
         <figure class="bn-videoframe reveal">
-          <video class="bn-video" style="--ar: 1600 / 1122" muted loop playsinline
+          <video class="bn-video" style="--ar: 1600 / 1122; background-image: url('bianca-orders-poster.jpg')" muted loop playsinline
                  preload="none" poster="bianca-orders-poster.jpg" width="1600" height="1122"
                  aria-label="Ordering products from the Bianca operations screen">
             <source src="bianca-orders.mp4" type="video/mp4" />
@@ -854,7 +863,9 @@
       const heroVid = document.querySelector('.bn-video[data-start-after="tablet"]');
       if (heroVid) {
         let launched = false;
-        const launch = () => { if (launched) return; launched = true; heroVid.currentTime = 0; play(heroVid); };
+        // no currentTime = 0 here: the video has never played, so it IS at frame 0 - and the
+        // explicit seek was the flash (it discards the poster before the first frame is decoded)
+        const launch = () => { if (launched) return; launched = true; play(heroVid); };
         const card = heroVid.closest('.bn-tablet');
         if (card) card.addEventListener('animationend', launch, { once: true });
         setTimeout(launch, 3600);             // 2.2s delay + 1.15s entrance, rounded up
@@ -874,13 +885,28 @@
             const covers = e.rootBounds ? (e.intersectionRect.height / e.rootBounds.height) : 0;
             const inView = e.intersectionRatio >= START_AT || covers >= START_AT;
             if (!started.has(v)) {
-              if (inView) { started.add(v); v.currentTime = 0; play(v); }
-              else v.pause();                 // also clears the autoplay flag, so nothing preloads
+              // same rule as the hero: never seek before the first play - the video is already at
+              // frame 0, and the seek used to blank the poster into a cream flash
+              if (inView) { started.add(v); play(v); }
+              else v.pause();                 // parked at its poster until the gate opens
             } else if (e.intersectionRatio > 0.05) play(v);
             else v.pause();
           });
         }, { threshold: [0, 0.05, 0.25, 0.5, 0.7, 0.9, 1] });
         vids.forEach((v) => { if (v !== heroVid) vio.observe(v); });
+        // Warm-up: one viewport before a recording scrolls in, lift preload to auto so frame 0 is
+        // decoded by the time the 70% gate opens - the start then lands on ready pixels, not a stall.
+        const warm = new IntersectionObserver((entries) => {
+          entries.forEach((e) => {
+            if (!e.isIntersecting) return;
+            const v = e.target;
+            warm.unobserve(v);
+            if (started.has(v)) return;      // already running (deep link) - nothing to warm
+            v.preload = 'auto';
+            if (v.readyState === 0) v.load(); // preload="none" never fetched; load() forces it
+          });
+        }, { rootMargin: '100% 0px' });
+        vids.forEach((v) => { if (v !== heroVid) warm.observe(v); });
       } else {
         vids.forEach((v) => { if (v !== heroVid) play(v); });
       }

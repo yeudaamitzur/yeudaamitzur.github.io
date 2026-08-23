@@ -138,7 +138,11 @@
        clipping misses by a fraction of a pixel shows the black underneath, never the page. */
     .td-mock__screen { position: absolute; z-index: 1; left: 4.389%; top: 2.131%;
       width: 91.014%; height: 95.992%;
-      border-radius: 11.808% / 5.733%; overflow: hidden; background: #000; }
+      border-radius: 11.808% / 5.733%; overflow: hidden;
+      /* the poster sits under the film at all times: when play() drops the poster attribute a
+         beat before the first frame is decoded, the gap paints these same pixels instead of the
+         black face - that black blink was the flash */
+      background: #0B0F10 url("td-hero-screen-poster.jpg?v=176") center / cover no-repeat; }
     .td-mock__vid { display: block; width: 100%; height: 100%; object-fit: cover; }
     @keyframes tdPhoneIn {
       from { opacity: 0; transform: translateY(64px) scale(1.08); }
@@ -388,7 +392,6 @@
       .td-hero__bg { position: absolute; }
       .td-hero__head { position: static; }
       .td-hero__vid { display: none; }
-      /* the mock keeps its screen - the poster is the video element's own background here */
 
     }
   </style>
@@ -461,7 +464,7 @@
           <img class="td-mock__frame" src="td-hero-mock.png?v=176" width="860" height="1771"
                fetchpriority="high" decoding="async" alt="" />
           <span class="td-mock__screen">
-            <video class="td-mock__vid" muted loop playsinline preload="metadata"
+            <video class="td-mock__vid" muted loop playsinline preload="auto"
                    poster="td-hero-screen-poster.jpg?v=176" aria-label="A walk through TrailDesk: the map, the filters and a place card">
               <source src="td-hero-screen.mp4?v=176" type="video/mp4" />
             </video>
@@ -671,10 +674,12 @@
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
 
-      // Reduced motion: the hero holds on the poster still, and the file is never fetched at all.
+      // Reduced motion: both films hold on their poster stills, and the files are not fetched.
+      // The mock film is included since it went preload="auto" - without this, 3.6MB would download
+      // for a video the reduced-motion CSS hides anyway. (film is looked up again further down;
+      // the removal makes that lookup return null, and every use there is guarded.)
       if (reduce) {
-        const v = document.querySelector('.td-hero__vid');
-        if (v) { v.pause(); v.remove(); }
+        document.querySelectorAll('.td-hero__vid, .td-mock__vid').forEach((v) => { v.pause(); v.remove(); });
       }
 
       // Right-side progress rail
