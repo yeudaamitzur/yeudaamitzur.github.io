@@ -51,13 +51,15 @@
   /* ---- the one-time unlock ----
      ?k= works on any page of the site, so the link can simply be the homepage.
      Read, stored, then wiped out of the address bar before anyone reads it. */
+  var said = '';
   var m = /[?&#]k=([^&#]*)/.exec(location.search + location.hash);
   if (m) {
     var handed = decodeURIComponent(m[1]);
     try {
-      if (handed === 'out') localStorage.removeItem(STORE);
-      else if (opens(handed)) localStorage.setItem(STORE, handed);
-    } catch (e) {}
+      if (handed === 'out') { localStorage.removeItem(STORE); said = 'Locked again'; }
+      else if (opens(handed)) { localStorage.setItem(STORE, handed); said = 'Unlocked on this browser'; }
+      else said = "That key didn't work";
+    } catch (e) { said = 'This browser is not storing site data, so it cannot be unlocked'; }
     try {
       if (window.history && history.replaceState && window.URL) {
         var u = new URL(location.href);
@@ -82,7 +84,26 @@
     else fn();
   }
 
+  /* ---- say what just happened ----
+     The unlock used to be completely silent: a working key, a mistyped one and a link opened in
+     the wrong Chrome profile all looked exactly the same - nothing. One quiet line, three
+     seconds, and there is never any doubt about which browser is holding the key. */
+  function announce(text, good) {
+    var el = document.createElement('div');
+    el.className = 'ya-said' + (good ? ' is-good' : '');
+    el.setAttribute('role', 'status');
+    el.textContent = text;
+    document.body.appendChild(el);
+    requestAnimationFrame(function () { el.classList.add('is-in'); });
+    setTimeout(function () {
+      el.classList.remove('is-in');
+      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 500);
+    }, 3400);
+  }
+
   ready(function () {
+    if (said) announce(said, OPEN);
+
     var card = document.querySelector('.pcard--talmind .pcard__inner');
     var pill = card && card.querySelector('.pcard__view');
     var nxt  = document.querySelector('[data-nxt-talmind]');
@@ -99,7 +120,7 @@
         var img  = nxt.querySelector('.nxt__img');
         if (link) link.setAttribute('href', '/talmind');
         if (desc) desc.innerHTML = '<b>TALMIND</b> a tablet learning app for Korean classrooms';
-        if (img) img.setAttribute('src', 'tile-talmind.jpg?v=177');
+        if (img) img.setAttribute('src', 'tile-talmind.jpg?v=178');
         nxt.className = nxt.className.replace('nxt--traildesk', 'nxt--talmind');
       }
       return;

@@ -759,6 +759,33 @@ html.ya-shut .pcard--talmind:hover .pcard__name { text-decoration: none; }
 
 /* the chip clears the pill AND, on this card, the padlock beside it */
 .pcard--talmind .pcard__chip { margin-right: clamp(7.3rem, 13.4vw, 10.4rem); }
+
+/* The unlock link answers back. It only ever renders for someone who arrived carrying a ?k=,
+   which in practice is Yehuda and nobody else - a visitor never sees this. Without it the unlock
+   was completely silent, and a key that worked looked exactly like a key opened in the wrong
+   Chrome profile. */
+.ya-said {
+  position: fixed; left: 50%; bottom: clamp(1.4rem, 4vh, 2.6rem); z-index: 999;
+  transform: translate(-50%, .7rem);
+  display: inline-flex; align-items: center; gap: .6em;
+  padding: .64em 1.2em; border-radius: 999px;
+  background: rgba(24, 22, 15, 0.93); color: #F3F1EA;
+  font-family: var(--f-body); font-size: .82rem; font-weight: 500;
+  box-shadow: 0 18px 40px -22px rgba(40, 37, 30, 0.85);
+  opacity: 0; pointer-events: none;
+  transition: opacity .35s ease, transform .35s cubic-bezier(.2, .7, .2, 1);
+}
+.ya-said.is-in { opacity: 1; transform: translate(-50%, 0); }
+/* a dot rather than an icon - the toast is built in JS, and one CSS dot beats shipping an SVG
+   through a template string */
+.ya-said::before {
+  content: ""; flex: none; width: .5em; height: .5em; border-radius: 50%;
+  background: rgba(243, 241, 234, 0.4);
+}
+.ya-said.is-good::before { background: #C6A9DE; }
+@media (prefers-reduced-motion: reduce) {
+  .ya-said { transition: opacity .2s ease; transform: translate(-50%, 0); }
+}
 /* Only the FIRST line has to stop short of the View button - the button sits at the top right and
    the chip at the top left, and everything below them has the full width to itself. A blanket
    right padding on the whole body was squeezing the headline and breaking the discipline list onto
