@@ -795,9 +795,11 @@ ul, ol { list-style: none; padding: 0; }
 html.ya-open .pcard__lock .lk-shut { display: none; }
 html.ya-open .pcard__lock .lk-open { display: block; }
 
-/* shut, the card is not a link - but it IS clickable, because clicking is what opens the field */
+/* Shut, the card has no href - but it IS clickable, because clicking is what opens the field, so
+   it keeps a pointer. And it keeps the shared hover in full: the purple rule under the project
+   name is how every card answers a hover, and Talmind being private is no reason for it to feel
+   dead under the cursor. Nothing here overrides it. */
 html.ya-shut .pcard--talmind .pcard__inner { cursor: pointer; }
-html.ya-shut .pcard--talmind:hover .pcard__name { text-decoration: none; }
 
 /* this card's chip has to clear the pill AND the padlock beside it. An override, so the shared
    .pcard__chip rule and the other two cards keep exactly what they had. */
@@ -895,9 +897,10 @@ html.ya-shut .pcard--talmind:hover .pcard__name { text-decoration: none; }
   78% { transform: translateX(2px); }
 }
 
-/* the card must stop breathing under an open field */
+/* The card must stop breathing under an open field - a 1.2% scale on hover would shift the input
+   sideways while you are typing in it. Only the scale is suppressed; the underline on the name is
+   left alone, so the hover reads the same whether the field is open or not. */
 .pcard--talmind.has-gate:hover .pcard__inner { transform: none; }
-.pcard--talmind.has-gate:hover .pcard__name { text-decoration: none; }
 
 /* ---- the unlock link answers back ----
    Only ever rendered for someone who arrived carrying a ?k=, which in practice is Yehuda and

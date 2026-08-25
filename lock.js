@@ -262,7 +262,7 @@
         var img  = nxt.querySelector('.nxt__img');
         if (link) link.setAttribute('href', '/talmind');
         if (desc) desc.innerHTML = '<b>TALMIND</b> a tablet learning app for Korean classrooms';
-        if (img) img.setAttribute('src', 'tile-talmind.jpg?v=180');
+        if (img) img.setAttribute('src', 'tile-talmind.jpg?v=181');
         nxt.className = nxt.className.replace('nxt--traildesk', 'nxt--talmind');
       }
       root.className = root.className.replace('ya-shut', 'ya-open');
