@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="ya-shut">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -60,6 +60,10 @@
        is already pulling. -->
   <link rel="preload" as="image" href="talmind-tablet.webp?v=177" fetchpriority="high" />
   <link rel="stylesheet" href="styles.css?v=177" />
+  <!-- The inline guard above is the pre-paint backstop and does the deciding. This is here so
+       that a ?k= handed to THIS page is wiped out of the address bar once it has been read,
+       instead of sitting there waiting to be screenshotted. -->
+  <script src="lock.js?v=177"></script>
 
   <style>
     /* =========================================================
