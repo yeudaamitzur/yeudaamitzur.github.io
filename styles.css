@@ -722,6 +722,43 @@ ul, ol { list-style: none; padding: 0; }
   transition: border-color .25s ease, color .25s ease;
 }
 .pcard:hover .pcard__view { border-color: var(--brand); color: var(--brand); }
+
+/* ---- Talmind is private (25.08.2026) -------------------------------------
+   The padlock is NOT inside the View pill - it hangs off the pill's LEFT edge.
+   .pcard__view is already an absolutely positioned box, so right:100% pins the
+   icon to that edge and the margin is the gap; the pill keeps its own geometry
+   and the other two cards never learn any of this happened.
+
+   It is grey and it STAYS grey through the card's hover, because it reports a
+   state rather than inviting a click - the pill next to it is the thing that
+   lights up. Two padlocks ship, shut and open, and the html class written by
+   lock.js before first paint decides which one is drawn. */
+.pcard__lock {
+  position: absolute; right: 100%; top: 50%; transform: translateY(-50%);
+  margin-right: .5rem; width: 1.15em; height: 1.15em;
+  color: rgba(40, 37, 30, 0.42);
+}
+.pcard__lock .lk { display: block; width: 100%; height: 100%; }
+.pcard__lock .lk-open { display: none; }
+.pcard:hover .pcard__lock { color: rgba(40, 37, 30, 0.42); }
+html.ya-open .pcard__lock .lk-shut { display: none; }
+html.ya-open .pcard__lock .lk-open { display: block; }
+
+/* A locked card that swallows a click reads as broken, so it answers once. */
+.pcard__hint {
+  position: absolute; right: 100%; top: 50%; transform: translateY(-50%);
+  margin-right: 2.15rem; white-space: nowrap;
+  font-family: var(--f-body); font-size: .82em; color: var(--ink-mute);
+  opacity: 0; transition: opacity .3s ease; pointer-events: none;
+}
+.pcard__view.is-hinting .pcard__hint { opacity: 1; }
+
+/* Shut, the card is not a link - it must stop dressing as one. */
+html.ya-shut .pcard--talmind .pcard__inner { cursor: default; }
+html.ya-shut .pcard--talmind:hover .pcard__name { text-decoration: none; }
+
+/* the chip clears the pill AND, on this card, the padlock beside it */
+.pcard--talmind .pcard__chip { margin-right: clamp(7.3rem, 13.4vw, 10.4rem); }
 /* Only the FIRST line has to stop short of the View button - the button sits at the top right and
    the chip at the top left, and everything below them has the full width to itself. A blanket
    right padding on the whole body was squeezing the headline and breaking the discipline list onto

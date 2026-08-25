@@ -6,6 +6,32 @@
   <title>Talmind case study · Yehuda Amitzur</title>
   <meta name="description" content="Talmind is a tablet app that brings authentic Talmud study into Korean classrooms, teaching the questioning, reasoning mind behind it. A UX/UI case study by Yehuda Amitzur." />
 
+  <!-- ===== Private project (25.08.2026) =====================================
+       Nothing links here any more: the homepage card ships without an href and
+       Bianca's hand-off points at TrailDesk, both restored by lock.js only for
+       the browser profile that holds the token. This is the backstop for an
+       address typed, bookmarked or forwarded by hand.
+
+       It runs FIRST in the head, before a stylesheet or an image is even
+       requested, so a stranger never sees a frame of the case study - the tab
+       is already on its way home. Digest, salt and the FNV pass are the same
+       three lines as lock.js; they are inline here rather than imported so the
+       check cannot be beaten by blocking one file.
+       ===================================================================== -->
+  <meta name="robots" content="noindex, nofollow" />
+  <script>
+  (function () {
+    var D = '123a8cda465e0f6ae32e92e5', S = 'ya-talmind-2026';
+    function f(s) { var h = 0x811c9dc5; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i) & 255; h = Math.imul(h, 0x01000193) >>> 0; } return ('0000000' + h.toString(16)).slice(-8); }
+    function d(t) { return f(S + t) + f(t + S) + f(t + t); }
+    var m = /[?&#]k=([^&#]*)/.exec(location.search + location.hash), t = '';
+    if (m) { try { var h = decodeURIComponent(m[1]); if (d(h) === D) localStorage.setItem('ya_pk', h); } catch (e) {} }
+    try { t = localStorage.getItem('ya_pk') || ''; } catch (e) { t = ''; }
+    if (d(t) !== D) location.replace('/#top');
+  })();
+  </script>
+
+
 
   <!-- Link previews - see the long note in index.html. The card image is this study's own tile. -->
   <meta property="og:type" content="article" />
@@ -13,7 +39,7 @@
   <meta property="og:url" content="https://yehudaamitzur.com/talmind" />
   <meta property="og:title" content="Talmind case study · Yehuda Amitzur" />
   <meta property="og:description" content="Talmind is a tablet app that brings authentic Talmud study into Korean classrooms, teaching the questioning, reasoning mind behind it. A UX/UI case study by Yehuda Amitzur." />
-  <meta property="og:image" content="https://yehudaamitzur.com/tile-talmind.jpg?v=176" />
+  <meta property="og:image" content="https://yehudaamitzur.com/tile-talmind.jpg?v=177" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="750" />
@@ -21,7 +47,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Talmind case study · Yehuda Amitzur" />
   <meta name="twitter:description" content="Talmind is a tablet app that brings authentic Talmud study into Korean classrooms, teaching the questioning, reasoning mind behind it. A UX/UI case study by Yehuda Amitzur." />
-  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-talmind.jpg?v=176" />
+  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-talmind.jpg?v=177" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -32,8 +58,8 @@
   <!-- The hero dashboard is the largest thing on the first screen; without this the
        browser only discovers it after the CSS has parsed, by which time the hero video
        is already pulling. -->
-  <link rel="preload" as="image" href="talmind-tablet.webp?v=176" fetchpriority="high" />
-  <link rel="stylesheet" href="styles.css?v=176" />
+  <link rel="preload" as="image" href="talmind-tablet.webp?v=177" fetchpriority="high" />
+  <link rel="stylesheet" href="styles.css?v=177" />
 
   <style>
     /* =========================================================
@@ -446,7 +472,7 @@
   <header class="hdr hdr--float hdr--bare" id="top">
     <div class="hdr__pill">
       <a class="hdr__logo" href="/#top" aria-label="Yehuda Amitzur, home">
-        <span class="hdr__avatar"><img class="hdr__avatar-img" src="profile.jpg?v=176" alt="Yehuda Amitzur" width="46" height="46" /></span>
+        <span class="hdr__avatar"><img class="hdr__avatar-img" src="profile.jpg?v=177" alt="Yehuda Amitzur" width="46" height="46" /></span>
       </a>
       <div class="hdr__expand">
         <nav class="hdr__nav" aria-label="Primary">
@@ -459,7 +485,7 @@
     </div>
     <div class="hdr__drawer" id="hdr-drawer" hidden>
       <div class="hdr__drawer-top">
-        <span class="hdr__drawer-ava"><img src="profile.jpg?v=176" alt="" width="46" height="46" /></span>
+        <span class="hdr__drawer-ava"><img src="profile.jpg?v=177" alt="" width="46" height="46" /></span>
         <button class="hdr__drawer-close" type="button" aria-label="Close menu"><span></span><span></span></button>
       </div>
       <a href="/#top">Home</a>
@@ -509,7 +535,7 @@
              4476px, 2.5 MB PNG - it has to keep its alpha (56% of it is transparent), so a
              256-colour PNG was the obvious shrink and it banded the hand badly. WebP keeps
              the alpha at full colour. talmind-tablet-only.png stays on disk as the master. -->
-        <img class="tl-tablet__img" src="talmind-tablet.webp?v=176" width="2240" height="967"
+        <img class="tl-tablet__img" src="talmind-tablet.webp?v=177" width="2240" height="967"
              fetchpriority="high" decoding="async"
              alt="Tablet running the Talmind home screen" />
       </div>
@@ -629,7 +655,7 @@
       <!-- the drag-and-match board on a tablet, closing the challenge before the sketch -->
       <!-- no `reveal` here: the 3D rise below IS this figure's entrance -->
       <div class="tl-challenge__fig" data-solo>
-        <img src="talmind-game-tablet.png?v=176" width="2400" height="1654"
+        <img src="talmind-game-tablet.png?v=177" width="2400" height="1654"
              alt="The drag-and-match game board on a tablet, a card being dragged onto the Torah Source category"
              loading="lazy" />
       </div>
@@ -641,7 +667,7 @@
       <p class="tl-lead reveal">Before a single pixel: The flow of the three steps of lesson preparation, the daily
         quiz, and the drag-and-match game, which were initially developed manually.</p>
       <div class="tl-sketch__stage reveal">
-        <img src="talmind-sketch-flow.jpg?v=176" width="1700" height="1030"
+        <img src="talmind-sketch-flow.jpg?v=177" width="1700" height="1030"
              alt="A hand sketch of the flow: first a video, then a quiz game, then a game the student will never forget"
              loading="lazy" />
       </div>
@@ -659,7 +685,7 @@
            top at measured percentages, because the base shot was empty in the middle. The new
            export has all of it baked in, so the stack is gone. -->
       <figure class="tl-shot reveal">
-        <img src="talmind-home-final.jpg?v=176" width="2400" height="1500"
+        <img src="talmind-home-final.jpg?v=177" width="2400" height="1500"
              alt="The Talmind home dashboard: today's lesson, the three preparation steps with their status, the weekly quiz, skills breakdown and leaderboard"
              loading="lazy" />
       </figure>
@@ -710,7 +736,7 @@
             lock it until preparation is complete to ensure all students start the lesson equally prepared</p>
         </div>
         <div class="tl-media__fig reveal">
-          <img src="talmind-home-exertion.jpg?v=176" width="1760" height="1291"
+          <img src="talmind-home-exertion.jpg?v=177" width="1760" height="1291"
                alt="The first pass at the home screen, with today's lesson openable straight from the dashboard"
                loading="lazy" />
         </div>
@@ -721,11 +747,11 @@
     <section class="tl-section tl-wrap" id="brand">
       <div class="tl-brand">
         <div class="tl-brand__card tl-brand__card--word reveal">
-          <img src="talmind-brand-word.jpg?v=176" width="1561" height="1792"
+          <img src="talmind-brand-word.jpg?v=177" width="1561" height="1792"
                alt="How the name was built: Talmud plus mind becomes Talmind" loading="lazy" />
         </div>
         <div class="tl-brand__card tl-brand__card--phone reveal">
-          <img src="talmind-brand-phone.jpg?v=176" width="1600" height="1067"
+          <img src="talmind-brand-phone.jpg?v=177" width="1600" height="1067"
                alt="The Talmind app icon on an iPhone home screen" loading="lazy" />
         </div>
       </div>
@@ -743,14 +769,14 @@
 
       <h3 class="tl-subhead reveal">Colors</h3>
       <figure class="tl-sysfig tl-sysfig--color reveal">
-        <img src="ds-semantic.jpg?v=176" width="1168" height="1832"
+        <img src="ds-semantic.jpg?v=177" width="1168" height="1832"
              alt="Talmind semantic tokens: brand and accents, surfaces and text, status, and game category boxes, each mapped to a primitive and a hex value"
              loading="lazy" />
       </figure>
 
       <h3 class="tl-subhead reveal">Typography</h3>
       <figure class="tl-sysfig tl-sysfig--type reveal">
-        <img src="ds-typography.jpg?v=176" width="1670" height="1544"
+        <img src="ds-typography.jpg?v=177" width="1670" height="1544"
              alt="The Talmind type scale: Display Large, Display, H1, H2, Subtitle, Label, Body, Caption and Tiny, each with its weight, size, usage and a sample"
              loading="lazy" />
       </figure>
@@ -780,7 +806,7 @@
             <span class="nxt__desc"><b>TRAILDESK</b> finding a public place you can actually work from</span>
           </span>
           <span class="nxt__frame">
-            <img class="nxt__img" src="nxt-traildesk.webp?v=176" width="800" height="521" alt="" loading="lazy" />
+            <img class="nxt__img" src="nxt-traildesk.webp?v=177" width="800" height="521" alt="" loading="lazy" />
           </span>
         </a>
       </div>
@@ -802,7 +828,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=176"></script>
+  <script src="script.js?v=177"></script>
   <script>
     /* ---- Talmind case-study interactions (page-scoped) ---- */
     (function () {
@@ -933,6 +959,6 @@
       window.addEventListener('load', onScroll);
     })();
   </script>
-  <script src="s.js?v=176" defer></script>
+  <script src="s.js?v=177" defer></script>
 </body>
 </html>

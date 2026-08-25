@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="ya-shut">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,7 +13,7 @@
   <meta property="og:url" content="https://yehudaamitzur.com/bianca" />
   <meta property="og:title" content="Bianca case study · Yehuda Amitzur" />
   <meta property="og:description" content="Bianca is a restaurant management dashboard built around the decisions a manager has to make first thing in the morning. A UX/UI case study by Yehuda Amitzur." />
-  <meta property="og:image" content="https://yehudaamitzur.com/tile-bianca.jpg?v=176" />
+  <meta property="og:image" content="https://yehudaamitzur.com/tile-bianca.jpg?v=177" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="750" />
@@ -21,7 +21,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Bianca case study · Yehuda Amitzur" />
   <meta name="twitter:description" content="Bianca is a restaurant management dashboard built around the decisions a manager has to make first thing in the morning. A UX/UI case study by Yehuda Amitzur." />
-  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-bianca.jpg?v=176" />
+  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-bianca.jpg?v=177" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -32,7 +32,9 @@
   <!-- The hero dashboard is the largest thing on the first screen. It is a recording now, so what
        gets preloaded is its poster - the first frame paints while the mp4 is still arriving. -->
   <link rel="preload" as="image" href="bianca-critical-poster.jpg" fetchpriority="high" />
-  <link rel="stylesheet" href="styles.css?v=176" />
+  <link rel="stylesheet" href="styles.css?v=177" />
+  <!-- restores the Talmind hand-off above, for Yehuda's browser profile only -->
+  <script src="lock.js?v=177"></script>
 
   <style>
     /* =========================================================
@@ -383,7 +385,7 @@
   <header class="hdr hdr--float hdr--bare" id="top">
     <div class="hdr__pill">
       <a class="hdr__logo" href="/#top" aria-label="Yehuda Amitzur, home">
-        <span class="hdr__avatar"><img class="hdr__avatar-img" src="profile.jpg?v=176" alt="Yehuda Amitzur" width="46" height="46" /></span>
+        <span class="hdr__avatar"><img class="hdr__avatar-img" src="profile.jpg?v=177" alt="Yehuda Amitzur" width="46" height="46" /></span>
       </a>
       <div class="hdr__expand">
         <nav class="hdr__nav" aria-label="Primary">
@@ -396,7 +398,7 @@
     </div>
     <div class="hdr__drawer" id="hdr-drawer" hidden>
       <div class="hdr__drawer-top">
-        <span class="hdr__drawer-ava"><img src="profile.jpg?v=176" alt="" width="46" height="46" /></span>
+        <span class="hdr__drawer-ava"><img src="profile.jpg?v=177" alt="" width="46" height="46" /></span>
         <button class="hdr__drawer-close" type="button" aria-label="Close menu"><span></span><span></span></button>
       </div>
       <a href="/#top">Home</a>
@@ -610,7 +612,7 @@
       <figure class="bn-shot reveal">
         <!-- re-exported 17.08.2026; the filename did not change, so the src carries ?v= or the old
              picture stays in every cache that already has it -->
-        <img src="bianca-weekly.jpg?v=176" width="2200" height="1564" alt="Bianca shift management: the weekly board, with missing shifts flagged in red" loading="lazy" />
+        <img src="bianca-weekly.jpg?v=177" width="2200" height="1564" alt="Bianca shift management: the weekly board, with missing shifts flagged in red" loading="lazy" />
       </figure>
       <figure class="bn-shot reveal">
         <img src="bianca-employees.jpg" width="2200" height="1564" alt="Bianca staff management: the employee directory with active, on-leave and inactive states" loading="lazy" />
@@ -633,15 +635,19 @@
          its two surviving foundations moved into Talmind. On 14.08.2026 the fourth case study came
          off the live site, so the loop closes here: Talmind -> Bianca -> Talmind. The block this
          replaced is kept verbatim in the local backup folder for that date. -->
-    <section class="nxt nxt--talmind" aria-label="Next project">
+    <!-- 25.08.2026: Talmind went private, and a hand-off to a shut door is a dead end. So the
+         SHIPPED loop skips it - Bianca -> TrailDesk -> Bianca - and lock.js swaps this block back
+         to Talmind for the one browser profile that is allowed in. Written this way round on
+         purpose: with the script blocked, the public page still holds no route to /talmind. -->
+    <section class="nxt nxt--traildesk" aria-label="Next project" data-nxt-talmind>
       <div class="nxt__inner reveal">
-        <a class="nxt__link" href="/talmind">
+        <a class="nxt__link" href="/traildesk">
           <span class="nxt__text">
             <span class="nxt__name">Next project<i class="nxt__arrow" aria-hidden="true">→</i></span>
-            <span class="nxt__desc"><b>TALMIND</b> a tablet learning app for Korean classrooms</span>
+            <span class="nxt__desc"><b>TRAILDESK</b> a workspace discovery app for hybrid employees</span>
           </span>
           <span class="nxt__frame">
-            <img class="nxt__img" src="tile-talmind.jpg?v=176" width="1200" height="750" alt="" loading="lazy" />
+            <img class="nxt__img" src="tile-traildesk.jpg?v=177" width="1200" height="750" alt="" loading="lazy" />
           </span>
         </a>
       </div>
@@ -663,7 +669,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=176"></script>
+  <script src="script.js?v=177"></script>
   <script>
     /* ---- Bianca case-study interactions (page-scoped) ---- */
     (function () {
@@ -915,6 +921,6 @@
       window.addEventListener('load', onScroll);
     })();
   </script>
-  <script src="s.js?v=176" defer></script>
+  <script src="s.js?v=177" defer></script>
 </body>
 </html>
