@@ -58,8 +58,19 @@
   function digest(t) { return f(SALT + t) + f(t + SALT) + f(t + t); }
   function opens(t) { return !!t && digest(t) === DIGEST; }
 
-  function remember(t) { try { localStorage.setItem(STORE, t); } catch (e) {} }
-  function forget()    { try { localStorage.removeItem(STORE); } catch (e) {} }
+  /* sessionStorage, NOT localStorage (25.08.2026, at Yehuda's request): the unlock lasts for
+     this visit and dies with the tab, so arriving at the site again asks for the password again.
+     It still survives moving between pages inside the visit, which it has to - typing the
+     password on the homepage and then being bounced off /talmind by the guard would make the
+     whole thing unusable.
+
+     forget() also clears the old localStorage copy, so a browser unlocked under the previous
+     build is not left permanently open by a key nobody can see any more. */
+  function remember(t) { try { sessionStorage.setItem(STORE, t); } catch (e) {} }
+  function forget() {
+    try { sessionStorage.removeItem(STORE); } catch (e) {}
+    try { localStorage.removeItem(STORE); } catch (e) {}
+  }
 
   /* password -> the token that gets stored. Deliberately expensive. */
   function derive(pw) {
@@ -95,8 +106,11 @@
     } catch (e) {}
   }
 
+  /* any leftover permanent key from the previous build is retired on sight, not honoured */
+  try { localStorage.removeItem(STORE); } catch (e) {}
+
   var token = '';
-  try { token = localStorage.getItem(STORE) || ''; } catch (e) {}
+  try { token = sessionStorage.getItem(STORE) || ''; } catch (e) {}
   var OPEN = opens(token);
 
   window.__yaOpen = OPEN;
@@ -262,7 +276,7 @@
         var img  = nxt.querySelector('.nxt__img');
         if (link) link.setAttribute('href', '/talmind');
         if (desc) desc.innerHTML = '<b>TALMIND</b> a tablet learning app for Korean classrooms';
-        if (img) img.setAttribute('src', 'tile-talmind.jpg?v=181');
+        if (img) img.setAttribute('src', 'tile-talmind.jpg?v=182');
         nxt.className = nxt.className.replace('nxt--traildesk', 'nxt--talmind');
       }
       root.className = root.className.replace('ya-shut', 'ya-open');
