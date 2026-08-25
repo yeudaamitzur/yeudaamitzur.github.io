@@ -126,10 +126,14 @@
   }
 
   /* ---- the password field ----
-     Not a panel and nothing layered over the card: the padlock opens a FRAME - the same stroke
-     pill as the View button beside it - which grows out of its own position and travels leftward
-     until there is room to type. Pinned right:100% to the pill and clipped to its own width, so
-     animating that width from 0 is the entire move and the right edge never shifts.
+     There is no second control and nothing is layered over the card. The View pill IS the field:
+     the word "View" collapses to nothing, the input grows out of the same box, and the pill
+     widens leftward while its right edge stays exactly where it was. The padlock, pinned at
+     right:100% of that pill, rides along at the leading edge.
+
+     Only the field's width is animated. The pill is inline-flex and content-sized, so it follows
+     every frame on its own - which is just as well, because a pill's `auto` width cannot be
+     transitioned at all.
 
      No <form> on purpose. This lives inside .pcard__inner, which is an <a>, and a form nested in
      an anchor is asking for trouble; Enter and the button both call submit() directly instead.
@@ -180,6 +184,7 @@
     function close() {
       wrap.classList.remove('is-in');
       note.classList.remove('is-in');
+      host.classList.remove('is-open', 'is-working', 'is-wrong');
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('mousedown', onOutside, true);
       if (card) card.classList.remove('has-gate');
@@ -198,9 +203,9 @@
     document.addEventListener('mousedown', onOutside, true);
 
     function wrong() {
-      wrap.classList.remove('is-working', 'is-wrong');
-      void wrap.offsetWidth;                       /* restart the shake on a second wrong try */
-      wrap.classList.add('is-wrong');
+      host.classList.remove('is-working', 'is-wrong');
+      void host.offsetWidth;                       /* restart the shake on a second wrong try */
+      host.classList.add('is-wrong');
       input.disabled = false;
       go.disabled = false;
       input.value = '';
@@ -212,8 +217,8 @@
     function submit() {
       var pw = input.value;
       if (!pw || input.disabled) return;
-      wrap.classList.remove('is-wrong');
-      wrap.classList.add('is-working');
+      host.classList.remove('is-wrong');
+      host.classList.add('is-working');
       input.disabled = true;                       /* 200k PBKDF2 rounds is a real beat */
       go.disabled = true;
       derive(pw).then(function (t) {
@@ -232,7 +237,12 @@
     /* preventScroll matters here: the field starts at zero width inside an overflow:hidden box,
        and a browser scrolling it into view would drag the whole scroll-driven card with it */
     try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); }
-    requestAnimationFrame(function () { wrap.classList.add('is-in'); note.classList.add('is-in'); });
+    /* is-open collapses the word "View" on the pill; is-in grows the field out of the same box */
+    requestAnimationFrame(function () {
+      host.classList.add('is-open');
+      wrap.classList.add('is-in');
+      note.classList.add('is-in');
+    });
   }
 
   ready(function () {
@@ -252,7 +262,7 @@
         var img  = nxt.querySelector('.nxt__img');
         if (link) link.setAttribute('href', '/talmind');
         if (desc) desc.innerHTML = '<b>TALMIND</b> a tablet learning app for Korean classrooms';
-        if (img) img.setAttribute('src', 'tile-talmind.jpg?v=179');
+        if (img) img.setAttribute('src', 'tile-talmind.jpg?v=180');
         nxt.className = nxt.className.replace('nxt--traildesk', 'nxt--talmind');
       }
       root.className = root.className.replace('ya-shut', 'ya-open');
