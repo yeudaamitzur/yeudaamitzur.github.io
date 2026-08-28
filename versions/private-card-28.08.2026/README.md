@@ -8,6 +8,11 @@ This folder is **not served**. `.github/workflows/pages.yml` deletes `versions/`
 checkout before the upload step, so nothing in here is reachable from the site — which is
 the point, since the files below are the very text that came off the card.
 
+`versions/` is also in `.gitignore`, which is what stops `publish.sh` deleting it: that
+script mirrors the Mac's site folder over this repo with `rsync --delete`, and the Mac's
+site folder has no `versions/`. The files already in here stay tracked — `.gitignore` does
+not untrack anything — but **a new file in here needs `git add -f`**.
+
 ---
 
 ## What changed on 28.08.2026

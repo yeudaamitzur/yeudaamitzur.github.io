@@ -30,3 +30,10 @@ glimpse-work.jpg
 strip-talmind-1.jpg
 strip-talmind-2.jpg
 strip-talmind-3.jpg
+
+# versions/ is committed - it holds what a page looked like before a change, so it can be put
+# back byte for byte - but it is NOT part of the site folder on the Mac. Listed here so
+# publish.sh's rsync excludes it and its --delete leaves it standing; the files already in it
+# stay tracked, .gitignore does not untrack. Adding a new one needs `git add -f versions/...`.
+# pages.yml drops the folder from its checkout, so none of it is ever served.
+versions/
