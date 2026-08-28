@@ -8,7 +8,7 @@
 
   <!-- Link previews - Mail, iMessage, Slack, WhatsApp, LinkedIn. With no og:image at all, every
        client picks whatever picture it happens to find first in the page, which is why sharing the
-       site showed a lone Talmind screenshot. og-cover.jpg IS the homepage: the real hero rendered
+       site showed a lone case-study screenshot. og-cover.jpg IS the homepage: the real hero rendered
        headless at 1600×840 and halved to the 1200×630 every platform expects. To regenerate it,
        screenshot index.html at that size with the entrance animations forced to their end state
        (`*{animation-delay:0s;animation-duration:.001s}` + `.reveal{opacity:1;transform:none}`),
@@ -22,7 +22,7 @@
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Hey, I'm Yehuda Amitzur, UX/UI Designer, with the Talmind, Bianca and Design System case studies" />
+  <meta property="og:image:alt" content="Hey, I'm Yehuda Amitzur, UX/UI Designer, with the case studies on his homepage" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Yehuda Amitzur · UX/UI Designer" />
   <meta name="twitter:description" content="A UX/UI designer specializing in B2B systems, complex workflows, and conversion-driven experiences." />
@@ -39,7 +39,7 @@
   <link rel="stylesheet" href="styles.css?v=185" />
   <link rel="stylesheet" href="hero-dots.css?v=185" />
   <!-- the alternate homepage carries the same lock as index.html - it is published too,
-       so a public route to /talmind here would undo the whole thing -->
+       so a public route to the case study here would undo the whole thing -->
   <script src="lock.js?v=185"></script>
 </head>
 <body>
@@ -116,21 +116,31 @@
       <div class="pstack__pin">
         <article class="reveal pcard pcard--talmind">
           <!-- Private project (25.08.2026): no href in the shipped markup. See lock.js. -->
-          <a class="pcard__inner" data-open="/talmind" aria-label="Talmind - a private project">
+          <a class="pcard__inner" data-open="/talmind" aria-label="A private project">
             <div class="pcard__media" aria-hidden="true">
               <span class="pcard__veil"></span>
             </div>
             
-            <!-- The project's own screens, side by side, arriving one after another -->
+            <!-- 28.08.2026: the project's own captures came off this card at Yehuda's request -
+                 what is here now are blank grey screens. Same three files, same 640x400, same
+                 places in the strip, so not a pixel of the card's geometry moved. The captures
+                 they replaced are off the published site as well - a card cannot be anonymous
+                 while the pictures behind it are still a URL away - so .gitignore now holds them
+                 the way it holds every other retired asset. See versions/private-card-28.08.2026. -->
             <div class="pcard__strip" aria-hidden="true">
-                <figure class="shot"><img src="strip-talmind-1.jpg?v=185" alt="" width="640" height="400" loading="lazy" /></figure>
-                <figure class="shot"><img src="strip-talmind-2.jpg?v=185" alt="" width="640" height="400" loading="lazy" /></figure>
-                <figure class="shot"><img src="strip-talmind-3.jpg?v=185" alt="" width="640" height="400" loading="lazy" /></figure>
+                <figure class="shot"><img src="strip-private-1.png?v=185" alt="" width="640" height="400" loading="lazy" /></figure>
+                <figure class="shot"><img src="strip-private-2.png?v=185" alt="" width="640" height="400" loading="lazy" /></figure>
+                <figure class="shot"><img src="strip-private-3.png?v=185" alt="" width="640" height="400" loading="lazy" /></figure>
             </div>
             <div class="pcard__body">
               <span class="pcard__chip">Case study</span>
-              <span class="pcard__name">Talmind</span>
-              <h3 class="pcard__value">Built a real pilot that answers a huge need in Korean classrooms</h3>
+              <!-- Anonymous while the project is shut (28.08.2026). The name and the headline said
+                   what it is and where it runs, which is exactly what a padlock is there to hold
+                   back. Nothing here names the project, the subject or the country. What stood
+                   here is kept in versions/private-card-28.08.2026 - put that block back and
+                   the card is what it was. -->
+              <span class="pcard__name">Confidential</span>
+              <h3 class="pcard__value">Built a pilot that answers a huge need in the classroom</h3>
               <p class="pcard__kind">Learning app</p>
             </div>
             <span class="pcard__view">

@@ -1,0 +1,36 @@
+        <article class="reveal pcard pcard--talmind">
+          <!-- Private project (25.08.2026): no href in the shipped markup. See lock.js. -->
+          <a class="pcard__inner" data-open="/talmind" aria-label="Talmind - a private project">
+            <div class="pcard__media" aria-hidden="true">
+              <span class="pcard__veil"></span>
+            </div>
+            
+            <!-- The project's own screens, side by side, arriving one after another -->
+            <div class="pcard__strip" aria-hidden="true">
+                <figure class="shot"><img src="strip-talmind-1.jpg?v=185" alt="" width="640" height="400" loading="lazy" /></figure>
+                <figure class="shot"><img src="strip-talmind-2.jpg?v=185" alt="" width="640" height="400" loading="lazy" /></figure>
+                <figure class="shot"><img src="strip-talmind-3.jpg?v=185" alt="" width="640" height="400" loading="lazy" /></figure>
+            </div>
+            <div class="pcard__body">
+              <span class="pcard__chip">Case study</span>
+              <span class="pcard__name">Talmind</span>
+              <h3 class="pcard__value">Built a real pilot that answers a huge need in Korean classrooms</h3>
+              <p class="pcard__kind">Learning app</p>
+            </div>
+            <span class="pcard__view">
+              <span class="pcard__lock" aria-hidden="true">
+                <svg class="lk lk-shut" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4.6" y="10.4" width="14.8" height="10" rx="2.6" />
+                  <path d="M8.4 10.4V7.5a3.6 3.6 0 0 1 7.2 0v2.9" />
+                </svg>
+                <svg class="lk lk-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4.6" y="10.4" width="14.8" height="10" rx="2.6" />
+                  <path d="M8.4 10.4V7.5a3.6 3.6 0 0 1 6.9-1.15" />
+                </svg>
+              </span>
+              <!-- wrapped so the label can collapse to nothing when the pill turns
+                   itself into the password field - see .pcard__view-label -->
+              <span class="pcard__view-label">View</span>
+            </span>
+          </a>
+        </article>
