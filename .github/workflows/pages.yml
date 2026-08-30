@@ -33,6 +33,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+      # versions/ holds what a page looked like before a change, so that it can be put back
+      # byte for byte. It is kept in the repo for exactly that, and it is deliberately NOT part
+      # of the site: versions/private-card-28.08.2026 is the copy and the captures that came OFF
+      # the homepage card, and serving it would hand them straight back.
+      # This runs on the runner's throwaway checkout - it does not touch the repo.
+      - name: Leave versions/ out of what gets served
+        run: rm -rf versions
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .          # the repo root IS the site

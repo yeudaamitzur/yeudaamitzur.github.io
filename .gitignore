@@ -22,3 +22,19 @@ glimpse-piano.jpg
 # the CV is served as cv-yehuda-amitzur.pdf; this is the same file under its original name
 CV - Yehuda Amitzur מעודכן.pdf
 glimpse-work.jpg
+
+# Talmind's own captures. Off its homepage card on 28.08.2026 (the card now carries blank grey
+# screens - see versions/private-card-28.08.2026) and off the published site with it: the card
+# names the project, but a shut card should not show the product, and it cannot hold it back
+# while the pictures of it are still a URL away.
+# Still on disk, and still in this repo's history at 76bb04b if they are ever wanted back.
+strip-talmind-1.jpg
+strip-talmind-2.jpg
+strip-talmind-3.jpg
+
+# versions/ is committed - it holds what a page looked like before a change, so it can be put
+# back byte for byte - but it is NOT part of the site folder on the Mac. Listed here so
+# publish.sh's rsync excludes it and its --delete leaves it standing; the files already in it
+# stay tracked, .gitignore does not untrack. Adding a new one needs `git add -f versions/...`.
+# pages.yml drops the folder from its checkout, so none of it is ever served.
+versions/
