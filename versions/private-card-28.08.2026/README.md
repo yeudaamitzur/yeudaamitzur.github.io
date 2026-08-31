@@ -1,86 +1,69 @@
-# The homepage card, as it stood before 28.08.2026
+# The anonymous homepage card — 28.08.2026 to 31.08.2026, and how to bring it back
 
-Taken from commit **`76bb04b`**, the last commit before the card's screens and headline
-changed. Kept so it can be put back **exactly** as it was, in one pass, whenever Yehuda
-says the word.
+For three days the Talmind card on the homepage showed nothing about the project: blank
+grey screens where its own captures go, and a headline that did not say which country the
+pilot is for. It went up on 28.08.2026 while the project was behind a password, and came
+down on 31.08.2026 when the project opened to everyone — there was nothing left for grey
+placeholders to hold back.
 
-This folder is **not served**. `.github/workflows/pages.yml` deletes `versions/` from its
-checkout before the upload step, so nothing in here is reachable from the site — which is
-the point, since the files below hold the copy and the picture references that came off
-the card.
+**The card is now what it was before all of this**, minus the padlock. Everything needed to
+make it anonymous again is in this folder.
 
-`versions/` is also in `.gitignore`, which is what stops `publish.sh` deleting it: that
-script mirrors the Mac's site folder over this repo with `rsync --delete`, and the Mac's
-site folder has no `versions/`. The files already in here stay tracked — `.gitignore` does
-not untrack anything — but **a new file in here needs `git add -f`**.
+This folder is **not served** — `pages.yml` deletes `versions/` from its checkout before
+uploading — and `versions/` is in `.gitignore` so `publish.sh`'s `rsync --delete` leaves it
+standing. A new file in here needs `git add -f`.
 
 ---
 
-## What changed on 28.08.2026
+## What "anonymous" meant, exactly
 
-The project stays locked exactly as it was — padlock, password field, `/talmind` guard, the
-whole of `lock.js` untouched. **The project also keeps its own name**: Talmind is not the
-part being held back. What changed is only what the **shut** card gives away about the
-product:
-
-| | before (in this folder) | after (live now) |
+| | live now | anonymous |
 |---|---|---|
-| the three screens | `strip-talmind-1.jpg` `-2` `-3` — the real captures | `strip-private-1.png` `-2` `-3` — blank grey screens |
-| headline, `index.html` | `Built a pilot that answers a huge need in Korean classrooms` | `Built a pilot that answers a huge need in the classroom` |
-| headline, `hero-dots.html` | `Built a real pilot that answers a huge need in Korean classrooms` | `Built a pilot that answers a huge need in the classroom` |
-| name / chip / kind / `aria-label` | `Talmind` / `Case study` / `Learning app` / `Talmind - a private project` | unchanged |
+| the three screens | `strip-talmind-1.jpg` `-2` `-3` — the real captures | `strip-private-1.png` `-2` `-3` — blank grey screens, **in this folder** |
+| headline | `Built a pilot that answers a huge need in Korean classrooms` | `Built a pilot that answers a huge need in the classroom` |
+| name / chip / kind | `Talmind` / `Case study` / `Learning app` | unchanged — the name was never the part held back |
 
-`hero-dots.html` also loses the stale `real`, which `index.html` dropped on 17.08.2026 —
-the pilot has not run, and that card was the last place still claiming it had.
+The grey screens are 640×400, the same as the captures, and sit in the same three places in
+`.pcard__strip`, so swapping either way moves nothing else on the card.
 
-For a few hours on 28.08.2026 the name read `Confidential` as well, and the prose comments
-naming the project were reworded with it. Both went back the same day, at Yehuda's
-request: the name is not secret, the product behind the padlock is.
+For a few hours on 28.08 the name read `Confidential` too, and the prose comments naming the
+project were reworded with it. Both went back the same day: the name is not secret.
 
-`pcard--talmind` and `data-open="/talmind"` were never touched — the stylesheet and
-`lock.js` are wired to them.
+`hero-dots.html` used to carry a fourth-day-old headline of its own — `Built a **real** pilot
+…` — which `index.html` had dropped on 17.08.2026 because the pilot has not run. Both pages
+say the same corrected line now. **Do not put `real` back.**
 
-The three original captures were also dropped from the repo and added to `.gitignore`,
-which is how this site has always retired an asset: still on Yehuda's disk, no longer
-served. They are in the history at `76bb04b`.
+## Making it anonymous again
+
+```sh
+# 1. the grey screens go back into the site root
+git mv versions/private-card-28.08.2026/strip-private-*.png .
+
+# 2. in index.html AND hero-dots.html, inside <div class="pcard__strip">, swap the three
+#    strip-talmind-N.jpg for strip-private-N.png, and change the headline to
+#    "Built a pilot that answers a huge need in the classroom"
+
+# 3. take the captures back off the published site - the card cannot read as anonymous
+#    while the pictures behind it are one URL away. This is how the site retires an asset:
+#    printf 'strip-talmind-1.jpg\nstrip-talmind-2.jpg\nstrip-talmind-3.jpg\n' >> .gitignore
+#    git rm --cached strip-talmind-1.jpg strip-talmind-2.jpg strip-talmind-3.jpg
+
+# 4. bump ?v= across the site by one
+```
 
 ## The files here
 
-- `index.card.html` — the whole `<article class="reveal pcard pcard--talmind">` block from
-  `index.html`, verbatim, at `76bb04b`.
-- `hero-dots.card.html` — the same block from `hero-dots.html`. It is **not** identical to
-  the one above: the alternate homepage carried a shorter comment and the older headline
-  (`Built a real pilot …`). Restore each into its own file.
+- `strip-private-1.png` `-2` `-3` — the grey screens themselves: a side rail and tiles, a
+  detail view, a list. Neutral grey, no type, no colour, nothing readable.
+- `index.card.html`, `hero-dots.card.html` — the whole `<article class="reveal pcard
+  pcard--talmind">` block from each homepage at commit `76bb04b`, verbatim. **These are the
+  card as it was with the PADLOCK on it**, from before the project opened, so they are a
+  record rather than something to paste back as-is. The lock itself is in
+  `versions/talmind-lock-31.08.2026`.
 
-## Putting it back
+## Worth knowing
 
-```sh
-# 1. the two card blocks, and the captures they point at
-git checkout 76bb04b -- index.html hero-dots.html strip-talmind-1.jpg strip-talmind-2.jpg strip-talmind-3.jpg
-
-# 2. drop the three strip-talmind lines from .gitignore, or step 1's images stay unpublished
-#    (they are the last block in the file, under "Talmind's own captures")
-
-# 3. bump ?v= across the site by one, so a cached page does not keep asking for the grey PNGs
-```
-
-`git checkout 76bb04b -- index.html hero-dots.html` also rewinds anything **else** those two
-files gained after 28.08.2026. If there is any such work, restore the card blocks alone: the
-two files in this folder are exactly what has to sit back in place, at
-`index.html` line 147 and `hero-dots.html` line 117, replacing the article block that is
-there. Then `strip-private-1..3.png` can go.
-
-Nothing outside those two files needs touching. `lock.js` and the `.pcard--talmind` rules in
-`styles.css` were never part of this change.
-
-## What this does and does not hide
-
-The card still says whose it is. What it no longer says is where the pilot runs, and it no
-longer shows a single screen of the product. That is the front door, and the front door is
-what a visitor sees.
-
-It is not a secret. This repository is public, so every commit before this one — the copy
-and the captures — is still readable on GitHub, and the case study itself is still a file
-on the server: the guard in `talmind.html` sends a browser home, but the page's own source
-answers a plain fetch. Taking the work genuinely off the internet means taking
-`talmind.html` and its assets off the server, and that is a bigger decision than this one.
+Being anonymous on the card never made the project private. It was the password lock that
+did that, and it is off: `talmind.html` opens for anyone and no longer carries
+`noindex, nofollow`. Grey screens on the card while the case study shows every one of them a
+click away is a choice about how the card reads, not a way of holding anything back.
