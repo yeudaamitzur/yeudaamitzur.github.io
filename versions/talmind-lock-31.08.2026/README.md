@@ -18,11 +18,14 @@ standing. A new file in here needs `git add -f`.
 ## Putting the lock back
 
 ```sh
-# the one-liner: undo the commit that took it off
-git revert <the "Talmind goes public" commit>
+# the commit that took the lock off is 5447d12; its diff, reversed, is the restore
+git show 5447d12 | git apply -R
 
-# then bump ?v= across the site by one, or a browser holding the current styles.css
-# will draw the padlock markup with no rules for it
+# it will not apply as-is once ?v= has moved on - it is on almost every line it touches.
+# Point the two sides at the same number first and the patch has nothing left to argue with:
+#   git show 5447d12 | sed -e 's/?v=186/?v=<current>/g' -e 's/?v=189/?v=<current>/g' | git apply -R
+# then bump ?v= across the site by one, or a browser holding the current styles.css will
+# draw the padlock markup with no rules for it.
 ```
 
 If that commit is ever out of reach, the seven pieces below are the whole lock. They were
