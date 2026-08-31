@@ -1,0 +1,25 @@
+  <!-- ===== Private project (25.08.2026) =====================================
+       Nothing links here any more: the homepage card ships without an href and
+       Bianca's hand-off points at TrailDesk, both restored by lock.js only for
+       the browser profile that holds the token. This is the backstop for an
+       address typed, bookmarked or forwarded by hand.
+
+       It runs FIRST in the head, before a stylesheet or an image is even
+       requested, so a stranger never sees a frame of the case study - the tab
+       is already on its way home. Digest, salt and the FNV pass are the same
+       three lines as lock.js; they are inline here rather than imported so the
+       check cannot be beaten by blocking one file.
+       ===================================================================== -->
+  <meta name="robots" content="noindex, nofollow" />
+  <script>
+  (function () {
+    var D = '35e35124f0b18420f88213c5', S = 'ya-talmind-2026';
+    function f(s) { var h = 0x811c9dc5; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i) & 255; h = Math.imul(h, 0x01000193) >>> 0; } return ('0000000' + h.toString(16)).slice(-8); }
+    function d(t) { return f(S + t) + f(t + S) + f(t + t); }
+    var m = /[?&#]k=([^&#]*)/.exec(location.search + location.hash), t = '';
+    if (m) { try { var h = decodeURIComponent(m[1]); if (d(h) === D) sessionStorage.setItem('ya_pk', h); } catch (e) {} }
+    try { localStorage.removeItem('ya_pk'); } catch (e) {}   /* retire the old permanent key */
+    try { t = sessionStorage.getItem('ya_pk') || ''; } catch (e) { t = ''; }
+    if (d(t) !== D) location.replace('/#top');
+  })();
+  </script>

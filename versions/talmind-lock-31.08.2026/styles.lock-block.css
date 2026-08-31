@@ -1,0 +1,168 @@
+/* =========================================================
+   Talmind is private (25.08.2026)
+
+   Everything below is ADDITIVE and belongs to exactly one
+   card. The shared .pcard rules above are left alone -
+   anything that has to differ on Talmind is written here as
+   a .pcard--talmind override rather than edited into the
+   shared rule, so the Bianca and TrailDesk cards cannot be
+   touched by any of it.
+
+   (Written this way after the first attempt did edit the
+   shared rules and quietly took the three cards' veil
+   colours, hover scale and mobile widths with it.)
+   ========================================================= */
+
+/* ---- the padlock ----
+   It hangs off the LEFT edge of the View pill: .pcard__view is already an absolutely positioned
+   box, so right:100% pins the icon to that edge and the margin is the gap. It is grey and STAYS
+   grey through the card's hover, because it reports a state rather than inviting a click - the
+   pill beside it is the thing that lights up. Two padlocks ship, shut and open, and the html
+   class lock.js writes before first paint decides which is drawn. */
+.pcard__lock {
+  position: absolute; right: 100%; top: 50%; transform: translateY(-50%);
+  margin-right: .5rem; width: 1.15em; height: 1.15em;
+  color: rgba(40, 37, 30, 0.42);
+}
+.pcard__lock .lk { display: block; width: 100%; height: 100%; }
+.pcard__lock .lk-open { display: none; }
+.pcard--talmind:hover .pcard__lock { color: rgba(40, 37, 30, 0.42); }
+html.ya-open .pcard__lock .lk-shut { display: none; }
+html.ya-open .pcard__lock .lk-open { display: block; }
+
+/* Shut, the card has no href - but it IS clickable, because clicking is what opens the field, so
+   it keeps a pointer. And it keeps the shared hover in full: the purple rule under the project
+   name is how every card answers a hover, and Talmind being private is no reason for it to feel
+   dead under the cursor. Nothing here overrides it. */
+html.ya-shut .pcard--talmind .pcard__inner { cursor: pointer; }
+
+/* this card's chip has to clear the pill AND the padlock beside it. An override, so the shared
+   .pcard__chip rule and the other two cards keep exactly what they had. */
+.pcard--talmind .pcard__chip { margin-right: clamp(7.3rem, 13.4vw, 10.4rem); }
+
+/* ---- the password field ----
+   There is no second control. The View pill IS the field: clicking it collapses the word "View"
+   to nothing and grows the input out of the same box, so the pill widens leftward while its
+   right edge stays exactly where it was. The padlock, pinned at right:100% of that pill, rides
+   along at the leading edge.
+
+   Nothing animates the pill's own width, which cannot be transitioned from `auto`. The pill is
+   inline-flex and content-sized: the field inside it animates and the pill follows every frame
+   for free. The stroke, radius and type are the pill's own, which is why the field cannot drift
+   out of step with the button it came from - no fill and no shadow anywhere.
+
+   It all lives inside .pcard__view, so it rides the arc driver's transform with the card. The
+   card moves under the scroll every frame; anything in viewport coordinates would slide off. */
+.pcard--talmind .pcard__view {
+  z-index: 3;                          /* above .pcard__strip, which claims z-index 1 */
+  /* padding and gap join the transition because this pill turns into the field: they go to zero
+     at that moment, and without easing them the pill snaps narrower for a frame before the field
+     starts growing. Scoped here so the other two pills keep the shared transition untouched. */
+  transition: border-color .25s ease, color .25s ease,
+              padding .42s cubic-bezier(.2, .7, .2, 1), gap .42s cubic-bezier(.2, .7, .2, 1);
+}
+.pcard--talmind .pcard__view.is-open { gap: 0; padding-inline: 0; cursor: text; }
+
+.pcard__view-label {
+  display: inline-block; overflow: hidden; white-space: nowrap; max-width: 8em;
+  transition: max-width .42s cubic-bezier(.2, .7, .2, 1), opacity .18s ease;
+}
+/* redundant the moment the field is open, so it gets out of the way completely - max-width AND
+   opacity, or a half-faded "View" rides along inside the field */
+.pcard__view.is-open .pcard__view-label { max-width: 0; opacity: 0; }
+
+.ya-gate {
+  display: block; overflow: hidden; width: 0; flex: none;
+  transition: width .42s cubic-bezier(.2, .7, .2, 1);
+}
+.ya-gate.is-in { width: min(14.5rem, 54vw); }
+/* the row holds its full width while the pill around it is still opening - without it the field
+   and the button squeeze out of nothing and the placeholder crawls instead of being revealed */
+.ya-gate__row {
+  display: flex; align-items: center;
+  width: min(14.5rem, 54vw); height: 100%;
+  padding-inline: 1.15em .35em; box-sizing: border-box;
+}
+.ya-gate__input {
+  flex: 1 1 auto; min-width: 0; height: 100%;
+  padding: 0; border: 0; background: none; outline: none;
+  font: inherit; letter-spacing: .02em; color: var(--ink);
+}
+.ya-gate__input::placeholder { color: rgba(40, 37, 30, 0.42); font-weight: 600; }
+
+/* the one accent, and still no fill - the stroke language belongs to the pill */
+.ya-gate__go {
+  flex: none; display: grid; place-items: center;
+  width: 1.75em; height: 1.75em; padding: 0; margin-left: .3em;
+  border: 0; border-radius: 50%; background: none;
+  color: var(--brand); cursor: pointer;
+  transition: background-color .2s ease, opacity .2s ease;
+}
+.ya-gate__go svg { width: .95em; height: .95em; display: block; }
+.ya-gate__go:hover { background: rgba(119, 63, 156, 0.1); }
+.ya-gate__go:disabled { opacity: .4; cursor: default; background: none; }
+
+/* the small line that says why. Anchored to the pill's RIGHT edge - the edge that never moves -
+   so it stays put under the field instead of travelling with the growing left edge. */
+.ya-gate__note {
+  position: absolute; right: 0; top: calc(100% + .5rem);
+  white-space: nowrap;
+  font-family: var(--f-body); font-size: .66rem; font-weight: 600;
+  letter-spacing: .13em; text-transform: uppercase;
+  color: rgba(40, 37, 30, 0.42);
+  opacity: 0; transform: translateY(-.25rem);
+  transition: opacity .3s ease .12s, transform .3s ease .12s;
+  pointer-events: none;
+}
+.ya-gate__note.is-in { opacity: 1; transform: none; }
+
+/* the pill is the frame, so the states belong to the pill */
+.pcard__view.is-open:focus-within { border-color: var(--brand); }
+.pcard__view.is-working { border-color: rgba(40, 37, 30, 0.18); }
+.pcard__view.is-working .ya-gate__input { color: rgba(40, 37, 30, 0.35); }
+
+/* a wrong password is felt before it is read */
+.pcard__view.is-wrong { border-color: #9B2C3F; animation: ya-shake .4s ease; }
+.pcard__view.is-wrong .ya-gate__input::placeholder { color: #9B2C3F; }
+@keyframes ya-shake {
+  0%, 100% { transform: translateX(0); }
+  18% { transform: translateX(-6px); }
+  38% { transform: translateX(5px); }
+  58% { transform: translateX(-3px); }
+  78% { transform: translateX(2px); }
+}
+
+/* The card must stop breathing under an open field - a 1.2% scale on hover would shift the input
+   sideways while you are typing in it. Only the scale is suppressed; the underline on the name is
+   left alone, so the hover reads the same whether the field is open or not. */
+.pcard--talmind.has-gate:hover .pcard__inner { transform: none; }
+
+/* ---- the unlock link answers back ----
+   Only ever rendered for someone who arrived carrying a ?k=, which in practice is Yehuda and
+   nobody else. Without it the unlock is silent, and a key that worked looks exactly like a link
+   opened in the wrong Chrome profile. */
+.ya-said {
+  position: fixed; left: 50%; bottom: clamp(1.4rem, 4vh, 2.6rem); z-index: 999;
+  transform: translate(-50%, .7rem);
+  display: inline-flex; align-items: center; gap: .6em;
+  padding: .64em 1.2em; border-radius: 999px;
+  background: rgba(24, 22, 15, 0.93); color: #F3F1EA;
+  font-family: var(--f-body); font-size: .82rem; font-weight: 500;
+  box-shadow: 0 18px 40px -22px rgba(40, 37, 30, 0.85);
+  opacity: 0; pointer-events: none;
+  transition: opacity .35s ease, transform .35s cubic-bezier(.2, .7, .2, 1);
+}
+.ya-said.is-in { opacity: 1; transform: translate(-50%, 0); }
+.ya-said::before {
+  content: ""; flex: none; width: .5em; height: .5em; border-radius: 50%;
+  background: rgba(243, 241, 234, 0.4);
+}
+.ya-said.is-good::before { background: #C6A9DE; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ya-gate, .pcard__view-label, .ya-gate__note { transition: opacity .2s ease; }
+  .ya-gate__note { transform: none; }
+  .pcard__view.is-wrong { animation: none; }
+  .ya-said { transition: opacity .2s ease; transform: translate(-50%, 0); }
+}
+

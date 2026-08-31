@@ -1,0 +1,48 @@
+        <article class="reveal pcard pcard--talmind">
+          <!-- Private project (25.08.2026): no href in the shipped markup. See lock.js. -->
+          <a class="pcard__inner" data-open="/talmind" aria-label="Talmind - a private project">
+            <div class="pcard__media" aria-hidden="true">
+              <span class="pcard__veil"></span>
+            </div>
+            
+            <!-- 28.08.2026: the project's own captures came off this card at Yehuda's request -
+                 what is here now are blank grey screens. Same three files, same 640x400, same
+                 places in the strip, so not a pixel of the card's geometry moved. The captures
+                 they replaced are off the published site as well - a shut card cannot hold the
+                 product back while the pictures of it are still a URL away - so .gitignore holds
+                 them the way it holds every other retired asset. See versions/private-card-28.08.2026. -->
+            <div class="pcard__strip" aria-hidden="true">
+                <figure class="shot"><img src="strip-private-1.png?v=185" alt="" width="640" height="400" loading="lazy" /></figure>
+                <figure class="shot"><img src="strip-private-2.png?v=185" alt="" width="640" height="400" loading="lazy" /></figure>
+                <figure class="shot"><img src="strip-private-3.png?v=185" alt="" width="640" height="400" loading="lazy" /></figure>
+            </div>
+            <div class="pcard__body">
+              <span class="pcard__chip">Case study</span>
+              <!-- 28.08.2026: the headline named the country the pilot is for, and the strip
+                   showed the product itself. Both came off - a shut card should not hand over
+                   what is behind it. The project keeps its own name: that was never the part
+                   being held back. ("real" is still out of the line, as it has been since
+                   17.08.2026 - the pilot has not run.) What stood here is kept in
+                   versions/private-card-28.08.2026 - put that block back and the card is
+                   what it was. -->
+              <span class="pcard__name">Talmind</span>
+              <h3 class="pcard__value">Built a pilot that answers a huge need in the classroom</h3>
+              <p class="pcard__kind">Learning app</p>
+            </div>
+            <span class="pcard__view">
+              <span class="pcard__lock" aria-hidden="true">
+                <svg class="lk lk-shut" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4.6" y="10.4" width="14.8" height="10" rx="2.6" />
+                  <path d="M8.4 10.4V7.5a3.6 3.6 0 0 1 7.2 0v2.9" />
+                </svg>
+                <svg class="lk lk-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4.6" y="10.4" width="14.8" height="10" rx="2.6" />
+                  <path d="M8.4 10.4V7.5a3.6 3.6 0 0 1 6.9-1.15" />
+                </svg>
+              </span>
+              <!-- wrapped so the label can collapse to nothing when the pill turns
+                   itself into the password field - see .pcard__view-label -->
+              <span class="pcard__view-label">View</span>
+            </span>
+          </a>
+        </article>
