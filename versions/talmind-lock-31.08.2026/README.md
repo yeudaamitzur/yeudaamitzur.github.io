@@ -1,13 +1,18 @@
 # The password lock, as it stood when it came off — 31.08.2026
 
-Talmind is open to everyone again. The lock that had been on it since 25.08.2026 —
-padlock on the card, the View pill turning into a password field, the pre-paint guard on
-the case study itself — is kept here whole, so it can go back up on a word.
+> **It is back on.** The lock came off on 31.08.2026 and went back up on 14.09.2026, out of
+> this folder, unchanged. The site is locked as you read this. Everything below still
+> describes the lock exactly, and is now the reference for taking it off or putting it back
+> the next time.
+
+The lock — padlock on the card, the View pill turning into a password field, the pre-paint
+guard on the case study itself — has been on Talmind since 25.08.2026, apart from those two
+weeks.
 
 Everything in this folder is the **live, working lock**, copied out of the tree at commit
-**`dbfd7d0`**, the last commit before it was removed. The removal itself is the commit
-right after it; **reverting that one commit is the whole restore**, and the files here are
-for reading, checking, and rebuilding by hand if the history is ever not to hand.
+**`dbfd7d0`**, the last commit before it was first removed. The files here are for reading,
+checking, and rebuilding by hand if the history is ever not to hand — and `lock.js` here is
+what was copied back into the site root on 14.09.
 
 This folder is **not served** — `pages.yml` deletes `versions/` from its checkout before
 uploading — and `versions/` is in `.gitignore` so `publish.sh`'s `rsync --delete` leaves it
@@ -60,10 +65,12 @@ How it behaves, unchanged since 25.08.2026:
 - the unlock lives in `sessionStorage`, so it lasts the visit and dies with the tab; a new
   arrival is asked again
 
-## What being open means now
+## The one thing a switch cannot take back
 
-`talmind.html` no longer carries `noindex, nofollow`, so search engines will index the case
-study from here on. Putting the lock back stops that going forward, but it does not undo
-it — anything already indexed has to be removed through Search Console, and a cache or an
-archive copy may outlive that. That is the one part of this that a `git revert` cannot take
-back, and it is worth knowing before the next switch.
+`talmind.html` carries `noindex, nofollow` again, so search engines will not index it from
+here on. But it was **open and indexable from 31.08.2026 to 14.09.2026** — two weeks — and
+`noindex` only stops what comes next. Anything picked up in that window has to be removed
+through Search Console, and a cache or an archive copy may outlive even that.
+
+Worth pricing in before the next switch: locking and unlocking the card is free and exact,
+but every open period leaves a tail that the lock cannot reel back in.
