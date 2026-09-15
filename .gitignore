@@ -29,3 +29,8 @@ glimpse-work.jpg
 # stay tracked, .gitignore does not untrack. Adding a new one needs `git add -f versions/...`.
 # pages.yml drops the folder from its checkout, so none of it is ever served.
 versions/
+
+# the real captures come off the published site while the card is shut (15.09.2026, as on 28.08)
+strip-talmind-1.jpg
+strip-talmind-2.jpg
+strip-talmind-3.jpg
