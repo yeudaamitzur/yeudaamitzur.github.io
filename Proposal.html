@@ -199,6 +199,12 @@
     .pr-foot { padding-block: 1.5rem 2rem; border-top: 1px solid var(--line); text-align: center;
       font-family: var(--f-body); font-size: .82rem; line-height: 1.5; color: var(--ink); }
     @media print { html, body { display: none !important; } }
+    /* The unlocked build marks the page is-open: no password stands in front of it any more, so it
+       behaves like any other page - selectable, printable, right-clickable. The three rules above
+       are left exactly as they are; these only answer them when the class is present. */
+    html.is-open { -webkit-user-select: auto; user-select: auto; -webkit-touch-callout: default; }
+    html.is-open img { -webkit-user-drag: auto; user-drag: auto; pointer-events: auto; }
+    @media print { html.is-open, html.is-open body { display: block !important; } }
 
     /* ---------- Closing ---------- */
     .tl-cta { margin-top: clamp(1.75rem, 4vw, 3.25rem); padding-top: clamp(3.25rem, 6.5vw, 5.5rem); padding-bottom: clamp(3.25rem, 6.5vw, 5.5rem); }
@@ -492,42 +498,49 @@
   (function () {
     var S = window.__PR || null;
     var mine = !!(S && S.owner);   // opened with the author's own key
+    var free = !!(S && S.open);    // the unlocked build: no password came before this page
     var html = document.documentElement;
+    if (free) html.classList.add('is-open');
 
-    /* -- protections -- */
-    var block = function (e) { e.preventDefault(); };
-    // The right-click menu stays open on the author's own key - it is his page to save from.
-    // Everyone else keeps the full set, and the password screen cannot know who is coming.
-    ['contextmenu', 'dragstart', 'selectstart', 'copy', 'cut']
-      .filter(function (t) { return !(mine && t === 'contextmenu'); })
-      .forEach(function (t) { document.addEventListener(t, block, true); });
-    var shield = document.querySelector('[data-shield]');
-    var hideFor = null;
-    function cover(ms) {
-      shield.hidden = false;
-      clearTimeout(hideFor);
-      if (ms) hideFor = setTimeout(function () { if (document.hasFocus() && document.visibilityState === 'visible') shield.hidden = true; }, ms);
+    /* -- protections --
+       All of this guards a page that was handed out behind a one-time password. The unlocked build
+       skips every line of it: holding a reader back from selecting or printing a page that anyone
+       with the link can open buys nothing. */
+    if (!free) {
+      var block = function (e) { e.preventDefault(); };
+      // The right-click menu stays open on the author's own key - it is his page to save from.
+      // Everyone else keeps the full set, and the password screen cannot know who is coming.
+      ['contextmenu', 'dragstart', 'selectstart', 'copy', 'cut']
+        .filter(function (t) { return !(mine && t === 'contextmenu'); })
+        .forEach(function (t) { document.addEventListener(t, block, true); });
+      var shield = document.querySelector('[data-shield]');
+      var hideFor = null;
+      function cover(ms) {
+        shield.hidden = false;
+        clearTimeout(hideFor);
+        if (ms) hideFor = setTimeout(function () { if (document.hasFocus() && document.visibilityState === 'visible') shield.hidden = true; }, ms);
+      }
+      function uncover() { clearTimeout(hideFor); shield.hidden = true; }
+      document.addEventListener('keydown', function (e) {
+        var k = (e.key || '').toLowerCase(), mod = e.ctrlKey || e.metaKey;
+        if (k === 'printscreen') { cover(1500); try { navigator.clipboard && navigator.clipboard.writeText(''); } catch (x) {} }
+        if (mod && ['s', 'p', 'c', 'x', 'a', 'u'].indexOf(k) > -1) e.preventDefault();
+        if (k === 'f12' || (mod && e.shiftKey && ['i', 'j', 'c'].indexOf(k) > -1) || (e.metaKey && e.altKey && ['i', 'j', 'c', 'u'].indexOf(k) > -1)) e.preventDefault();
+        // the first key of the macOS / Windows capture chords still reaches the page
+        if ((e.metaKey && e.shiftKey) || (k === 'meta' && e.shiftKey) || (k === 'shift' && e.metaKey)) cover(2500);
+      }, true);
+      document.addEventListener('keyup', function (e) { if ((e.key || '').toLowerCase() === 'printscreen') { cover(1500); try { navigator.clipboard && navigator.clipboard.writeText(''); } catch (x) {} } }, true);
+      window.addEventListener('blur', function () {
+        // focus moving INTO the prototype is not leaving the page
+        setTimeout(function () { var a = document.activeElement; if (!(a && a.tagName === 'IFRAME')) cover(); }, 0);
+      });
+      window.addEventListener('focus', uncover);
+      // Coming back from another app: on a phone, and inside an in-app browser, document.hasFocus()
+      // can stay false after the page is visible again - the cover must not outlive the absence.
+      document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') cover(); else uncover(); });
+      document.addEventListener('pointerdown', function () { if (document.visibilityState === 'visible') uncover(); }, true);
+      window.addEventListener('beforeprint', function () { cover(); });
     }
-    function uncover() { clearTimeout(hideFor); shield.hidden = true; }
-    document.addEventListener('keydown', function (e) {
-      var k = (e.key || '').toLowerCase(), mod = e.ctrlKey || e.metaKey;
-      if (k === 'printscreen') { cover(1500); try { navigator.clipboard && navigator.clipboard.writeText(''); } catch (x) {} }
-      if (mod && ['s', 'p', 'c', 'x', 'a', 'u'].indexOf(k) > -1) e.preventDefault();
-      if (k === 'f12' || (mod && e.shiftKey && ['i', 'j', 'c'].indexOf(k) > -1) || (e.metaKey && e.altKey && ['i', 'j', 'c', 'u'].indexOf(k) > -1)) e.preventDefault();
-      // the first key of the macOS / Windows capture chords still reaches the page
-      if ((e.metaKey && e.shiftKey) || (k === 'meta' && e.shiftKey) || (k === 'shift' && e.metaKey)) cover(2500);
-    }, true);
-    document.addEventListener('keyup', function (e) { if ((e.key || '').toLowerCase() === 'printscreen') { cover(1500); try { navigator.clipboard && navigator.clipboard.writeText(''); } catch (x) {} } }, true);
-    window.addEventListener('blur', function () {
-      // focus moving INTO the prototype is not leaving the page
-      setTimeout(function () { var a = document.activeElement; if (!(a && a.tagName === 'IFRAME')) cover(); }, 0);
-    });
-    window.addEventListener('focus', uncover);
-    // Coming back from another app: on a phone, and inside an in-app browser, document.hasFocus()
-    // can stay false after the page is visible again - the cover must not outlive the absence.
-    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') cover(); else uncover(); });
-    document.addEventListener('pointerdown', function () { if (document.visibilityState === 'visible') uncover(); }, true);
-    window.addEventListener('beforeprint', function () { cover(); });
 
     if (!S) return;
 
