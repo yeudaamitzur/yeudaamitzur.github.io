@@ -124,7 +124,7 @@
     /* default = the screen's straight bounding rect; the script refines it to the exact perspective */
     .tl-tablet__video { position: absolute; left: 1.5625%; top: 1.79%; width: 96.68%; height: 96.28%;
       display: block; object-fit: cover; transform-origin: 0 0;
-      background: url("talmind-tablet-screen-poster.jpg") center / cover no-repeat; }
+      background: url("talmind-tablet-screen-hd-poster.jpg") center / cover no-repeat; }
     /* ---- end: prototype video on the tablet screen ---- */
     @keyframes tlTabletIn {
       from { opacity: 0; transform: translateY(80px) scale(1.16); }
@@ -532,8 +532,11 @@
              warps the video onto the screen's measured perspective. Silent, 1.25x baked in. -->
         <div class="tl-tablet__screen" data-tablet-screen aria-hidden="true">
           <video class="tl-tablet__video" autoplay muted loop playsinline preload="auto"
-                 disablepictureinpicture disableremoteplayback poster="talmind-tablet-screen-poster.jpg">
-            <source src="talmind-tablet-screen.mp4" type="video/mp4" />
+                 disablepictureinpicture disableremoteplayback poster="talmind-tablet-screen-hd-poster.jpg">
+            <!-- full frame rate, near-transparent quality (q0.7, ~41-43 dB vs a lossless pass).
+                 Phones show this screen at ~500 device px, so they get the 800px cut. -->
+            <source src="talmind-tablet-screen-sm.mp4" type="video/mp4" media="(max-width: 760px)" />
+            <source src="talmind-tablet-screen-hd.mp4" type="video/mp4" />
           </video>
         </div>
       </div>
