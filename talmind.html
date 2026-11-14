@@ -15,7 +15,7 @@
   <meta property="og:url" content="https://yehudaamitzur.com/talmind" />
   <meta property="og:title" content="Talmind case study · Yehuda Amitzur" />
   <meta property="og:description" content="Talmind is a tablet app that brings authentic Talmud study into Korean classrooms, teaching the questioning, reasoning mind behind it. A UX/UI case study by Yehuda Amitzur." />
-  <meta property="og:image" content="https://yehudaamitzur.com/tile-talmind.jpg?v=193" />
+  <meta property="og:image" content="https://yehudaamitzur.com/tile-talmind.jpg?v=194" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="750" />
@@ -23,7 +23,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Talmind case study · Yehuda Amitzur" />
   <meta name="twitter:description" content="Talmind is a tablet app that brings authentic Talmud study into Korean classrooms, teaching the questioning, reasoning mind behind it. A UX/UI case study by Yehuda Amitzur." />
-  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-talmind.jpg?v=193" />
+  <meta name="twitter:image" content="https://yehudaamitzur.com/tile-talmind.jpg?v=194" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -34,8 +34,8 @@
   <!-- The hero dashboard is the largest thing on the first screen; without this the
        browser only discovers it after the CSS has parsed, by which time the hero video
        is already pulling. -->
-  <link rel="preload" as="image" href="talmind-tablet.webp?v=193" fetchpriority="high" />
-  <link rel="stylesheet" href="styles.css?v=193" />
+  <link rel="preload" as="image" href="talmind-tablet.webp?v=194" fetchpriority="high" />
+  <link rel="stylesheet" href="styles.css?v=194" />
 
   <style>
     /* =========================================================
@@ -441,13 +441,14 @@
 </head>
 <body class="tl">
   <!-- phones: the side rail is hidden, so progress runs along the top edge instead -->
+  <div class="pgbar" aria-hidden="true"><span></span></div>
   <a class="skip-link" href="#about">Skip to content</a>
 
   <!-- ===== HEADER (floating pill → collapses to a status badge on scroll) ===== -->
   <header class="hdr hdr--float hdr--bare" id="top">
     <div class="hdr__pill">
       <a class="hdr__logo" href="/#top" aria-label="Yehuda Amitzur, home">
-        <span class="hdr__avatar"><img class="hdr__avatar-img" src="profile.jpg?v=193" alt="Yehuda Amitzur" width="46" height="46" /></span>
+        <span class="hdr__avatar"><img class="hdr__avatar-img" src="profile.jpg?v=194" alt="Yehuda Amitzur" width="46" height="46" /></span>
       </a>
       <div class="hdr__expand">
         <nav class="hdr__nav" aria-label="Primary">
@@ -460,7 +461,7 @@
     </div>
     <div class="hdr__drawer" id="hdr-drawer" hidden>
       <div class="hdr__drawer-top">
-        <span class="hdr__drawer-ava"><img src="profile.jpg?v=193" alt="" width="46" height="46" /></span>
+        <span class="hdr__drawer-ava"><img src="profile.jpg?v=194" alt="" width="46" height="46" /></span>
         <button class="hdr__drawer-close" type="button" aria-label="Close menu"><span></span><span></span></button>
       </div>
       <a href="/#top">Home</a>
@@ -469,6 +470,23 @@
     </div>
   </header>
 
+  <!-- ===== RIGHT-SIDE SCROLL PROGRESS RAIL ===== -->
+  <nav class="tl-rail" aria-label="Section progress">
+    <span class="tl-rail__bar"><span class="tl-rail__fill"></span></span>
+    <span class="tl-rail__dots">
+      <!-- the anchors are spread across the WHOLE page, not just its first half: the product
+           walkthrough is five long sections now, so it carries three dots of its own -->
+      <a class="tl-rail__dot" href="#journey" aria-label="What I discovered"></a>
+      <a class="tl-rail__dot" href="#gemara" aria-label="What is Talmud"></a>
+      <a class="tl-rail__dot" href="#problem" aria-label="Problem & solution"></a>
+      <a class="tl-rail__dot" href="#challenge" aria-label="The challenges"></a>
+      <a class="tl-rail__dot" href="#home-final" aria-label="The home screen"></a>
+      <a class="tl-rail__dot" href="#quiz" aria-label="The quiz"></a>
+      <a class="tl-rail__dot" href="#lessons" aria-label="The lessons"></a>
+      <a class="tl-rail__dot" href="#system" aria-label="The design system"></a>
+      <span class="tl-rail__dot tl-rail__cap" aria-hidden="true"></span>
+    </span>
+  </nav>
 
   <main>
     <!-- ===== HERO (video backdrop + dissolving tablet) ===== -->
@@ -493,7 +511,7 @@
              4476px, 2.5 MB PNG - it has to keep its alpha (56% of it is transparent), so a
              256-colour PNG was the obvious shrink and it banded the hand badly. WebP keeps
              the alpha at full colour. talmind-tablet-only.png stays on disk as the master. -->
-        <img class="tl-tablet__img" src="talmind-tablet.webp?v=193" width="2240" height="967"
+        <img class="tl-tablet__img" src="talmind-tablet.webp?v=194" width="2240" height="967"
              fetchpriority="high" decoding="async"
              alt="Tablet running the Talmind home screen" />
       </div>
@@ -520,7 +538,6 @@
     </section>
 
     <!-- ===== TWO-SCREEN SHOWCASE (slide in from the sides) ===== -->
-    <div class="tm-peek" data-tm-peek>
     <section class="tl-duo" data-duo aria-label="Two Talmind screens">
       <div class="tl-duo__stage">
         <img class="tl-duo__screen tl-duo__screen--left" src="talmind-screen-lessons.png" width="1500" height="1033"
@@ -529,416 +546,265 @@
              alt="Talmind drag-and-match game on a tablet" loading="lazy" />
       </div>
     </section>
-    </div>
 
+    <!-- ===== THE JOURNEY - numbered list ===== -->
+    <section class="tl-section tl-wrap" id="journey">
+      <h2 class="tl-h2 tl-h2--wide reveal">This is what I discovered after a friend sparked my curiosity</h2>
+      <ol class="tl-facts reveal">
+        <li class="tl-factrow"><span class="tl-factrow__n">1</span>
+          <p>The Korean population, approximately 50 million people, owns almost every household a "book called
+            the Talmud." The Ministry of Education has even recommended including Talmudic stories in children's
+            studies to develop thinking and intellectual skills.<a class="tl-factrow__src" href="https://aish.com/south_koreans_learning_talmud/">Source<span aria-hidden="true">↗</span></a></p></li>
+        <li class="tl-factrow"><span class="tl-factrow__n">2</span>
+          <p>In most families, the book called the "Korean Gemara" is a 40-page collection of Talmudic stories,
+            based on the work of Rabbi Marvin Tokayer from the 1970s, similar to moral tales of the sages or
+            Stories of the Sages.<a class="tl-factrow__src" href="https://aish.com/south_koreans_learning_talmud/">Source<span aria-hidden="true">↗</span></a></p></li>
+        <li class="tl-factrow"><span class="tl-factrow__n">3</span>
+          <p>There are private educational institutions known as "Chavruta Academies." The academies were founded
+            by Dr. Park Ki-Ryong from KHU University, in collaboration with associations for Jewish leadership and
+            innovative education.<a class="tl-factrow__src" href="https://www.jpost.com/diaspora/talmud-inspired-learning-craze-sweeps-south-korea-577402">Source<span aria-hidden="true">↗</span></a></p></li>
+      </ol>
+    </section>
 
-  <!-- ===== THE GATE (12.10.2026) ==========================================
-       Everything above this point is the public half of the case study. The rest
-       of the page is not in this file at all - it is sealed below, and the key
-       lives on the server, handed over only to a code Yehuda has approved.
-
-       The sheet is fixed to the bottom of the screen and rides in when the two
-       tablets arrive, so the reader meets it at the end of the scroll rather
-       than being stopped mid-sentence. The page simply has no more height: the
-       scroll ends here on its own, which is quieter than trapping it.
-       ===================================================================== -->
-  <section class="tm-gate" aria-labelledby="tm-gate-title">
-    <div class="tm-gate__in">
-      <span class="tl-mini">Private from here on</span>
-      <h2 class="tm-gate__title" id="tm-gate-title">The rest of this project is confidential</h2>
-      <p class="tm-gate__note">Talmind is a live pilot, so the full case study is shared on request. If it is of
-        interest, I am glad to open it: ask for access and a password is on its way.</p>
-      <div class="tm-gate__act">
-        <button class="tm-btn" type="button" data-tm-ask>Request access</button>
-        <span class="tm-gate__hint">Ask Yehuda and view it right now</span>
+    <!-- ===== WHAT IS TALMUD (dry vs alive) ===== -->
+    <section class="tl-section tl-wrap" id="gemara">
+      <h2 class="tl-h2 reveal">What is Talmud?</h2>
+      <div class="tl-diptych">
+        <div class="tl-side tl-side--dry reveal">
+          <span class="tl-mini">Starts with a dry and boring part</span>
+          <h3>Rules &amp; quotations</h3>
+          <div class="tl-chips"><span>Definitions</span><span>Citations</span><span>Precedents</span><span>Rulings</span></div>
+        </div>
+        <div class="tl-dip-arrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+        </div>
+        <div class="tl-side tl-side--alive reveal">
+          <span class="tl-mini">And continues to the part that comes to life</span>
+          <h3>In-depth discussion</h3>
+          <div class="tl-chips"><span>Questions</span><span>Answers</span><span>creativity</span></div>
+        </div>
       </div>
-      <button class="tm-gate__have" type="button" data-tm-have>I already have a password</button>
-      <form class="tm-code" data-tm-code hidden>
-        <label class="tm-pill">
-          <svg class="tm-pill__lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.6" y="10.4" width="14.8" height="10" rx="2.6" /><path d="M8.4 10.4V7.5a3.6 3.6 0 0 1 7.2 0v2.9" /></svg>
-          <span class="sr-only">Password</span>
-          <input class="tm-pill__input" type="password" name="code" placeholder="Password" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" />
-          <button class="tm-pill__go" type="submit" aria-label="Open the project">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
-          </button>
-        </label>
-        <p class="tm-say" data-tm-say aria-live="polite"></p>
-      </form>
-    </div>
-  </section>
+    </section>
 
-  <!-- Not a <dialog>: showModal() paints into the browser's top layer, which sits above
-       everything on the page including the site's own cursor ring, so the ring vanished behind
-       this box. A plain fixed overlay at z-index 9000 keeps the ring (9999) where it belongs. -->
-  <div class="tm-ask" data-tm-dialog role="dialog" aria-modal="true" aria-labelledby="tm-ask-title" hidden>
-    <div class="tm-ask__veil" data-tm-veil></div>
-    <form class="tm-ask__form" data-tm-form>
-      <button class="tm-ask__x" type="button" data-tm-close aria-label="Close">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
-      </button>
-      <h3 class="tm-ask__title" id="tm-ask-title">Request access</h3>
-      <p class="tm-ask__note">It reaches Yehuda by email, from your own address, so he knows who is asking.
-        He sends the password back to you there. Leave this tab open and the project opens here the
-        moment he approves.</p>
+    <!-- ===== PROBLEM / SOLUTION (stacked, one under the other) ===== -->
+    <section class="tl-section tl-wrap" id="problem">
+      <div class="tl-col tl-col--problem reveal">
+        <h2 class="tl-h2">Problem</h2>
+        <p class="tl-col__text">Gaps in knowledge and a limited cultural context lead to an approach that ignores
+          core principles, making it hard to learn the material effectively. Additionally, social norms make
+          students hesitant to ask questions in front of their peers, so they miss out on deeper learning.</p>
+      </div>
+      <div class="tl-col tl-col--solution tl-col--next reveal">
+        <h2 class="tl-h2">Solution</h2>
+        <p class="tl-col__text">The experience connects to authentic Talmudic topics using a simple two-step path:
+          first, getting a clear grip on the dry facts, and then diving into the more engaging and deeper parts of
+          the material.</p>
+      </div>
+      <p class="tl-statement reveal">To ensure fit and profitability, I have currently focused the product on the
+        student side and it will serve as a classroom pilot allowing teachers to track real-world progress and
+        validate the value of the product before scaling up.</p>
+    </section>
 
-      <label class="tm-field">
-        <span>Your email</span>
-        <input type="email" name="email" required maxlength="120" autocomplete="email" placeholder="you@company.com" />
-      </label>
-      <label class="tm-field">
-        <span>Who you are, and where from</span>
-        <input type="text" name="who" required minlength="2" maxlength="120" autocomplete="organization" placeholder="Name, company or school" />
-      </label>
-      <label class="tm-field">
-        <span>Anything to add <i>(optional)</i></span>
-        <textarea name="note" rows="2" maxlength="400" placeholder="What brought you here"></textarea>
-      </label>
 
-      <button class="tm-btn tm-btn--wide" type="submit" data-tm-send>Send request</button>
+    <!-- ===== WHAT A SUCCESSFUL PILOT LOOKS LIKE ===== -->
+    <section class="tl-section tl-wrap" id="pilot">
+      <h2 class="tl-h2 tl-h2--wide reveal">What does a successful pilot look like?</h2>
+      <p class="tl-note reveal">Success means 80%+ of the class achieves the engagement metrics set in one lesson:
+        7 good questions, 3 accurate answers, and 1 creative solution.</p>
+      <p class="tl-note reveal">To ensure this, Talmind AI agent, trained in Talmudic subjects, handles rapid
+        assessment behind the scenes, instantly determining which ones meet standards of quality, accuracy,
+        and creativity.</p>
+    </section>
 
-      <p class="tm-say tm-say--ask" data-tm-asksay aria-live="polite"></p>
+    <!-- ===== THE CHALLENGES ===== -->
+    <section class="tl-section tl-wrap" id="challenge">
+      <h2 class="tl-h2 reveal">The Challenges</h2>
+      <div class="tl-stack reveal">
+        <p class="tl-challenge__q">How do I teach the dry, boring parts?!<br />And how can the same game structure
+          work for both grades 4-6 and grades 7-12?</p>
+        <p class="tl-challenge__sub">The proposed solution:</p>
+        <p class="tl-challenge__body">I brought the fun part to life through a game experience that allows them to be
+          active partners in the learning process. And for the game, I trained an artificial intelligence agent to
+          analyze each Talmudic section and automatically adapt its content to each learning level, so that the game
+          structure itself will never have to change.</p>
+      </div>
+      <!-- the drag-and-match board on a tablet, closing the challenge before the sketch -->
+      <!-- no `reveal` here: the 3D rise below IS this figure's entrance -->
+      <div class="tl-challenge__fig" data-solo>
+        <img src="talmind-game-tablet.png?v=194" width="2400" height="1654"
+             alt="The drag-and-match game board on a tablet, a card being dragged onto the Torah Source category"
+             loading="lazy" />
+      </div>
+    </section>
 
-      <!-- after the request is written down, the message to Yehuda is handed to this visitor's
-           own mail client, already typed: one press and it arrives from their own address, which
-           he can simply reply to. Nothing is lost if they never press it - the request is saved,
-           and he sees it in his dashboard either way. -->
-      <div class="tm-done" data-tm-done hidden>
-        <a class="tm-btn tm-btn--wide" data-tm-mail>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5" /><path d="M3.5 7l8.5 6 8.5-6" /></svg>
-          Send it from your email
+    <!-- ===== SKETCH - the flow sheet, worked out by hand ===== -->
+    <section class="tl-section tl-wrap" id="sketch">
+      <h2 class="tl-h2 reveal">Sketch</h2>
+      <p class="tl-lead reveal">Before a single pixel: The flow of the three steps of lesson preparation, the daily
+        quiz, and the drag-and-match game, which were initially developed manually.</p>
+      <div class="tl-sketch__stage reveal">
+        <img src="talmind-sketch-flow.jpg?v=194" width="1700" height="1030"
+             alt="A hand sketch of the flow: first a video, then a quiz game, then a game the student will never forget"
+             loading="lazy" />
+      </div>
+    </section>
+
+
+    <!-- ===== HOME - FINAL DESIGN ===== -->
+    <section class="tl-section tl-wrap" id="home-final">
+      <h2 class="tl-h2 reveal">Home - Final design</h2>
+      <p class="tl-lead reveal">I used status icons to help students quickly understand which steps are completed and
+        which step they're currently on.<br />I also added a progress bar within each step and locked the next one to
+        keep students focused and create motivation and curiosity.</p>
+      <!-- One flat export, 17.08.2026. This used to be a composite: talmind-home-empty.jpg with the
+           "Prepare for today's lesson" block, three status badges and a progress bar laid back on
+           top at measured percentages, because the base shot was empty in the middle. The new
+           export has all of it baked in, so the stack is gone. -->
+      <figure class="tl-shot reveal">
+        <img src="talmind-home-final.jpg?v=194" width="2400" height="1500"
+             alt="The Talmind home dashboard: today's lesson, the three preparation steps with their status, the weekly quiz, skills breakdown and leaderboard"
+             loading="lazy" />
+      </figure>
+    </section>
+
+    <!-- ===== QUIZ ===== -->
+    <section class="tl-section tl-wrap" id="quiz">
+      <h2 class="tl-h2 reveal">Quiz</h2>
+      <p class="tl-lead reveal">Includes 8 questions about the material taught in the video.<br />To increase
+        engagement, I added a points system and immersive character animation to create a more rewarding and
+        enjoyable experience.</p>
+      <figure class="tl-shot reveal">
+        <img src="talmind-quiz.jpg" width="1280" height="800" alt="The Talmind daily quiz" loading="lazy" />
+      </figure>
+    </section>
+
+    <!-- ===== GAME ===== -->
+    <section class="tl-section tl-wrap" id="game">
+      <h2 class="tl-h2 reveal">Game</h2>
+      <p class="tl-lead reveal">To reduce development costs for a game targeting 4th to 12th graders, as a first step
+        I chose a simple drag-and-drop mechanics. This allowed me to easily scale the difficulty based on the
+        complexity of the concepts.<br />and to be honest, I was also inspired by the Duolingo app on how to teach in
+        a fun way.</p>
+      <figure class="tl-shot reveal">
+        <img src="talmind-game.jpg" width="1600" height="1000" alt="The Talmind drag-and-match game board" loading="lazy" />
+      </figure>
+    </section>
+
+    <!-- ===== LESSONS ===== -->
+    <section class="tl-section tl-wrap" id="lessons">
+      <h2 class="tl-h2 reveal">Lessons</h2>
+      <p class="tl-lead reveal">The lessons are organized by topic, while an artificial intelligence assistant clearly
+        highlights what remains to be completed, so the student can stay focused.</p>
+      <p class="tl-lead reveal">Based on two key components of Talmudic intellect, I combined these elements to
+        incentivize three core skills that support students throughout their lessons and quizzes.</p>
+      <figure class="tl-shot reveal">
+        <img src="talmind-lesson.jpg" width="1280" height="800"
+             alt="The Talmind lesson screen with the three skill meters" loading="lazy" />
+      </figure>
+    </section>
+
+    <!-- ===== HOME - EXERTION (the first pass, and why it was dropped) ===== -->
+    <section class="tl-section tl-wrap" id="exertion">
+      <div class="tl-media">
+        <div class="tl-media__body reveal">
+          <h2 class="tl-h2">Home - Exertion</h2>
+          <p class="tl-lead">I initially considered allowing direct lesson access from the homepage, but decided to
+            lock it until preparation is complete to ensure all students start the lesson equally prepared</p>
+        </div>
+        <div class="tl-media__fig reveal">
+          <img src="talmind-home-exertion.jpg?v=194" width="1760" height="1291"
+               alt="The first pass at the home screen, with today's lesson openable straight from the dashboard"
+               loading="lazy" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== BRANDING - the name being built, and the icon on a home screen ===== -->
+    <section class="tl-section tl-wrap" id="brand">
+      <div class="tl-brand">
+        <div class="tl-brand__card tl-brand__card--word reveal">
+          <img src="talmind-brand-word.jpg?v=194" width="1561" height="1792"
+               alt="How the name was built: Talmud plus mind becomes Talmind" loading="lazy" />
+        </div>
+        <div class="tl-brand__card tl-brand__card--phone reveal">
+          <img src="talmind-brand-phone.jpg?v=194" width="1600" height="1067"
+               alt="The Talmind app icon on an iPhone home screen" loading="lazy" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== DESIGN SYSTEM - the foundations every screen above is built on =====
+         Was its own case study until 13.08.2026. Only the two foundations that say something
+         about Talmind itself survived the move: semantic colour tokens and the type scale. The
+         component sheets stayed behind - the screens above already show what they build. -->
+    <section class="tl-section tl-wrap" id="system">
+      <h2 class="tl-h2 tl-h2--wide reveal">None of these screens were designed one at a time</h2>
+      <p class="tl-lead reveal">Every screen above is built on a full design system I made for the product: colour
+        primitives and semantic tokens as Figma Variables, one type scale, and primitive components that compose
+        into all of it. Change a primitive once and it updates everywhere it appears.</p>
+
+      <h3 class="tl-subhead reveal">Colors</h3>
+      <figure class="tl-sysfig tl-sysfig--color reveal">
+        <img src="ds-semantic.jpg?v=194" width="1168" height="1832"
+             alt="Talmind semantic tokens: brand and accents, surfaces and text, status, and game category boxes, each mapped to a primitive and a hex value"
+             loading="lazy" />
+      </figure>
+
+      <h3 class="tl-subhead reveal">Typography</h3>
+      <figure class="tl-sysfig tl-sysfig--type reveal">
+        <img src="ds-typography.jpg?v=194" width="1670" height="1544"
+             alt="The Talmind type scale: Display Large, Display, H1, H2, Subtitle, Label, Body, Caption and Tiny, each with its weight, size, usage and a sample"
+             loading="lazy" />
+      </figure>
+    </section>
+
+    <!-- ===== IMPACT & TAKEAWAYS - where the product went, and what it taught ===== -->
+    <section class="tl-section tl-wrap" id="impact">
+      <h2 class="tl-h2 reveal">Impact &amp; Takeaways</h2>
+      <p class="tl-lead tl-lead--brand reveal">I am excited to share that word-of-mouth has brought our product to influential
+        figures in South Korea, sparking great curiosity among educators. We are currently exploring a pilot program
+        tailored for middle school classes. This initial phase will feature the student interface alongside a data
+        collection and analytics dashboard for teachers.</p>
+      <p class="tl-lead reveal">Through this experience, I learned that any challenge can be transformed into a
+        successful reality by deeply understanding user pain points and breaking them down into actionable stages.
+        The most rewarding part was finding intuitive ways to bridge cultural gaps while leveraging advanced AI
+        capabilities to elevate the product.</p>
+    </section>
+
+    <!-- ===== NEXT PROJECT - the loop, handed over before the contact ask ===== -->
+    <!-- Pointed at Bianca while TrailDesk was off the site (14.08 - 17.08.2026). The loop follows the
+         homepage stack: Bianca -> Talmind -> TrailDesk -> Bianca. -->
+    <section class="nxt nxt--traildesk" aria-label="Next project">
+      <div class="nxt__inner reveal">
+        <a class="nxt__link" href="/traildesk">
+          <span class="nxt__text">
+            <span class="nxt__name">Next project<i class="nxt__arrow" aria-hidden="true">→</i></span>
+            <span class="nxt__desc"><b>TRAILDESK</b> finding a public place you can actually work from</span>
+          </span>
+          <span class="nxt__frame">
+            <img class="nxt__img" src="nxt-traildesk.webp?v=194" width="800" height="521" alt="" loading="lazy" />
+          </span>
         </a>
-        <button class="tm-gate__have tm-copy" type="button" data-tm-copy>or copy the message instead</button>
-        <p class="tm-fine">Yehuda replies to that address with the password. You can close this tab -
-          if he is quick, the project opens here by itself.</p>
       </div>
-    </form>
-  </div>
+    </section>
 
-  <style>
-    /* ---- how much of the two tablets the scroll may ever uncover ----
-       The sheet covers the bottom of the screen, so the band is the sheet's own height plus a
-       strip above it. Without JS, 44vh is the same thing in round numbers. ---- */
-    .tm-peek { overflow: hidden; max-height: 44vh; }
-
-    /* ---- the glass sheet ---- */
-    .tm-gate { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
-      transform: translateY(102%); transition: transform .62s cubic-bezier(.22,.78,.3,1);
-      background: rgba(246, 245, 240, 0.62);
-      -webkit-backdrop-filter: blur(26px) saturate(1.3); backdrop-filter: blur(26px) saturate(1.3);
-      border-top: 1px solid rgba(255, 255, 255, 0.65);
-      box-shadow: 0 -34px 64px -36px rgba(40, 37, 30, 0.45); }
-    .tm-gate.is-in { transform: translateY(0); }
-    /* the content above has to dissolve into the glass, not meet a hard edge */
-    .tm-gate::before { content: ""; position: absolute; left: 0; right: 0; top: -120px; height: 120px; pointer-events: none;
-      background: linear-gradient(to bottom, rgba(240, 239, 233, 0), rgba(240, 239, 233, 0.55)); }
-    .tm-gate__in { width: 100%; max-width: 640px; margin-inline: auto; padding: clamp(1.4rem, 3.4vw, 2.2rem) var(--pad) calc(clamp(1.4rem, 3.4vw, 2.2rem) + env(safe-area-inset-bottom)); text-align: center; }
-    .tm-gate__title { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.45rem, 3.2vw, 2rem);
-      line-height: 1.08; letter-spacing: -0.02em; margin: .7rem 0 0; }
-    .tm-gate__note { margin: .7rem auto 0; max-width: 52ch; color: var(--ink-mute); line-height: 1.6; text-wrap: pretty; }
-    .tm-gate__act { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .55rem 1rem; margin-top: 1.25rem; }
-    .tm-gate__hint { font-size: .92rem; color: var(--ink-mute); }
-    .tm-gate__have { margin-top: .9rem; padding: 0; border: 0; background: none; font: inherit; font-size: .88rem;
-      color: var(--ink-faint); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
-    .tm-gate__have:hover { color: var(--brand); }
-
-    /* ---- the one button the page is built around ---- */
-    .tm-btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
-      height: 3rem; padding-inline: 1.6rem; border: 0; border-radius: 999px;
-      background: var(--brand); color: #fff; font-family: var(--f-body); font-size: 1rem; font-weight: 600;
-      cursor: pointer; transition: background-color .22s ease, transform .22s ease, box-shadow .22s ease;
-      box-shadow: 0 18px 32px -20px rgba(119, 63, 156, 0.9); }
-    .tm-btn:hover { background: var(--brand-lit); transform: translateY(-1px); }
-    .tm-btn:disabled { opacity: .55; cursor: default; transform: none; }
-    .tm-btn--wide { width: 100%; margin-top: 1.1rem; }
-
-    /* ---- "I already have a password": the same stroke pill the site uses ---- */
-    .tm-code { margin: 1rem auto 0; width: min(20rem, 100%); }
-    .tm-pill { display: flex; align-items: center; gap: .5rem; height: 3rem; padding-inline: 1.05rem .35rem;
-      border: 1.5px solid rgba(40, 37, 30, 0.28); border-radius: 999px; background: rgba(255, 255, 255, 0.5);
-      transition: border-color .25s ease; }
-    .tm-pill:focus-within { border-color: var(--brand); }
-    .tm-pill__lock { flex: none; width: 1.05rem; height: 1.05rem; color: var(--brand); }
-    .tm-pill__input { flex: 1 1 auto; min-width: 0; height: 100%; border: 0; background: none; outline: none;
-      font: inherit; font-size: 1rem; letter-spacing: .04em; color: var(--ink); }
-    .tm-pill__input::placeholder { color: var(--ink-faint); font-weight: 600; letter-spacing: .01em; }
-    .tm-pill__go { flex: none; display: grid; place-items: center; width: 2.4rem; height: 2.4rem; padding: 0;
-      border: 0; border-radius: 50%; background: none; color: var(--brand); cursor: pointer; transition: background-color .2s ease; }
-    .tm-pill__go svg { width: 1.1rem; height: 1.1rem; }
-    .tm-pill__go:hover { background: var(--brand-soft); }
-    .tm-say { margin: .7rem 0 0; min-height: 1.4em; font-size: .9rem; font-weight: 600; color: var(--ink-mute); }
-    .tm-say--bad { color: #9B2C3F; }
-    .is-wrong .tm-pill { border-color: #9B2C3F; animation: tm-shake .4s ease; }
-    @keyframes tm-shake { 0%,100% { transform: translateX(0); } 18% { transform: translateX(-6px); } 38% { transform: translateX(5px); } 58% { transform: translateX(-3px); } 78% { transform: translateX(2px); } }
-
-    /* ---- the request dialog ---- */
-    .tm-ask { position: fixed; inset: 0; z-index: 9000; display: grid; place-items: center; padding: 1rem; }
-    .tm-ask[hidden] { display: none; }   /* a display rule outranks the hidden attribute on its own */
-    .tm-ask__veil { position: absolute; inset: 0; background: rgba(24, 22, 15, 0.42);
-      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
-    .tm-ask__form { position: relative; width: min(30rem, calc(100vw - 2rem)); max-height: calc(100vh - 2rem);
-      overflow-y: auto; padding: clamp(1.5rem, 4vw, 2.1rem); border-radius: 28px;
-      background: var(--surface); color: var(--ink); box-shadow: 0 50px 90px -40px rgba(40, 37, 30, 0.55); }
-    .tm-ask__x { position: absolute; top: .85rem; right: .85rem; display: grid; place-items: center; width: 2.1rem; height: 2.1rem;
-      border: 0; border-radius: 50%; background: none; color: var(--ink-faint); cursor: pointer; }
-    .tm-ask__x svg { width: 1.1rem; height: 1.1rem; }
-    .tm-ask__x:hover { background: var(--bg-deep); color: var(--ink); }
-    .tm-ask__title { font-family: var(--f-display); font-weight: 700; font-size: 1.5rem; letter-spacing: -0.01em; margin: 0; }
-    .tm-ask__note { margin: .6rem 0 1.3rem; font-size: .94rem; line-height: 1.6; color: var(--ink-mute); text-wrap: pretty; }
-    .tm-field { display: block; margin-bottom: .85rem; text-align: left; }
-    .tm-field > span { display: block; margin-bottom: .35rem; font-size: .84rem; font-weight: 600; color: var(--ink-mute); }
-    .tm-field i { font-style: normal; font-weight: 500; color: var(--ink-faint); }
-    .tm-field input, .tm-field textarea { width: 100%; padding: .72rem .95rem; border: 1.5px solid var(--line);
-      border-radius: 14px; background: var(--bg); font: inherit; font-size: .97rem; color: var(--ink); outline: none;
-      transition: border-color .2s ease; resize: vertical; }
-    .tm-field input:focus, .tm-field textarea:focus { border-color: var(--brand); }
-    .tm-ask.is-sent .tm-field, .tm-ask.is-sent .tm-ask__note, .tm-ask.is-sent [data-tm-send] { display: none; }
-    .tm-btn[data-tm-mail] svg { width: 1.2rem; height: 1.2rem; }
-    .tm-copy { display: block; margin-inline: auto; }
-    .tm-fine { margin: .8rem 0 0; font-size: .86rem; line-height: 1.55; color: var(--ink-faint); text-align: center; text-wrap: pretty; }
-    .tm-say--ask { text-align: center; }
-
-    @media (max-width: 680px) {
-      .tm-gate__act { flex-direction: column; gap: .6rem; }
-      .tm-btn { width: 100%; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .tm-gate { transition: none; }
-      .is-wrong .tm-pill { animation: none; }
-    }
-  </style>
-
-  <script type="application/octet-stream" id="tm-sealed">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</script>
-  <script>
-  /* ---- the gate's own wiring ------------------------------------------------
-     What the browser holds is ciphertext; the key is on the server and is handed
-     over only for a code that Yehuda has approved. A code is remembered for its
-     window, so coming back to the page does not mean asking twice.
-     -------------------------------------------------------------------------- */
-  (function () {
-    var API = 'https://ya-stats.yeudaamizur.workers.dev';
-    var MAILBOX = 'yeudaamizur@gmail.com';   /* the address the site already shows in its contact row */
-    var SEEN = 'tm_key', ASK = 'tm_ask';
-    var gate = document.querySelector('.tm-gate');
-    var dialog = document.querySelector('[data-tm-dialog]');
-    var form = document.querySelector('[data-tm-form]');
-    var codeForm = document.querySelector('[data-tm-code]');
-    var say = document.querySelector('[data-tm-say]');
-    var askSay = document.querySelector('[data-tm-asksay]');
-    var send = document.querySelector('[data-tm-send]');
-    var MSG = {
-      wrong: 'That password does not open it. Check it, or ask for a new one.',
-      used: 'That password has already been used on another device. Ask for a new one.',
-      slow: 'Too many tries. Give it a minute.',
-      net: 'No connection to the server. Try again.',
-      old: 'Please open this page in an up-to-date browser.',
-      sent: 'Saved. One last step, so it reaches Yehuda right away:',
-      copied: 'Copied. Send it to yeudaamizur@gmail.com from your own mail.',
-      waiting: 'Waiting for Yehuda. The moment he approves, the project opens here.',
-      no: 'Not this time. Yehuda will be in touch by email.',
-      failed: 'That did not send. Try again in a moment.'
-    };
-    var ok = window.crypto && crypto.subtle && window.fetch && window.TextEncoder && window.DecompressionStream;
-
-    function store(k, v) { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
-    function read(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
-    function bytes(s) { var b = atob(s), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
-    function hex(buf) { return Array.prototype.map.call(new Uint8Array(buf), function (x) { return ('0' + x.toString(16)).slice(-2); }).join(''); }
-    function norm(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
-    function post(path, body) {
-      return fetch(API + path, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-        body: JSON.stringify(body), cache: 'no-store', credentials: 'omit' })
-        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j.status = r.status; return j; }); });
-    }
-    function codeId(code) {
-      return crypto.subtle.digest('SHA-256', new TextEncoder().encode('tm1:' + code)).then(hex);
-    }
-
-    /* the sealed half, opened and written in place - the page that comes out is
-       the case study exactly as it was before any of this was built */
-    function reveal(keyB64) {
-      return crypto.subtle.importKey('raw', bytes(keyB64), 'AES-GCM', false, ['decrypt']).then(function (key) {
-        var sealed = bytes(document.getElementById('tm-sealed').textContent.replace(/\s+/g, ''));
-        return crypto.subtle.decrypt({ name: 'AES-GCM', iv: sealed.subarray(0, 12) }, key, sealed.subarray(12));
-      }).then(function (buf) {
-        return new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
-      }).then(function (html) {
-        var at = Math.max(0, window.scrollY);
-        /* the pictures below the gate are sealed too, and the loader inside that page needs
-           the same key - it travels in the written document, never in this one */
-        var pass = '<script>window.__TMK=' + JSON.stringify(keyB64).replace(/</g, '\\u003c') + ';<\/script>';
-        document.open(); document.write(html.replace('</head>', pass + '</head>')); document.close();
-        /* carry the reader on from where the gate stopped them, not back to the hero */
-        var root = document.documentElement, stop = false;
-        root.style.scrollBehavior = 'auto';
-        ['wheel', 'touchstart', 'keydown'].forEach(function (e) {
-          document.addEventListener(e, function () { stop = true; }, { once: true, passive: true });
-        });
-        /* the page keeps growing for a beat as the sealed pictures land, so the landing is
-           held rather than jumped to once - the same shape as the #top arrival in script.js */
-        var tries = 0;
-        (function land() {
-          if (stop || tries++ > 14) { root.style.scrollBehavior = ''; return; }
-          var el = document.getElementById('journey');
-          if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 70);
-          else window.scrollTo(0, at);
-          setTimeout(land, 110);
-        })();
-      });
-    }
-
-    function unlock(code, quiet) {
-      var saved = null; try { saved = JSON.parse(read(SEEN) || 'null'); } catch (e) {}
-      var vt = saved && saved.c === code ? saved.vt : undefined;
-      return codeId(code).then(function (id) { return post('/t/open', { id: id, vt: vt, d: /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'm' : 'd' }); })
-        .then(function (res) {
-          if (res.status !== 200 || !res.key) {
-            throw res.status === 410 ? 'used' : res.status === 404 ? 'wrong' : res.status === 429 ? 'slow' : 'net';
-          }
-          store(SEEN, JSON.stringify({ c: code, vt: res.vt, exp: res.exp }));
-          return reveal(res.key);
-        })
-        .catch(function (kind) {
-          if (typeof kind !== 'string') kind = 'net';
-          if (kind === 'wrong' || kind === 'used') store(SEEN, null);
-          if (!quiet) { codeForm.classList.remove('is-wrong'); void codeForm.offsetWidth; codeForm.classList.add('is-wrong'); tell(say, MSG[kind], true); }
-        });
-    }
-
-    function tell(el, text, bad) {
-      if (!el) return;
-      el.textContent = text || '';
-      el.classList.toggle('tm-say--bad', !!bad);
-    }
-
-    /* ---- the band is cut to the sheet, so the same sliver shows on every screen ---- */
-    var peek = document.querySelector('[data-tm-peek]');
-    function fitPeek() {
-      if (!peek || !gate) return;
-      var shot = peek.querySelector('img');
-      if (!shot) return;
-      var strip = window.innerWidth < 680 ? 44 : 62;   /* what stays sharp above the glass */
-      /* measured from the SCREEN itself, not from the band: the section carries padding of its
-         own, and the strip has to be the sliver of tablet that clears the glass */
-      var lead = shot.getBoundingClientRect().top - peek.getBoundingClientRect().top;
-      peek.style.maxHeight = '';
-      lead = shot.getBoundingClientRect().top - peek.getBoundingClientRect().top;
-      peek.style.maxHeight = Math.round(lead + gate.offsetHeight + strip) + 'px';
-    }
-    fitPeek();
-    window.addEventListener('resize', fitPeek);
-    window.addEventListener('load', fitPeek);
-
-    /* ---- the sheet arrives with the two tablets ---- */
-    var duo = document.querySelector('[data-duo]');
-    if (duo && 'IntersectionObserver' in window) {
-      new IntersectionObserver(function (es) {
-        es.forEach(function (e) { if (e.isIntersecting) gate.classList.add('is-in'); });
-      }, { rootMargin: '0px 0px -25% 0px' }).observe(duo);
-    } else {
-      gate.classList.add('is-in');
-    }
-
-    if (!ok) { tell(say, MSG.old, true); return; }
-
-    /* ---- asking ---- */
-    function openAsk() {
-      dialog.hidden = false;
-      document.documentElement.style.overflow = 'hidden';   /* the page must not scroll behind it */
-      var first = form.querySelector('input');
-      if (first) first.focus({ preventScroll: true });
-    }
-    function closeAsk() {
-      dialog.hidden = true;
-      document.documentElement.style.overflow = '';
-    }
-    document.querySelector('[data-tm-ask]').addEventListener('click', openAsk);
-    document.querySelector('[data-tm-close]').addEventListener('click', closeAsk);
-    document.querySelector('[data-tm-veil]').addEventListener('click', closeAsk);
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !dialog.hidden) closeAsk(); });
-    document.querySelector('[data-tm-have]').addEventListener('click', function () {
-      codeForm.hidden = !codeForm.hidden;
-      if (!codeForm.hidden) codeForm.querySelector('input').focus();
-    });
-    codeForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var code = norm(codeForm.querySelector('input').value);
-      if (code.length < 8) { codeForm.classList.remove('is-wrong'); void codeForm.offsetWidth; codeForm.classList.add('is-wrong'); tell(say, MSG.wrong, true); return; }
-      tell(say, '');
-      unlock(code, false);
-    });
-    codeForm.addEventListener('input', function () { codeForm.classList.remove('is-wrong'); tell(say, ''); });
-
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      if (!form.reportValidity()) return;
-      send.disabled = true;
-      tell(askSay, 'Sending...');
-      post('/t/ask', {
-        email: form.email.value.trim(), who: form.who.value.trim(), note: form.note.value.trim()
-      }).then(function (res) {
-        if (res.status !== 200 || !res.ticket) throw 0;
-        dialog.classList.add('is-sent');
-        tell(askSay, MSG.sent);
-        var done = document.querySelector('[data-tm-done]'), mail = document.querySelector('[data-tm-mail]');
-        var subject = 'Access request - Talmind case study';
-        var note = form.note.value.trim();
-        var text = [
-          'Hi Yehuda,', '',
-          'I would like to see the Talmind case study.', '',
-          form.who.value.trim(),
-          form.email.value.trim(),
-          note ? '"' + note + '"' : null,
-          '',
-          'Sent from https://yehudaamitzur.com/talmind (request ' + res.ticket + ')'
-        ].filter(function (l) { return l !== null; }).join('\r\n');
-        mail.href = 'mailto:' + MAILBOX + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(text);
-        done.hidden = false;
-        /* webmail in a tab often has no mailto handler, so the whole message can be taken by hand */
-        document.querySelector('[data-tm-copy]').onclick = function () {
-          var put = navigator.clipboard && navigator.clipboard.writeText
-            ? navigator.clipboard.writeText(subject + '\n\n' + text)
-            : Promise.reject();
-          put.then(function () { tell(askSay, MSG.copied); }, function () { tell(askSay, 'Write to ' + MAILBOX + ' and mention request ' + res.ticket + '.'); });
-        };
-        store(ASK, JSON.stringify({ t: res.ticket, w: res.wait, at: Date.now() }));
-        watch();
-      }).catch(function () { send.disabled = false; tell(askSay, MSG.failed, true); });
-    });
-
-    /* ---- waiting for the answer ---- */
-    var timer = null;
-    function watch() {
-      var ask = null; try { ask = JSON.parse(read(ASK) || 'null'); } catch (e) {}
-      if (!ask || !ask.t || Date.now() - ask.at > 86400000) { store(ASK, null); return; }
-      if (timer) clearInterval(timer);
-      var tries = 0;
-      timer = setInterval(function () {
-        if (++tries > 240) { clearInterval(timer); return; }   /* twenty minutes of listening, then it rests */
-        post('/t/wait', { ticket: ask.t, wait: ask.w }).then(function (res) {
-          if (res.status !== 200) return;
-          if (res.state === 'approved' && res.code) {
-            clearInterval(timer); store(ASK, null);
-            tell(askSay, 'Approved. Opening...');
-            unlock(res.code, true);
-          } else if (res.state === 'declined') {
-            clearInterval(timer); store(ASK, null); tell(askSay, MSG.no);
-          } else {
-            tell(askSay, MSG.waiting);
-          }
-        }).catch(function () {});
-      }, 5000);
-    }
-
-    /* ---- coming back ---- */
-    var saved = null; try { saved = JSON.parse(read(SEEN) || 'null'); } catch (e) {}
-    if (saved && saved.c && (!saved.exp || saved.exp > Date.now())) unlock(saved.c, true);
-    else if (read(ASK)) watch();
-  })();
-  </script>
+    <!-- ===== CTA ===== -->
+    <section class="tl-cta tl-wrap">
+      <h2 class="reveal">Liked this project?</h2>
+      <div class="reveal"><a class="pill" href="/#contact"><span>Let's work together</span></a></div>
+      <div><a class="tl-backall" href="/#top"><span aria-hidden="true">←</span> Back to all work</a></div>
+    </section>
+    </div><!-- /.tl-cover -->
   </main>
 
+  <footer class="foot">
+    <div class="wrap foot__inner">
+      <span>© 2026 Yehuda Amitzur</span>
+      <a href="#top">Back to top ↑</a>
+    </div>
+  </footer>
 
-  <script src="script.js?v=193"></script>
+  <script src="script.js?v=194"></script>
   <script>
     /* ---- Talmind case-study interactions (page-scoped) ---- */
     (function () {
@@ -1069,6 +935,6 @@
       window.addEventListener('load', onScroll);
     })();
   </script>
-  <script src="s.js?v=193" defer></script>
+  <script src="s.js?v=194" defer></script>
 </body>
 </html>
