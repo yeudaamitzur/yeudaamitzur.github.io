@@ -114,6 +114,18 @@
       transform-style: preserve-3d; will-change: transform, opacity;
       animation: tlTabletIn 1.15s cubic-bezier(.2,.7,.2,1) 2.2s both; }
     .tl-tablet__img { display: block; width: 100%; height: auto; }
+    /* ---- the prototype video on the tablet screen (own block, 14.11.2026) ----
+       box = the screen's bounding area in the 2240x967 photo (x 620-1644, y 16-648);
+       the mask PNG is that same box at 1:1 photo pixels */
+    .tl-tablet__screen { position: absolute; left: 27.6786%; top: 1.6546%; width: 45.7143%; height: 65.3568%;
+      pointer-events: none;
+      -webkit-mask: url("talmind-tablet-screen-mask.png") 0 0 / 100% 100% no-repeat;
+              mask: url("talmind-tablet-screen-mask.png") 0 0 / 100% 100% no-repeat; }
+    /* default = the screen's straight bounding rect; the script refines it to the exact perspective */
+    .tl-tablet__video { position: absolute; left: 1.5625%; top: 1.79%; width: 96.68%; height: 96.28%;
+      display: block; object-fit: cover; transform-origin: 0 0;
+      background: url("talmind-tablet-screen-poster.jpg") center / cover no-repeat; }
+    /* ---- end: prototype video on the tablet screen ---- */
     @keyframes tlTabletIn {
       from { opacity: 0; transform: translateY(80px) scale(1.16); }
       to   { opacity: 1; transform: translateY(0) scale(1); }
@@ -514,6 +526,16 @@
         <img class="tl-tablet__img" src="talmind-tablet.webp?v=194" width="2240" height="967"
              fetchpriority="high" decoding="async"
              alt="Tablet running the Talmind home screen" />
+        <!-- the prototype walkthrough playing ON the tablet's screen (14.11.2026). The box is the
+             screen's bounding area; the mask is the screen's exact shape cut from this photo
+             (rounded corners + the right hand's palm and thumb left on top), and the script
+             warps the video onto the screen's measured perspective. Silent, 1.25x baked in. -->
+        <div class="tl-tablet__screen" data-tablet-screen aria-hidden="true">
+          <video class="tl-tablet__video" autoplay muted loop playsinline preload="auto"
+                 disablepictureinpicture disableremoteplayback poster="talmind-tablet-screen-poster.jpg">
+            <source src="talmind-tablet-screen.mp4" type="video/mp4" />
+          </video>
+        </div>
       </div>
     </section>
 
@@ -929,6 +951,31 @@
           if (!raf) raf = requestAnimationFrame(apply);
         });
         (hero || tablet).addEventListener('pointerleave', () => { if (!ready) return; tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(apply); });
+      }
+
+      // ---- Hero tablet: warp the prototype video onto the screen's measured perspective ----
+      // Corners of the lit screen in the 2240px photo (TL, TR, BR, BL), measured from the edge
+      // pixels; the left edge leans ~21px, so a flat rectangle would cut the sidebar unevenly.
+      const tScreen = document.querySelector('[data-tablet-screen]');
+      const tVideo = tScreen && tScreen.querySelector('video');
+      if (tVideo) {
+        const Q = [[656.88, 29.48], [1626.25, 27.27], [1623.94, 633.19], [635.96, 635.84]];
+        const OX = 620, OY = 16, BOX_W = 1024, BLEED = 2;   // mask box origin/width in photo px
+        const mx = Q.reduce((a, p) => a + p[0], 0) / 4, my = Q.reduce((a, p) => a + p[1], 0) / 4;
+        const QB = Q.map(([x, y]) => { const d = Math.hypot(x - mx, y - my); return [x + (x - mx) / d * BLEED, y + (y - my) / d * BLEED]; });
+        const fit = () => {
+          const s = tScreen.clientWidth / BOX_W, w = tVideo.offsetWidth, h = tVideo.offsetHeight;
+          if (!w || !h) return;
+          const P = QB.map(([x, y]) => [(x - OX) * s - tVideo.offsetLeft, (y - OY) * s - tVideo.offsetTop]);
+          const [[x0, y0], [x1, y1], [x2, y2], [x3, y3]] = P;
+          const dx1 = x1 - x2, dx2 = x3 - x2, dx3 = x0 - x1 + x2 - x3, dy1 = y1 - y2, dy2 = y3 - y2, dy3 = y0 - y1 + y2 - y3;
+          const den = dx1 * dy2 - dx2 * dy1;
+          const g = (dx3 * dy2 - dx2 * dy3) / den, k = (dx1 * dy3 - dx3 * dy1) / den;
+          const a = x1 - x0 + g * x1, b = x3 - x0 + k * x3, d = y1 - y0 + g * y1, e = y3 - y0 + k * y3;
+          tVideo.style.transform = 'matrix3d(' + [a / w, d / w, 0, g / w, b / h, e / h, 0, k / h, 0, 0, 1, 0, x0, y0, 0, 1].join(',') + ')';
+        };
+        fit();
+        if ('ResizeObserver' in window) new ResizeObserver(fit).observe(tScreen); else window.addEventListener('resize', fit);
       }
 
       onScroll();
