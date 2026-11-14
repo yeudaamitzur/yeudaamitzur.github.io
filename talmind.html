@@ -531,7 +531,7 @@
              (rounded corners + the right hand's palm and thumb left on top), and the script
              warps the video onto the screen's measured perspective. Silent, 1.25x baked in. -->
         <div class="tl-tablet__screen" data-tablet-screen aria-hidden="true">
-          <video class="tl-tablet__video" autoplay muted loop playsinline preload="auto"
+          <video class="tl-tablet__video" muted loop playsinline preload="auto"
                  disablepictureinpicture disableremoteplayback poster="talmind-tablet-screen-hd-poster.jpg">
             <!-- full frame rate, near-transparent quality (q0.7, ~41-43 dB vs a lossless pass).
                  Phones show this screen at ~500 device px, so they get the 800px cut. -->
@@ -979,6 +979,28 @@
         };
         fit();
         if ('ResizeObserver' in window) new ResizeObserver(fit).observe(tScreen); else window.addEventListener('resize', fit);
+
+        // Hold on frame 0 (the poster, painted behind too) until the tablet has LANDED and is on
+        // screen, then play from the start - otherwise it is ~3s in by the time the tablet settles.
+        // No seek before the first play: a never-played video already sits on frame 0.
+        const tabletEl = tScreen.closest('[data-tablet]');
+        let landed = !tabletEl || getComputedStyle(tabletEl).animationName === 'none';   // reduced motion: no entrance
+        let onScreen = !('IntersectionObserver' in window), started = false;
+        const go = () => {
+          if (!landed || !onScreen) return;
+          started = true;
+          const p = tVideo.play(); if (p && p.catch) p.catch(() => {});
+        };
+        const land = () => { if (!landed) { landed = true; go(); } };
+        if (!landed) {
+          tabletEl.addEventListener('animationend', (e) => { if (e.target === tabletEl && e.animationName === 'tlTabletIn') land(); });
+          setTimeout(land, 4500);   // backstop only - the entrance ends at ~3.35s (2.2s delay + 1.15s)
+        }
+        if (!onScreen) new IntersectionObserver(([en]) => {
+          onScreen = en.isIntersecting;
+          if (onScreen) go(); else if (started) tVideo.pause();   // resume where it was when it comes back
+        }, { threshold: 0.35 }).observe(tScreen);
+        go();
       }
 
       onScroll();
