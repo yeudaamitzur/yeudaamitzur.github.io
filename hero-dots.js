@@ -449,8 +449,17 @@ if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
     cursorEl.style.transform = `translate(${(cx - SIZE / 2).toFixed(1)}px, ${(cy - SIZE / 2).toFixed(1)}px) scale(${cs.toFixed(3)})`;
   };
   const ts = () => (active ? 1 : HOME_S);
+  // Where the photo belongs RIGHT NOW. The floating header changes shape (collapsed badge vs open
+  // pill) while the photo is out, so the slot it left is not the slot it returns to - read it live,
+  // at the start of the return and on every frame of it, so the landing follows the header even if
+  // it opens or collapses mid-flight. Only the target moves; the flight curve is untouched.
+  const readHome = () => {
+    const r = hdrAvatar.getBoundingClientRect();
+    homeX = r.left + r.width / 2; homeY = r.top + r.height / 2;
+  };
   const loop = () => {
     if (returning) {
+      readHome();
       const t = clamp((performance.now() - retStart) / RET, 0, 1);
       const e = easeInOutCubic(t);
       cx = rfx + (homeX - rfx) * e;
@@ -470,8 +479,7 @@ if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
   const kick = () => { if (!raf) raf = requestAnimationFrame(loop); };
 
   const flyOut = (x, y) => {
-    const r = hdrAvatar.getBoundingClientRect();
-    homeX = r.left + r.width / 2; homeY = r.top + r.height / 2;
+    readHome();
     if (!active && !returning) { cx = homeX; cy = homeY; cs = HOME_S; render(); }
     active = true; returning = false;
     document.documentElement.classList.add('hero-ava-on');
@@ -484,6 +492,7 @@ if (hero && line2 && cursorEl && hdrAvatar && hdrAvatarImg && !reduced) {
     active = false; returning = true;
     document.documentElement.classList.remove('hero-ava-on');
     retStart = performance.now(); rfx = cx; rfy = cy; rfs = cs;
+    readHome();
     kick();
   };
 
