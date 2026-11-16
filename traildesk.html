@@ -773,7 +773,7 @@
       const phone = document.querySelector('[data-phone]');
       if (phone && !reduce && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
         const hero = phone.closest('.td-hero');
-        let raf = null, tx = 0, ty = 0, cx = 0, cy = 0;
+        let raf = null, tx = 0, ty = 0, cx = 0, cy = 0, box = null;
         const apply = () => {
           cx += (tx - cx) * 0.12; cy += (ty - cy) * 0.12;
           const ax = -cy * 0.05, ay = cx * 0.05, deg = Math.hypot(ax, ay);
@@ -781,13 +781,24 @@
           phone.style.rotate = deg < 0.005 ? 'none' : ax.toFixed(4) + ' ' + ay.toFixed(4) + ' 0 ' + deg.toFixed(3) + 'deg';
           if (Math.hypot(tx - cx, ty - cy) > 0.3) raf = requestAnimationFrame(apply); else raf = null;
         };
-        (hero || phone).addEventListener('pointermove', (e) => {
-          const r = (hero || phone).getBoundingClientRect();
-          tx = ((e.clientX - r.left) / r.width - 0.5) * 34;
-          ty = ((e.clientY - r.top) / r.height - 0.5) * 22;
+        // The cursor is followed across the WHOLE window, never only while it is over the hero box
+        // (16.11.2026). The hero is a centred column, so the old hero-only listener lost the cursor
+        // at the side margins, under the floating header, and the moment a scroll slid the cover
+        // sheet under it - and every one of those pointerleaves sent the phone back to the middle.
+        // Now a cursor past the hero's edge just holds the full tilt on that side, and nothing ever
+        // recentres it: the phone stays where the cursor last put it, scroll or no scroll.
+        // The box is measured once and dropped on scroll/resize - never read on every move.
+        const drop = () => { box = null; };
+        window.addEventListener('scroll', drop, { passive: true });
+        window.addEventListener('resize', drop);
+        window.addEventListener('pointermove', (e) => {
+          if (e.pointerType === 'touch') return;
+          const r = box || (box = (hero || phone).getBoundingClientRect());
+          if (r.bottom <= 0) return;                 // hero scrolled away: keep the last pose
+          tx = clamp((e.clientX - r.left) / r.width - 0.5, -0.5, 0.5) * 34;
+          ty = clamp((e.clientY - r.top) / r.height - 0.5, -0.5, 0.5) * 22;
           if (!raf) raf = requestAnimationFrame(apply);
-        });
-        (hero || phone).addEventListener('pointerleave', () => { tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(apply); });
+        }, { passive: true });
       }
 
       // ---- The UI band on a phone: three screens on one swipeable strip ----
