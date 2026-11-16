@@ -814,27 +814,32 @@
       window.addEventListener('scroll', onScroll, { passive: true });
       window.addEventListener('resize', onScroll);
 
-      // ---- Hero dashboard: cursor parallax - starts only after the timed load-in entrance ----
+      // ---- Hero dashboard: cursor parallax - live from the very first frame (16.11.2026) ----
+      // It used to wait out the timed entrance (and a stale extra second on top), because the
+      // entrance owns `transform` and an inline transform would fight it. The parallax now rides
+      // the separate `translate` / `rotate` properties, which the browser composes ON TOP of the
+      // animation's transform - so the dashboard answers the cursor while it is still rising, and
+      // nothing is handed over when the entrance ends. Same numbers, same easing as before.
+      // rotateX(a) rotateY(b) is written as one turn about the axis (a, b, 0) by |(a, b)|: at these
+      // angles (about a degree) the two differ by well under a hundredth of a degree.
       const tablet = document.querySelector('[data-tablet]');
       if (tablet && !reduce && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
         const hero = tablet.closest('.bn-hero');
-        let raf = null, tx = 0, ty = 0, cx = 0, cy = 0, ready = false;
-        // clear the CSS entrance animation once it's done - its fill state would otherwise
-        // override the inline transform we set for the cursor parallax
-        setTimeout(() => { tablet.style.animation = 'none'; ready = true; }, 4300);   // 3s delay + ~1.15s entrance (matches Talmind)
+        let raf = null, tx = 0, ty = 0, cx = 0, cy = 0;
         const apply = () => {
           cx += (tx - cx) * 0.12; cy += (ty - cy) * 0.12;
-          tablet.style.transform = 'translate3d(' + cx.toFixed(1) + 'px,' + cy.toFixed(1) + 'px,0) rotateX(' + (-cy * 0.045).toFixed(2) + 'deg) rotateY(' + (cx * 0.045).toFixed(2) + 'deg)';
+          const ax = -cy * 0.045, ay = cx * 0.045, deg = Math.hypot(ax, ay);
+          tablet.style.translate = cx.toFixed(1) + 'px ' + cy.toFixed(1) + 'px 0';
+          tablet.style.rotate = deg < 0.005 ? 'none' : ax.toFixed(4) + ' ' + ay.toFixed(4) + ' 0 ' + deg.toFixed(3) + 'deg';
           if (Math.hypot(tx - cx, ty - cy) > 0.3) raf = requestAnimationFrame(apply); else raf = null;
         };
         (hero || tablet).addEventListener('pointermove', (e) => {
-          if (!ready) return;
           const r = (hero || tablet).getBoundingClientRect();
           tx = ((e.clientX - r.left) / r.width - 0.5) * 38;
           ty = ((e.clientY - r.top) / r.height - 0.5) * 24;
           if (!raf) raf = requestAnimationFrame(apply);
         });
-        (hero || tablet).addEventListener('pointerleave', () => { if (!ready) return; tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(apply); });
+        (hero || tablet).addEventListener('pointerleave', () => { tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(apply); });
       }
 
       // ---- Product recordings: silent, endless, and never spending their first cycle unseen ----

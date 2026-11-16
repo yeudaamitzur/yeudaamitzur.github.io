@@ -689,7 +689,7 @@
   <script>
     /* ---- TrailDesk case-study interactions (page-scoped) ----
          Same three moves as Bianca: the right-side rail, the hero title dissolve, and a cursor
-         parallax on the hero art that only starts once its timed entrance has finished. ---- */
+         parallax on the hero art that answers the cursor from the first frame, entrance and all. ---- */
     (function () {
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
@@ -762,26 +762,32 @@
       window.addEventListener('scroll', onScroll, { passive: true });
       window.addEventListener('resize', onScroll);
 
-      // ---- Hero phone: cursor parallax - handed over on animationend, so retuning the entrance
-      //      can never desynchronise the two (the DS hero does the same). ----
+      // ---- Hero phone: cursor parallax - live from the very first frame (16.11.2026) ----
+      // It used to wait for animationend, because the entrance owns `transform` and an inline
+      // transform would fight it. The parallax now rides the separate `translate` / `rotate`
+      // properties, which the browser composes ON TOP of the animation's transform - so the phone
+      // answers the cursor while it is still rising, and nothing is handed over when the entrance
+      // ends. Same numbers, same easing as before.
+      // rotateX(a) rotateY(b) is written as one turn about the axis (a, b, 0) by |(a, b)|: at these
+      // angles (about a degree) the two differ by well under a hundredth of a degree.
       const phone = document.querySelector('[data-phone]');
       if (phone && !reduce && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
         const hero = phone.closest('.td-hero');
-        let raf = null, tx = 0, ty = 0, cx = 0, cy = 0, ready = false;
-        phone.addEventListener('animationend', () => { phone.style.animation = 'none'; ready = true; }, { once: true });
+        let raf = null, tx = 0, ty = 0, cx = 0, cy = 0;
         const apply = () => {
           cx += (tx - cx) * 0.12; cy += (ty - cy) * 0.12;
-          phone.style.transform = 'translate3d(' + cx.toFixed(1) + 'px,' + cy.toFixed(1) + 'px,0) rotateX(' + (-cy * 0.05).toFixed(2) + 'deg) rotateY(' + (cx * 0.05).toFixed(2) + 'deg)';
+          const ax = -cy * 0.05, ay = cx * 0.05, deg = Math.hypot(ax, ay);
+          phone.style.translate = cx.toFixed(1) + 'px ' + cy.toFixed(1) + 'px 0';
+          phone.style.rotate = deg < 0.005 ? 'none' : ax.toFixed(4) + ' ' + ay.toFixed(4) + ' 0 ' + deg.toFixed(3) + 'deg';
           if (Math.hypot(tx - cx, ty - cy) > 0.3) raf = requestAnimationFrame(apply); else raf = null;
         };
         (hero || phone).addEventListener('pointermove', (e) => {
-          if (!ready) return;
           const r = (hero || phone).getBoundingClientRect();
           tx = ((e.clientX - r.left) / r.width - 0.5) * 34;
           ty = ((e.clientY - r.top) / r.height - 0.5) * 22;
           if (!raf) raf = requestAnimationFrame(apply);
         });
-        (hero || phone).addEventListener('pointerleave', () => { if (!ready) return; tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(apply); });
+        (hero || phone).addEventListener('pointerleave', () => { tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(apply); });
       }
 
       // ---- The UI band on a phone: three screens on one swipeable strip ----
