@@ -449,6 +449,70 @@
       .tl-duo__screen { transform: translate(0, -50%) !important; }
       .tl-challenge__fig img { transform: none !important; opacity: 1 !important; }
     }
+
+    /* ---- 16.11.2026: the pilot material from /Proposal (own block - start) ----
+       Everything new rides on the page's existing classes (.tl-section, .tl-h2, .tl-about__p,
+       .tl-facts, .tl-statement, .tl-lead, .tl-note, .tl-shot, .tl-sysfig); only what they cannot
+       say lives here. The Proposal's blue (#3858BD) becomes this page's purple via var(--brand). */
+
+    /* the one heading too long for 30ch - at that width it broke into three lines and left
+       "development?" alone on the last; two balanced lines, as in the Figma frame */
+    .tl-h2--long { max-width: 40ch; text-wrap: balance; }
+
+    /* the next challenge: the question line is gone, so the answer reads at running-text size (.tl-lead)
+       and its label steps up to match, as in the Figma frame */
+    .tl-challenge__sub--lg { font-size: clamp(1rem, 1.25vw, 1.125rem); margin-top: 1.1rem; }   /* the old question's gap under the heading */
+    .tl-challenge__body--lead { font-size: clamp(1.06rem, 1.5vw, 1.3rem); line-height: 1.6; max-width: 62rem; }
+
+    /* fact 3 opens with one sentence a weight up, as in the Figma frame */
+    .tl-factrow p strong { font-weight: 600; }
+
+    /* the English translation sheet: a flat export whose rounded corners are transparent, so the
+       shadow has to follow the artwork (drop-shadow) - left on the text column like the DS figures */
+    .tl-sysfig--sheet { max-width: 827px; }
+    .tl-sysfig--sheet > img { filter: drop-shadow(0 1px 4px rgba(0,0,0,0.05)) drop-shadow(0 10px 36px rgba(0,0,0,0.11)); }
+
+    /* the live prototype - Proposal.html's .pr-proto, renamed; same corner + shadow as .tl-shot */
+    .tl-proto { margin-top: clamp(1.75rem, 3.5vw, 2.75rem); }
+    .tl-proto__frame { position: relative; aspect-ratio: 16 / 10; overflow: clip; isolation: isolate; background: #f5f5f5;
+      border-radius: max(11px, calc((min(100vw, 1180px) - var(--pad) * 2) * 0.024));
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 10px 36px rgba(0,0,0,0.11); }
+    .tl-proto__still { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+    .tl-proto__iframe { position: absolute; inset: 0; z-index: 1; display: block; width: 100%; height: 100%; border: 0; }
+    .tl-proto__cover { position: absolute; inset: 0; z-index: 2; display: grid; place-items: center;
+      width: 100%; height: 100%; padding: 0; border: 0; font: inherit; color: inherit; cursor: pointer;
+      background: rgba(24,22,15,0.14); transition: opacity .35s ease, background-color .35s ease; }
+    .tl-proto__cover:hover { background: rgba(24,22,15,0.22); }
+    .tl-proto__cover:focus-visible { outline: 3px solid var(--brand); outline-offset: -3px; }
+    .tl-proto__cta { display: inline-flex; align-items: center; gap: .6em; padding: .85em 1.5em; border-radius: 999px;
+      background: var(--ink); color: #fff; font-family: var(--f-body); font-weight: 600; font-size: clamp(1rem, 1.5vw, 1.2rem);
+      box-shadow: 0 18px 40px -16px rgba(24,22,15,0.55); transition: transform .35s cubic-bezier(.2,.7,.2,1); }
+    .tl-proto__cover:hover .tl-proto__cta { transform: scale(1.04); }
+    .tl-proto__cta svg { width: 1.2em; height: 1.2em; }
+    .tl-proto.is-live .tl-proto__cover { opacity: 0; pointer-events: none; }
+    .tl-proto__bar { display: flex; justify-content: flex-start; margin-top: 1rem; }
+    .tl-proto__full { display: inline-flex; align-items: center; gap: .55em; padding: .7em 1.25em; border: 0; border-radius: 999px;
+      background: var(--surface); color: var(--ink); font-family: var(--f-body); font-weight: 600; font-size: 1rem; cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 8px 24px -12px rgba(40,37,30,0.35); transition: color .25s ease, box-shadow .25s ease; }
+    .tl-proto__full:hover { color: var(--brand); box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 12px 30px -12px rgba(119,63,156,0.45); }
+    .tl-proto__full:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+    .tl-proto__full svg { width: 1.05em; height: 1.05em; }
+    /* a phone never gets the small in-page frame live: the picture stays, and a tap opens the app full screen */
+    @media (max-width: 759px) { .tl-proto__iframe { display: none !important; } }
+
+    /* the app, full screen - a phone held upright shows it turned a quarter, so turning the phone reads
+       it at full size even with rotation lock on; once the screen really is landscape it sits straight */
+    .tl-player { position: fixed; inset: 0; z-index: 1000; background: #f5f5f5; overflow: hidden; overscroll-behavior: contain; }
+    .tl-player[hidden] { display: none; }
+    .tl-player__iframe { position: absolute; top: 50%; left: 50%; display: block; border: 0; transform: translate(-50%, -50%); }
+    .tl-player.is-rot .tl-player__iframe { transform: translate(-50%, -50%) rotate(90deg); }
+    .tl-player__close { position: absolute; z-index: 2; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right));
+      width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
+      background: rgba(24,22,15,0.82); color: #fff; box-shadow: 0 10px 24px -10px rgba(24,22,15,0.6); }
+    .tl-player__close svg { width: 18px; height: 18px; }
+    .tl-player__close:focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; }
+    html.tl-playing, html.tl-playing body { overflow: hidden; }
+    /* ---- 16.11.2026: the pilot material from /Proposal (own block - end) ---- */
   </style>
 </head>
 <body class="tl">
@@ -489,9 +553,10 @@
       <!-- the anchors are spread across the WHOLE page, not just its first half: the product
            walkthrough is five long sections now, so it carries three dots of its own -->
       <a class="tl-rail__dot" href="#journey" aria-label="What I discovered"></a>
-      <a class="tl-rail__dot" href="#gemara" aria-label="What is Talmud"></a>
       <a class="tl-rail__dot" href="#problem" aria-label="Problem & solution"></a>
-      <a class="tl-rail__dot" href="#challenge" aria-label="The challenges"></a>
+      <a class="tl-rail__dot" href="#curriculum" aria-label="The structure of the curriculum"></a>
+      <a class="tl-rail__dot" href="#prototype" aria-label="How the system looks"></a>
+      <a class="tl-rail__dot" href="#challenge" aria-label="The next challenge"></a>
       <a class="tl-rail__dot" href="#home-final" aria-label="The home screen"></a>
       <a class="tl-rail__dot" href="#quiz" aria-label="The quiz"></a>
       <a class="tl-rail__dot" href="#lessons" aria-label="The lessons"></a>
@@ -585,45 +650,32 @@
             based on the work of Rabbi Marvin Tokayer from the 1970s, similar to moral tales of the sages or
             Stories of the Sages.<a class="tl-factrow__src" href="https://aish.com/south_koreans_learning_talmud/">Source<span aria-hidden="true">↗</span></a></p></li>
         <li class="tl-factrow"><span class="tl-factrow__n">3</span>
-          <p>There are private educational institutions known as "Chavruta Academies." The academies were founded
+          <p><strong>The paired-study method called "Chavruta" is very common among them!</strong> There are private educational institutions known as "Chavruta Academies." The academies were founded
             by Dr. Park Ki-Ryong from KHU University, in collaboration with associations for Jewish leadership and
             innovative education.<a class="tl-factrow__src" href="https://www.jpost.com/diaspora/talmud-inspired-learning-craze-sweeps-south-korea-577402">Source<span aria-hidden="true">↗</span></a></p></li>
       </ol>
     </section>
 
-    <!-- ===== WHAT IS TALMUD (dry vs alive) ===== -->
-    <section class="tl-section tl-wrap" id="gemara">
-      <h2 class="tl-h2 reveal">What is Talmud?</h2>
-      <div class="tl-diptych">
-        <div class="tl-side tl-side--dry reveal">
-          <span class="tl-mini">Starts with a dry and boring part</span>
-          <h3>Rules &amp; quotations</h3>
-          <div class="tl-chips"><span>Definitions</span><span>Citations</span><span>Precedents</span><span>Rulings</span></div>
-        </div>
-        <div class="tl-dip-arrow" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
-        </div>
-        <div class="tl-side tl-side--alive reveal">
-          <span class="tl-mini">And continues to the part that comes to life</span>
-          <h3>In-depth discussion</h3>
-          <div class="tl-chips"><span>Questions</span><span>Answers</span><span>creativity</span></div>
-        </div>
-      </div>
-    </section>
+    <!-- "What is Talmud?" (the dry vs alive diptych) came off the page on 16.11.2026 - Yehuda's
+         restructured Figma frame leaves it out. Its CSS (.tl-diptych, .tl-side, .tl-chips) is kept. -->
 
     <!-- ===== PROBLEM / SOLUTION (stacked, one under the other) ===== -->
     <section class="tl-section tl-wrap" id="problem">
       <div class="tl-col tl-col--problem reveal">
         <h2 class="tl-h2">Problem</h2>
-        <p class="tl-col__text">Gaps in knowledge and a limited cultural context lead to an approach that ignores
+        <p class="tl-col__text">Today, because of a cultural limitation, they study in pairs mostly the stories and
+          legends of the Sages - so how do I make the authentic material accessible to them and make sure they learn it
+          the right way, because gaps in knowledge and a limited cultural context lead to an approach that ignores
           core principles, making it hard to learn the material effectively. Additionally, social norms make
           students hesitant to ask questions in front of their peers, so they miss out on deeper learning.</p>
       </div>
       <div class="tl-col tl-col--solution tl-col--next reveal">
         <h2 class="tl-h2">Solution</h2>
-        <p class="tl-col__text">The experience connects to authentic Talmudic topics using a simple two-step path:
-          first, getting a clear grip on the dry facts, and then diving into the more engaging and deeper parts of
-          the material.</p>
+        <p class="tl-col__text">I mapped the learning process and the achievements the South Korean audience would want
+          to acquire, and designed an experience that connects to authentic Talmudic topics using a simple three-step
+          learning path: first, getting a clear grip on the dry facts through a video, then learning in pairs, and then
+          learning with an interactive AI chavruta partner. I defined three core skills associated with the Talmud
+          that I want them to acquire: the ability to ask questions, finding answers, and creativity.</p>
       </div>
       <p class="tl-statement reveal">To ensure fit and profitability, I have currently focused the product on the
         student side and it will serve as a classroom pilot allowing teachers to track real-world progress and
@@ -631,9 +683,90 @@
     </section>
 
 
-    <!-- ===== WHAT A SUCCESSFUL PILOT LOOKS LIKE ===== -->
-    <section class="tl-section tl-wrap" id="pilot">
-      <h2 class="tl-h2 tl-h2--wide reveal">What does a successful pilot look like?</h2>
+    <!-- ===== THE PILOT, AS IT WILL RUN IN CLASS (from the Proposal page, 16.11.2026) =====
+         Age, equipment, the three-stage lesson, the texts, how the skills are measured and the live
+         prototype - in the order of Yehuda's restructured Figma frame, set in this page's own classes. -->
+    <section class="tl-section tl-wrap" id="age">
+      <h2 class="tl-h2 reveal">Age:</h2>
+      <p class="tl-about__p reveal">Middle school.</p>
+    </section>
+
+    <section class="tl-section tl-wrap" id="equipment">
+      <h2 class="tl-h2 tl-h2--wide reveal">I defined the required equipment</h2>
+      <p class="tl-about__p reveal">Every student has a tablet and headphones with a microphone</p>
+    </section>
+
+    <section class="tl-section tl-wrap" id="curriculum">
+      <h2 class="tl-h2 tl-h2--wide reveal">The structure of the curriculum - includes 3 stages:</h2>
+      <ol class="tl-facts reveal">
+        <li class="tl-factrow"><span class="tl-factrow__n">1</span><p>Introductory video (2&nbsp;-&nbsp;5 minutes).</p></li>
+        <li class="tl-factrow"><span class="tl-factrow__n">2</span><p>Havruta study in pairs, each student reads a sentence and explains it to their havruta (10&nbsp;-&nbsp;20 minutes).</p></li>
+        <li class="tl-factrow"><span class="tl-factrow__n">3</span><p>Personal havruta study with an AI assistant + headphones with a microphone for every student (10&nbsp;-&nbsp;15 minutes).</p></li>
+      </ol>
+      <p class="tl-statement reveal">About 30&nbsp;-&nbsp;45 minutes in total.</p>
+      <figure class="tl-shot reveal">
+        <img src="talmind-home-havruta.webp?v=194" width="2400" height="1500"
+             alt="The Talmind home screen: prepare for today's havruta with three steps - video, havruta and AI havruta"
+             loading="lazy" decoding="async" />
+      </figure>
+    </section>
+
+    <section class="tl-section tl-wrap" id="materials">
+      <h2 class="tl-h2 tl-h2--wide reveal">Adapting the learning materials</h2>
+      <p class="tl-lead reveal">After a pure translation of the Talmudic text, I mapped and characterized the structure
+        of a Talmudic sugya and defined it by dividing it into clear cases, with each part getting its own characteristic
+        colour that stays the same in every sugya. In addition, I trained an AI model that knows how to replicate this
+        work process on any future sugya we want to add to the system.</p>
+      <figure class="tl-sysfig tl-sysfig--sheet reveal">
+        <img src="talmind-talmud-text.webp?v=194" width="1654" height="3356"
+             alt="Talmudic text, translated to English" loading="lazy" decoding="async" />
+      </figure>
+    </section>
+
+    <section class="tl-section tl-wrap" id="measure">
+      <h2 class="tl-h2 tl-h2--long reveal">The Koreans believe in results - how does the system measure skill development?</h2>
+      <p class="tl-lead reveal">In the AI havruta stage, the artificial intelligence assistant will serve as an almost-human
+        havruta (similar to a voice conversation format with ChatGPT), which is trained very, very well on the sugya,
+        while behind the scenes it gathers data such as how many good questions the student asked, how many good answers
+        they gave, how much creativity they showed. The artificial intelligence assistant will also be trained to
+        encourage the student to ask questions and to develop the rest of the skills.</p>
+      <p class="tl-lead reveal">These data are reflected immediately on the student's board at this stage, and at the
+        same time are also passed on to the teacher's screen, which receives an accurate picture of a student and the
+        pace of their progress in developing these skills.</p>
+    </section>
+
+    <!-- the live prototype, as on /Proposal: mouse + wide screen plays it in place, touch screens and
+         phones get the still and open it full screen -->
+    <section class="tl-section tl-wrap" id="prototype">
+      <h2 class="tl-h2 tl-h2--wide reveal">How the system looks:</h2>
+      <div class="tl-proto reveal" data-proto>
+        <div class="tl-proto__frame">
+          <img class="tl-proto__still" src="talmind-proto-still.webp?v=194" width="1600" height="1000"
+               alt="The Talmind prototype" loading="lazy" decoding="async" />
+          <button class="tl-proto__cover" type="button" data-proto-cover data-track="prototype: try">
+            <span class="tl-proto__cta">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11.5V5.75a1.75 1.75 0 0 1 3.5 0V11"/><path d="M12.5 10.25a1.75 1.75 0 0 1 3.5 0V11.5"/><path d="M16 11a1.75 1.75 0 0 1 3.5 0v3.5A6.5 6.5 0 0 1 13 21h-1.2a6 6 0 0 1-4.6-2.15L4.4 15.5a1.7 1.7 0 0 1 2.55-2.25L9 15"/></svg>
+              Click to try
+            </span>
+          </button>
+        </div>
+        <div class="tl-proto__bar">
+          <button class="tl-proto__full" type="button" data-track="prototype: fullscreen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
+            Full screen
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== IMPACT - where the product went, and what a successful pilot means ===== -->
+    <section class="tl-section tl-wrap" id="impact">
+      <h2 class="tl-h2 reveal">Impact</h2>
+      <p class="tl-lead tl-lead--brand reveal">I am excited to share that thanks to hard fieldwork and efforts to reach the
+        relevant people, I succeeded, and the product reached influential figures in South Korea, sparking enormous
+        curiosity among leading educators.<br />The product will soon launch as an official pilot for middle
+        school.<br />This initial phase will feature the student interface alongside a data collection and analytics
+        dashboard for teachers.</p>
       <p class="tl-note reveal">Success means 80%+ of the class achieves the engagement metrics set in one lesson:
         7 good questions, 3 accurate answers, and 1 creative solution.</p>
       <p class="tl-note reveal">To ensure this, Talmind AI agent, trained in Talmudic subjects, handles rapid
@@ -641,17 +774,14 @@
         and creativity.</p>
     </section>
 
-    <!-- ===== THE CHALLENGES ===== -->
+    <!-- ===== THE NEXT CHALLENGE ===== -->
     <section class="tl-section tl-wrap" id="challenge">
-      <h2 class="tl-h2 reveal">The Challenges</h2>
+      <h2 class="tl-h2 tl-h2--brand tl-h2--long reveal">The next challenge - how I adapt everything for elementary grades as well</h2>
       <div class="tl-stack reveal">
-        <p class="tl-challenge__q">How do I teach the dry, boring parts?!<br />And how can the same game structure
-          work for both grades 4-6 and grades 7-12?</p>
-        <p class="tl-challenge__sub">The proposed solution:</p>
-        <p class="tl-challenge__body">I brought the fun part to life through a game experience that allows them to be
-          active partners in the learning process. And for the game, I trained an artificial intelligence agent to
-          analyze each Talmudic section and automatically adapt its content to each learning level, so that the game
-          structure itself will never have to change.</p>
+        <p class="tl-challenge__sub tl-challenge__sub--lg">The proposed solution:</p>
+        <p class="tl-challenge__body tl-challenge__body--lead">I decided to split it up and implement two different stages
+          that include a level-adapted game and a fun quiz, and to postpone the chavruta stages, in pairs / with an AI
+          assistant, to the next lesson, after the three stages are completed.</p>
       </div>
       <!-- the drag-and-match board on a tablet, closing the challenge before the sketch -->
       <!-- no `reveal` here: the 3D rise below IS this figure's entrance -->
@@ -677,7 +807,7 @@
 
     <!-- ===== HOME - FINAL DESIGN ===== -->
     <section class="tl-section tl-wrap" id="home-final">
-      <h2 class="tl-h2 reveal">Home - Final design</h2>
+      <h2 class="tl-h2 reveal">Home screen</h2>
       <p class="tl-lead reveal">I used status icons to help students quickly understand which steps are completed and
         which step they're currently on.<br />I also added a progress bar within each step and locked the next one to
         keep students focused and create motivation and curiosity.</p>
@@ -706,7 +836,7 @@
     <!-- ===== GAME ===== -->
     <section class="tl-section tl-wrap" id="game">
       <h2 class="tl-h2 reveal">Game</h2>
-      <p class="tl-lead reveal">To reduce development costs for a game targeting 4th to 12th graders, as a first step
+      <p class="tl-lead reveal">To reduce development costs for a game targeting elementary school students, as a first step
         I chose a simple drag-and-drop mechanics. This allowed me to easily scale the difficulty based on the
         complexity of the concepts.<br />and to be honest, I was also inspired by the Duolingo app on how to teach in
         a fun way.</p>
@@ -783,17 +913,13 @@
       </figure>
     </section>
 
-    <!-- ===== IMPACT & TAKEAWAYS - where the product went, and what it taught ===== -->
-    <section class="tl-section tl-wrap" id="impact">
-      <h2 class="tl-h2 reveal">Impact &amp; Takeaways</h2>
-      <p class="tl-lead tl-lead--brand reveal">I am excited to share that word-of-mouth has brought our product to influential
-        figures in South Korea, sparking great curiosity among educators. We are currently exploring a pilot program
-        tailored for middle school classes. This initial phase will feature the student interface alongside a data
-        collection and analytics dashboard for teachers.</p>
+    <!-- ===== TAKEAWAYS - what it taught (the impact paragraph moved up, 16.11.2026) ===== -->
+    <section class="tl-section tl-wrap" id="takeaways">
+      <h2 class="tl-h2 reveal">Takeaways</h2>
       <p class="tl-lead reveal">Through this experience, I learned that any challenge can be transformed into a
         successful reality by deeply understanding user pain points and breaking them down into actionable stages.
-        The most rewarding part was finding intuitive ways to bridge cultural gaps while leveraging advanced AI
-        capabilities to elevate the product.</p>
+        The most rewarding part was succeeding in reaching the right people and finding wonderful ways to bridge
+        cultural gaps, while leveraging advanced AI capabilities.</p>
     </section>
 
     <!-- ===== NEXT PROJECT - the loop, handed over before the contact ask ===== -->
@@ -828,6 +954,13 @@
       <a href="#top">Back to top ↑</a>
     </div>
   </footer>
+
+  <!-- the prototype, full screen (touch screens, phones, and the "Full screen" button) -->
+  <div class="tl-player" data-player role="dialog" aria-modal="true" aria-label="Talmind prototype" hidden>
+    <button class="tl-player__close" type="button" aria-label="Close" data-player-close data-track="prototype: close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg>
+    </button>
+  </div>
 
   <script src="script.js?v=194"></script>
   <script>
@@ -1005,6 +1138,114 @@
 
       onScroll();
       window.addEventListener('load', onScroll);
+    })();
+  </script>
+  <script>
+    /* ---- 16.11.2026: the live prototype, ported from Proposal.html (own block) ----
+       Mouse + wide screen: a click hands the pointer to the app in place, and leaving the frame (or
+       scrolling it away) puts the cover back so the page scrolls again. Touch screens and phones: a tap
+       opens the app full screen - an in-page frame would swallow the finger trying to scroll the page.
+       talmind.vercel.app only lets itself be framed by yehudaamitzur.com, and only with this ?v= pass. */
+    (function () {
+      var proto = document.querySelector('[data-proto]');
+      if (!proto) return;
+      var SRC = 'https://talmind.vercel.app/?v=vkttkv2nzrrbyfu6';
+      var frame = proto.querySelector('.tl-proto__frame');
+      var cover = proto.querySelector('[data-proto-cover]');
+      var wide = window.matchMedia('(min-width: 760px)');
+      var touch = window.matchMedia('(hover: none), (pointer: coarse)');
+      // the site's round cursor lives in this document - inside the app's frame it would hang at the
+      // edge where the pointer left, so it stands down until the pointer comes back out
+      var hideDot = function () { var d = document.querySelector('.cursor-dot'); if (d) d.style.opacity = '0'; };
+      var makeFrame = function (cls) {
+        var f = document.createElement('iframe');
+        f.className = cls;
+        f.title = 'Talmind prototype';
+        f.src = SRC;
+        f.setAttribute('allow', 'microphone; autoplay; fullscreen; clipboard-write');
+        f.setAttribute('referrerpolicy', 'no-referrer');
+        f.addEventListener('mouseenter', hideDot);
+        return f;
+      };
+      var iframe = null;
+      var mount = function () {
+        if (iframe || !wide.matches) return;
+        iframe = makeFrame('tl-proto__iframe');
+        frame.insertBefore(iframe, cover);
+      };
+      var unmount = function () {
+        if (!iframe || wide.matches) return;
+        iframe.remove(); iframe = null; proto.classList.remove('is-live');
+      };
+      var near = false;
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) { near = e.isIntersecting; if (near) mount(); });
+        }, { rootMargin: '100% 0px' }).observe(proto);
+        new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) { if (e.intersectionRatio < 0.35) proto.classList.remove('is-live'); });
+        }, { threshold: [0, 0.35] }).observe(frame);
+      } else { mount(); }
+      var onChange = function () { if (wide.matches) { if (near) mount(); } else unmount(); };
+      if (wide.addEventListener) wide.addEventListener('change', onChange); else wide.addListener(onChange);
+
+      var player = document.querySelector('[data-player]');
+      var closeBtn = player.querySelector('[data-player-close]');
+      var pframe = null, pushed = false;
+      var fit = function () {
+        if (!pframe || player.hidden) return;
+        var w = player.clientWidth, h = player.clientHeight, rot = h > w;
+        player.classList.toggle('is-rot', rot);
+        pframe.style.width = (rot ? h : w) + 'px';
+        pframe.style.height = (rot ? w : h) + 'px';
+      };
+      var openPlayer = function () {
+        if (!pframe) { pframe = makeFrame('tl-player__iframe'); player.insertBefore(pframe, closeBtn); }
+        player.hidden = false;
+        document.documentElement.classList.add('tl-playing');
+        fit();
+        try { history.pushState({ tlPlayer: 1 }, ''); pushed = true; } catch (e) {}
+        // Android: go truly full screen and hold landscape; iPhone has neither, the quarter turn covers it
+        var root = document.documentElement, req = root.requestFullscreen || root.webkitRequestFullscreen;
+        if (req) {
+          try {
+            var pr = req.call(root);
+            if (pr && pr.then) pr.then(function () {
+              if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(function () {});
+            }).catch(function () {});
+          } catch (e) {}
+        }
+        try { closeBtn.focus({ preventScroll: true }); } catch (e) {}
+      };
+      var closePlayer = function (fromHistory) {
+        if (player.hidden) return;
+        player.hidden = true;
+        document.documentElement.classList.remove('tl-playing');
+        try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
+        var fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+        if (fsEl) { try { (document.exitFullscreen || document.webkitExitFullscreen).call(document); } catch (e) {} }
+        if (pushed && !fromHistory) { pushed = false; history.back(); } else { pushed = false; }
+        try { cover.focus({ preventScroll: true }); } catch (e) {}
+      };
+      closeBtn.addEventListener('click', function () { closePlayer(false); });
+      window.addEventListener('popstate', function () { if (!player.hidden) closePlayer(true); });
+      window.addEventListener('resize', fit);
+      window.addEventListener('orientationchange', function () { setTimeout(fit, 250); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !player.hidden) closePlayer(false); });
+      var useFull = function () { return touch.matches || !wide.matches; };
+
+      cover.addEventListener('click', function () {
+        if (useFull()) { openPlayer(); return; }
+        mount();
+        proto.classList.add('is-live');
+        hideDot();
+        if (iframe) { try { iframe.focus(); } catch (e) {} }
+      });
+      // full screen is always the in-page player: the prototype's own address is never handed out
+      proto.querySelector('.tl-proto__full').addEventListener('click', openPlayer);
+      frame.addEventListener('pointerleave', function (e) {
+        if (e.pointerType === 'mouse') proto.classList.remove('is-live');
+      });
     })();
   </script>
   <script src="s.js?v=194" defer></script>
